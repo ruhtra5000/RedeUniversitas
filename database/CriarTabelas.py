@@ -1,0 +1,28 @@
+from database.Conexao import engine
+
+from database.Base import Base
+from database.entidades.Almoxarife import Almoxarife
+from database.entidades.Aluno import Aluno
+from database.entidades.Bolsa import Bolsa
+from database.entidades.Caixa import Caixa
+from database.entidades.Campus import Campus
+from database.entidades.Compra import Compra
+from database.entidades.ContaPagar import ContaPagar
+from database.entidades.ContaReceber import ContaReceber
+from database.entidades.Curso import Curso
+from database.entidades.Disciplina import Disciplina
+from database.entidades.Estoque import Estoque
+from database.entidades.Financeiro import Financeiro
+from database.entidades.Fornecedor import Fornecedor
+from database.entidades.Matricula import Matricula
+from database.entidades.Mensalidade import Mensalidade
+from database.entidades.Movimentacao import Movimentacao
+from database.entidades.Pessoa import Pessoa
+from database.entidades.PreRequisito import PreRequisito
+from database.entidades.Professor import Professor
+from database.entidades.Turma import Turma
+
+Base.metadata.create_all(engine)
+
+# PARA CRIAR AS TABELAS:
+# - Executar o comando: python -m database.CriarTabelas
