@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import database.entidades
 
 # Conexão com o Postgres
 DATABASE_URL = (

@@ -9,6 +9,7 @@ from database.Base import Base
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
 
 if TYPE_CHECKING:
+    from database.entidades.Campus import Campus
     from database.entidades.Disciplina import Disciplina
     from database.entidades.Professor import Professor
 
@@ -34,6 +35,11 @@ class Curso(Base):
     disciplinas: Mapped[list["Disciplina"]] = relationship(
         foreign_keys="Disciplina.curso_id",
         back_populates="curso"
+    )
+
+    campus: Mapped["Campus"] = relationship(
+        foreign_keys=[campus_id],
+        back_populates="cursos"
     )
 
     # Constraints da tabela

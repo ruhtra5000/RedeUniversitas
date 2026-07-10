@@ -24,11 +24,11 @@ class Movimentacao(Base):
 
     # Ligações de ORM
     produto: Mapped["Estoque"] = relationship(
-        foreign_keys="Estoque.id"
+        foreign_keys=[produto_id]
     )
 
     almoxarife: Mapped["Almoxarife"] = relationship(
-        foreign_keys="Almoxarife.pessoa_id"
+        foreign_keys=[pessoa_id]
     )
 
     # Constraints da tabela
