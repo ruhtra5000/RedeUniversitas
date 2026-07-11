@@ -1,5 +1,6 @@
 import streamlit as st
 
+from modulos.cadastros.campus import telaCadastroCampus
 from modulos.home import telaHome
 from modulos.cadastros.cadastros import telaCadastros
 
@@ -11,7 +12,7 @@ match st.session_state.pagina:
         telaHome()
 
     case "cadastro":
-        telaCadastros()
+        telaCadastroCampus()
 
 pagina = st.sidebar.radio(
     "Módulos",
