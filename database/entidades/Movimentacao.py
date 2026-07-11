@@ -24,7 +24,8 @@ class Movimentacao(Base):
 
     # Ligações de ORM
     produto: Mapped["Estoque"] = relationship(
-        foreign_keys=[produto_id]
+        foreign_keys=[produto_id],
+        back_populates="movimentacoes"
     )
 
     almoxarife: Mapped["Almoxarife"] = relationship(

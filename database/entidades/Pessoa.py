@@ -18,8 +18,8 @@ class Pessoa(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     cpf: Mapped[str] = mapped_column(String(11), unique=True, nullable=False)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
-    email: Mapped[str | None] = mapped_column(String(50))
-    telefone: Mapped[str | None] = mapped_column(String(25))
+    email: Mapped[str | None] = mapped_column(String(50), unique=True)
+    telefone: Mapped[str | None] = mapped_column(String(25), unique=True)
 
     # Ligações de ORM
     almoxarife: Mapped["Almoxarife"] = relationship(

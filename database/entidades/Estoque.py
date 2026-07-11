@@ -4,6 +4,7 @@ from sqlalchemy import CheckConstraint, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.Base import Base
+from database.entidades.Movimentacao import Movimentacao
 
 if TYPE_CHECKING:
     from database.entidades.Campus import Campus
@@ -28,6 +29,11 @@ class Estoque(Base):
 
     compras: Mapped[list["Compra"]] = relationship(
         foreign_keys="Compra.produto_id",
+        back_populates="produto"
+    )
+
+    movimentacoes: Mapped[list["Movimentacao"]] = relationship(
+        foreign_keys="Movimentacao.produto_id",
         back_populates="produto"
     )
 
