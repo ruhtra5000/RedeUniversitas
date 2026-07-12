@@ -18,12 +18,11 @@ def criarAlmoxarife(pessoa: Pessoa):
     try:
         if not CPF().validate(pessoa.cpf):
             raise Exception("O CPF disponibilizado não é válido.")
-        
-        if pessoa.email != "":
-            if not validarEmail(pessoa.email):
-                raise Exception("O E-mail disponibilizado não é válido.")
+    
+        if not validarEmail(pessoa.email):
+            raise Exception("O E-mail disponibilizado não é válido.")
             
-        if pessoa.telefone != "":
+        if pessoa.telefone != "" or pessoa.telefone != None:
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

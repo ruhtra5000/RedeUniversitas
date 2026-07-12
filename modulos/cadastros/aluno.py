@@ -21,9 +21,8 @@ def criarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):
         if not CPF().validate(pessoa.cpf):
             raise Exception("O CPF disponibilizado não é válido.")
         
-        if pessoa.email != "":
-            if not validarEmail(pessoa.email):
-                raise Exception("O E-mail disponibilizado não é válido.")
+        if not validarEmail(pessoa.email):
+            raise Exception("O E-mail disponibilizado não é válido.")
             
         if pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
