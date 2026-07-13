@@ -1,11 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
-from validate_docbr.CPF import CPF
 
 from database.Conexao import SessionLocal
 from database.entidades.Curso import Curso
 from modulos.academico.academico_db import dbListarProfessorId
-from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
 
 # Interface
