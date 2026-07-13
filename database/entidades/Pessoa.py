@@ -16,9 +16,10 @@ class Pessoa(Base):
 
     # Colunas
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    google_id: Mapped[str] = mapped_column(String(100), unique=True, nullable=True)
     cpf: Mapped[str] = mapped_column(String(11), unique=True, nullable=False)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
-    email: Mapped[str | None] = mapped_column(String(50), unique=True)
+    email: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=False)
     telefone: Mapped[str | None] = mapped_column(String(25), unique=True)
 
     # Ligações de ORM
