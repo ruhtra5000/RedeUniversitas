@@ -21,7 +21,7 @@ def criarCurso(curso: Curso):
 
             # Coordenador do curso deve pertencer ao campus vinculado ao curso
             if coordenador.campus_id != curso.campus_id:
-                raise Exception(f"O coordenador do curso deve estar vinculado ao campus {coordenador.campus.nome}.")
+                raise Exception(f"O coordenador do curso deve estar vinculado ao campus {curso.campus.nome}.")
         
         dbCriarCurso(curso)
             
