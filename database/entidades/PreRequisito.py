@@ -17,7 +17,8 @@ class PreRequisito(Base):
 
     # Ligações de ORM
     disciplina: Mapped["Disciplina"] = relationship(
-        foreign_keys=[disciplina_id]
+        foreign_keys=[disciplina_id],
+        back_populates="preRequisitos"
     )
 
     prerequisito: Mapped["Disciplina"] = relationship(

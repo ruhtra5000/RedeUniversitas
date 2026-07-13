@@ -7,6 +7,7 @@ from database.Base import Base
 
 if TYPE_CHECKING:
     from database.entidades.Curso import Curso
+    from database.entidades.PreRequisito import PreRequisito
 
 class Disciplina(Base):
     __tablename__ = "disciplina"
@@ -23,6 +24,11 @@ class Disciplina(Base):
     curso: Mapped["Curso"] = relationship(
         foreign_keys=[curso_id],
         back_populates="disciplinas"
+    )
+
+    preRequisitos: Mapped[list["PreRequisito"]] = relationship(
+        foreign_keys="PreRequisito.disciplina_id",
+        back_populates="disciplina"
     )
 
     # Constraints da tabela
