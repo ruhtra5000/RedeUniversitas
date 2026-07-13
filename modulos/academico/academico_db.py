@@ -4,6 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from database.Conexao import SessionLocal
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
+from database.entidades.Disciplina import Disciplina
+from database.entidades.PreRequisito import PreRequisito
 from database.entidades.Professor import Professor 
 import database.entidades
 
@@ -118,6 +120,60 @@ def dbRemoverCoordenador(idCurso: int):
 
         curso.coordenador_id = None
         session.commit()
+
+
+# ______  _             _         _  _                    
+# |  _  \(_)           (_)       | |(_)                   
+# | | | | _  ___   ___  _  _ __  | | _  _ __    __ _  ___ 
+# | | | || |/ __| / __|| || '_ \ | || || '_ \  / _` |/ __|
+# | |/ / | |\__ \| (__ | || |_) || || || | | || (_| |\__ \
+# |___/  |_||___/ \___||_|| .__/ |_||_||_| |_| \__,_||___/
+#                         | |                             
+#                         |_|                             
+
+def dbListarDisciplinas(idCurso: int):
+    with SessionLocal() as session:
+        query = select(Disciplina).where(Disciplina.curso_id == idCurso)
+        disciplinas = session.execute(query).scalars().all()
+
+        return disciplinas
+
+def dbListarDisciplinaId(idDisciplina: int):
+    with SessionLocal() as session:
+        query = select(Disciplina).where(Disciplina.id == idDisciplina)
+        disciplina = session.execute(query).scalar_one_or_none()
+
+        return disciplina
+    
+def dbEditarDisciplina(idDisciplina: int, novaDisciplina: Disciplina):
+    # São editaveis: nome, carga_horaria, obrigatoria
+    with SessionLocal() as session:
+        query = select(Disciplina).where(Disciplina.id == idDisciplina)
+        disciplina = session.execute(query).scalar_one()
+
+        disciplina.nome = novaDisciplina.nome
+        disciplina.carga_horaria = novaDisciplina.carga_horaria
+        disciplina.obrigatoria = novaDisciplina.obrigatoria
+
+        session.commit()
+
+def dbAdicionarPreRequisito(preRequisito: PreRequisito):
+    with SessionLocal() as session:
+        try:
+            session.add(PreRequisito)
+            session.commit()
+        
+        except SQLAlchemyError:
+            raise
+
+def dbRemoverPreRequisito(preRequisito: PreRequisito):
+    with SessionLocal() as session:
+        try:
+            session.delete(PreRequisito)
+            session.commit()
+        
+        except SQLAlchemyError:
+            raise
 
 
 # ______                __                                         

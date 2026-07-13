@@ -118,6 +118,56 @@ def removerCoordenador(idCurso: int):
     dbRemoverCoordenador(idCurso)
 
 
+# ______  _             _         _  _                    
+# |  _  \(_)           (_)       | |(_)                   
+# | | | | _  ___   ___  _  _ __  | | _  _ __    __ _  ___ 
+# | | | || |/ __| / __|| || '_ \ | || || '_ \  / _` |/ __|
+# | |/ / | |\__ \| (__ | || |_) || || || | | || (_| |\__ \
+# |___/  |_||___/ \___||_|| .__/ |_||_||_| |_| \__,_||___/
+#                         | |                             
+#                         |_|                             
+
+def listarDisciplinas(idCurso: int):
+    return dbListarDisciplinas(idCurso)
+
+def listarDisciplinaId(idDisciplina: int):
+    disciplina = dbListarDisciplinaId(idDisciplina)
+
+    if disciplina == None:
+        raise Exception(f"Disciplina com id {idDisciplina} não existente.")
+    
+    return disciplina
+    
+def editarDisciplina(idDisciplina: int, nome: str, carga_horaria: int, obrigatoria: bool):
+    if nome == "" or nome == None:
+        raise Exception("O campo 'nome' é obrigatório.")
+    
+    if carga_horaria <= 0:
+        raise Exception("O valor da carga horária deve ser maior que 0.")
+    
+    disciplina = Disciplina(
+        nome=nome,
+        carga_horaria=carga_horaria,
+        obrigatoria=obrigatoria
+    )
+
+    dbEditarDisciplina(idDisciplina, disciplina)
+    
+def adicionarPreRequisito(idDisciplina: int, idPreRequisito: int):
+    preRequisito = PreRequisito(
+        disciplina_id=idDisciplina,
+        prerequisito_id=idPreRequisito
+    )
+    dbAdicionarPreRequisito(preRequisito)
+    
+def removerPreRequisito(idDisciplina: int, idPreRequisito: int):
+    preRequisito = PreRequisito(
+        disciplina_id=idDisciplina,
+        prerequisito_id=idPreRequisito
+    )
+    dbRemoverPreRequisito(preRequisito)
+    
+
 # ______                __                                         
 # | ___ \              / _|                                        
 # | |_/ / _ __   ___  | |_   ___  ___  ___   ___   _ __   ___  ___ 
