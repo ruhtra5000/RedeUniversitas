@@ -1,10 +1,13 @@
+import streamlit as st
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import database.entidades
 
+db = st.secrets.database
+
 # Conexão com o Postgres
 DATABASE_URL = (
-    "postgresql+psycopg://user_universitas:universitas123@localhost:5432/rede_universitas"
+    f"postgresql+psycopg://{db.user}:{db.password}@{db.host}:{db.port}/{db.database_name}"
 )
 
 # Criação da engine
