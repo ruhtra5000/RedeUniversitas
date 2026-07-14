@@ -166,6 +166,71 @@ def removerPreRequisito(idDisciplina: int, idPreRequisito: int):
         prerequisito_id=idPreRequisito
     )
     dbRemoverPreRequisito(preRequisito)
+
+
+#  _____                                
+# |_   _|                               
+#   | |   _   _  _ __  _ __ ___    __ _ 
+#   | |  | | | || '__|| '_ ` _ \  / _` |
+#   | |  | |_| || |   | | | | | || (_| |
+#   \_/   \__,_||_|   |_| |_| |_| \__,_|
+
+def listarTurmasProfessor(idProfessor: int, semestre: str):
+    return dbListarTurmasProfessor(idProfessor, semestre)
+    
+def listarTurmasCurso(idCurso: int, semestre: str):
+    return dbListarTurmasCurso(idCurso, semestre)
+    
+def listarTurmaId(idTurma: int):
+    turma = dbListarTurmaId(idTurma)
+
+    if turma == None:
+        raise Exception(f"Turma com id {idTurma} não existente.")
+    
+    return turma
+
+def alterarProfessorTurma(idTurma: int, idNovoProfessor: int):
+    turma = dbListarTurmaId(idTurma)
+    professor = dbListarProfessorId(idNovoProfessor)
+
+    if turma == None:
+        raise Exception(f"Turma com id {idTurma} não existente.")
+    
+    if professor == None:
+        raise Exception(f"Professor com id {idNovoProfessor} não existente.")
+
+    if turma.curso.campus_id != professor.campus_id:
+        raise Exception(f"O novo professor designado para esta Turma deve pertencer ao Campus {turma.curso.campus.nome}.")
+    
+    dbAlterarProfessorTurma(idTurma, idNovoProfessor)
+
+
+# ___  ___        _          _               _             
+# |  \/  |       | |        (_)             | |            
+# | .  . |  __ _ | |_  _ __  _   ___  _   _ | |  __ _  ___ 
+# | |\/| | / _` || __|| '__|| | / __|| | | || | / _` |/ __|
+# | |  | || (_| || |_ | |   | || (__ | |_| || || (_| |\__ \
+# \_|  |_/ \__,_| \__||_|   |_| \___| \__,_||_| \__,_||___/
+
+def listarMatriculaId(idAluno: int, idTurma: int):
+    matricula = dbListarMatriculaId(idAluno, idTurma)
+
+    if matricula == None:
+        raise Exception(f"Matrícula de aluno com id {idAluno} e turma com id {idTurma} não existente.")
+    
+    return matricula
+        
+def lancarNota1(idAluno: int, idTurma: int, nota: Decimal):
+    dbLancarNota1(idAluno, idTurma, nota)
+        
+def lancarNota2(idAluno: int, idTurma: int, nota: Decimal):
+    dbLancarNota2(idAluno, idTurma, nota)
+        
+def lancarNota3(idAluno: int, idTurma: int, nota: Decimal):
+    dbLancarNota3(idAluno, idTurma, nota)
+        
+def lancarNotaFinal(idAluno: int, idTurma: int, nota: Decimal):
+    dbLancarNotaFinal(idAluno, idTurma, nota)
     
 
 # ______                __                                         
@@ -177,6 +242,9 @@ def removerPreRequisito(idDisciplina: int, idPreRequisito: int):
 
 def listarProfessores():
     return dbListarProfessores()
+
+def listarProfessoresCampus(idCampus: int):
+    return dbListarProfessoresCampus(idCampus)
     
 def listarProfessorId(idProfessor: int):
     professor = dbListarProfessorId(idProfessor)
@@ -191,3 +259,47 @@ def listarProfessorNome(nomeProfessor: str):
     
 def listarProfessorCpf(cpfProfessor: str):
     return dbListarProfessorCpf(cpfProfessor)
+
+
+#   ___   _                      
+#  / _ \ | |                     
+# / /_\ \| | _   _  _ __    ___  
+# |  _  || || | | || '_ \  / _ \ 
+# | | | || || |_| || | | || (_) |
+# \_| |_/|_| \__,_||_| |_| \___/ 
+
+def listarAlunos():
+    return dbListarAlunos()
+
+def listarAlunosCampus(idCampus: int):
+    return dbListarAlunosCampus(idCampus)
+    
+def listarAlunosCurso(idCurso: int):
+    return dbListarAlunosCurso(idCurso)
+    
+def listarAlunoId(idAluno: int):
+    aluno = dbListarAlunoId(idAluno)
+
+    if aluno == None:
+        raise Exception(f"Aluno com id {idAluno} não existente.")
+    
+    return aluno
+    
+def atualizarCoefRendMediaGeral(idAluno: int):
+    aluno = listarAlunoId(idAluno)
+
+    mediaSoma: float = 0
+    coefSoma: float = 0
+    chSoma: int = 0
+
+    for matr in aluno.matriculas:
+        mediaSoma += matr.media.__float__()
+
+        coefSoma += (matr.media.__float__() * matr.disciplina.carga_horaria)
+
+        chSoma += matr.disciplina.carga_horaria
+
+    media = mediaSoma / len(aluno.matriculas)
+    coefRend = coefSoma / chSoma
+
+    dbAtualizarCoefRendMediaGeral(idAluno, coefRend, media)

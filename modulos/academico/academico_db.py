@@ -1,13 +1,18 @@
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
+from database.entidades.Aluno import Aluno
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from database.entidades.Disciplina import Disciplina
+from database.entidades.Matricula import Matricula
 from database.entidades.PreRequisito import PreRequisito
 from database.entidades.Professor import Professor 
 import database.entidades
+from database.entidades.Turma import Turma
 
 #  _____                                      
 # /  __ \                                     
@@ -176,6 +181,149 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
             raise
 
 
+#  _____                                
+# |_   _|                               
+#   | |   _   _  _ __  _ __ ___    __ _ 
+#   | |  | | | || '__|| '_ ` _ \  / _` |
+#   | |  | |_| || |   | | | | | || (_| |
+#   \_/   \__,_||_|   |_| |_| |_| \__,_|
+
+def dbListarTurmasProfessor(idProfessor: int, semestre: str):
+    with SessionLocal() as session:
+        query = select(Turma).where(Turma.professor_id == idProfessor, Turma.semestre == semestre)
+        turmas = session.execute(query).scalars().all()
+
+        return turmas
+    
+def dbListarTurmasCurso(idCurso: int, semestre: str):
+    with SessionLocal() as session:
+        query = select(Turma).where(Turma.curso_id == idCurso, Turma.semestre == semestre)
+        turmas = session.execute(query).scalars().all()
+
+        return turmas
+    
+def dbListarTurmaId(idTurma: int):
+    with SessionLocal() as session:
+        query = select(Turma).where(Turma.id == idTurma)
+        turma = session.execute(query).scalar_one_or_none()
+
+        return turma
+
+def dbAlterarProfessorTurma(idTurma: int, idNovoProfessor: int):
+    with SessionLocal() as session:
+        query = select(Turma).where(Turma.id == idTurma)
+        turma = session.execute(query).scalar_one()
+
+        turma.professor_id = idNovoProfessor
+
+        session.commit()
+
+# ___  ___        _          _               _             
+# |  \/  |       | |        (_)             | |            
+# | .  . |  __ _ | |_  _ __  _   ___  _   _ | |  __ _  ___ 
+# | |\/| | / _` || __|| '__|| | / __|| | | || | / _` |/ __|
+# | |  | || (_| || |_ | |   | || (__ | |_| || || (_| |\__ \
+# \_|  |_/ \__,_| \__||_|   |_| \___| \__,_||_| \__,_||___/
+
+def dbListarMatriculaId(idAluno: int, idTurma: int):
+    with SessionLocal() as session:
+        query = select(Matricula).where(Matricula.aluno_id == idAluno, Matricula.turma_id == idTurma)
+        matricula = session.execute(query).scalar_one_or_none()
+
+        return matricula
+        
+def dbLancarNota1(idAluno: int, idTurma: int, nota: Decimal):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        if matricula != None:
+            matricula.nota1 = nota
+            
+            session.add(matricula)
+            session.commit()
+        else:
+            raise SQLAlchemyError
+        
+def dbLancarNota2(idAluno: int, idTurma: int, nota: Decimal):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        if matricula != None:
+            matricula.nota2 = nota
+
+            if matricula.nota1 != -1 and matricula.nota2 != -1:
+                # Atualizar Media
+                matricula.media = (matricula.nota1 + matricula.nota2) / 2
+
+                # Atualizar Aprovacao
+                if matricula.media >= 7:
+                    matricula.aprovacao = True
+            
+            elif matricula.nota1 == -1 and matricula.nota2 == -1:
+                matricula.aprovacao = False
+            
+            session.add(matricula)
+            session.commit()
+        else:
+            raise SQLAlchemyError
+        
+def dbLancarNota3(idAluno: int, idTurma: int, nota: Decimal):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        if matricula != None:
+            matricula.nota3 = nota
+
+            if (matricula.aprovacao == False) or ((matricula.nota1 == -1 or matricula.nota2 == -1) and matricula.nota3 == -1):
+               matricula.aprovacao = False
+            else:
+                # Atualizar Media
+                notas = [matricula.nota1, matricula.nota2, matricula.nota3]
+                maiorNota1 = max(notas)
+                notas.remove(maiorNota1)
+                maiorNota2 = max(notas)
+
+                matricula.media = (maiorNota1 + maiorNota2) / 2
+
+                # Atualizar Aprovacao
+                if matricula.media >= 7:
+                    matricula.aprovacao = True
+            
+            session.add(matricula)
+            session.commit()
+        else:
+            raise SQLAlchemyError
+        
+def dbLancarNotaFinal(idAluno: int, idTurma: int, nota: Decimal):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        if matricula != None:
+            if matricula.aprovacao == False:
+                raise SQLAlchemyError
+            else:
+                matricula.final = nota
+
+                # Atualizar Media
+                antigaMedia = matricula.media
+
+                matricula.media = (antigaMedia + matricula.final) / 2
+
+                # Atualizar Aprovacao
+                if matricula.media >= 5:
+                    matricula.aprovacao = True
+                else:
+                    matricula.aprovacao = False
+            
+            session.add(matricula)
+            session.commit()
+        else:
+            raise SQLAlchemyError
+        
+
+# FALTA A LÓGICA DE FREQUENCIA NA MATRICULA
+        
+
 # ______                __                                         
 # | ___ \              / _|                                        
 # | |_/ / _ __   ___  | |_   ___  ___  ___   ___   _ __   ___  ___ 
@@ -186,6 +334,13 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
 def dbListarProfessores():
     with SessionLocal() as session:
         query = select(Professor)
+        professores = session.execute(query).scalars().all()
+
+        return professores
+    
+def dbListarProfessoresCampus(idCampus: int):
+    with SessionLocal() as session:
+        query = select(Professor).where(Professor.campus_id == idCampus)
         professores = session.execute(query).scalars().all()
 
         return professores
@@ -210,3 +365,49 @@ def dbListarProfessorCpf(cpfProfessor: str):
         professor = session.execute(query).scalars().all()
 
         return professor
+
+ 
+#   ___   _                      
+#  / _ \ | |                     
+# / /_\ \| | _   _  _ __    ___  
+# |  _  || || | | || '_ \  / _ \ 
+# | | | || || |_| || | | || (_) |
+# \_| |_/|_| \__,_||_| |_| \___/ 
+
+def dbListarAlunos():
+    with SessionLocal() as session:
+        query = select(Aluno)
+        alunos = session.execute(query).scalars().all()
+
+        return alunos
+
+def dbListarAlunosCampus(idCampus: int):
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.campus_id == idCampus)
+        alunos = session.execute(query).scalars().all()
+
+        return alunos
+    
+def dbListarAlunosCurso(idCurso: int):
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.curso_id == idCurso)
+        alunos = session.execute(query).scalars().all()
+
+        return alunos
+    
+def dbListarAlunoId(idAluno: int):
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.pessoa_id == idAluno)
+        aluno = session.execute(query).scalar_one_or_none()
+
+        return aluno
+    
+def dbAtualizarCoefRendMediaGeral(idAluno: int, coef_rend: float, media_geral: float):
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.pessoa_id == idAluno)
+        aluno = session.execute(query).scalar_one()
+
+        aluno.coef_rend = coef_rend
+        aluno.media_geral = media_geral
+
+        session.commit()
