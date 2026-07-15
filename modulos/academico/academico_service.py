@@ -1,3 +1,5 @@
+from datetime import date
+
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
 from modulos.academico.academico_db import *
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone
@@ -336,3 +338,72 @@ def atualizarCoefRendMediaGeral(idAluno: int):
     coefRend = coefSoma / chSoma
 
     dbAtualizarCoefRendMediaGeral(idAluno, coefRend, media)
+
+
+# ______         _                  
+# | ___ \       | |                 
+# | |_/ /  ___  | | ___   __ _  ___ 
+# | ___ \ / _ \ | |/ __| / _` |/ __|
+# | |_/ /| (_) || |\__ \| (_| |\__ \
+# \____/  \___/ |_||___/ \__,_||___/
+
+def listarBolsasCampus(idCampus: int):
+    alunos = listarAlunosCampus(idCampus)
+
+    bolsas: list[Bolsa] = []
+    for aluno in alunos:
+        for bolsa in aluno.bolsas:
+            bolsas.append(bolsa)
+
+    return bolsas
+
+def listarBolsasCurso(idCurso: int):
+    alunos = listarAlunosCurso(idCurso)
+
+    bolsas: list[Bolsa] = []
+    for aluno in alunos:
+        for bolsa in aluno.bolsas:
+            bolsas.append(bolsa)
+
+    return bolsas
+
+def listarBolsasAluno(idAluno: int):
+    return dbListarBolsasAluno(idAluno)
+
+def listarBolsasAtivas():
+    return dbListarBolsasAtivas()
+
+def listarBolsasAtivasAluno(idAluno: int):
+    return dbListarBolsasAtivasAluno(idAluno)
+
+def listarBolsaId(idBolsa: int):
+    bolsa = dbListarBolsaId(idBolsa)
+
+    if bolsa == None:
+        raise Exception(f"Bolsa com id {idBolsa} não existente.")
+    
+    return bolsa
+
+def editarBolsa(idBolsa: int, tipo_bolsa: str, percentual_desconto: float, data_fim: date, status: StatusBolsa):
+    bolsa = listarBolsaId(idBolsa)
+
+    if status == StatusBolsa.ATIVA:
+        bolsasAluno: list[Bolsa] = listarBolsasAtivasAluno(bolsa.aluno_id)
+        
+        if bolsasAluno.count(bolsa) > 0:
+            bolsasAluno.remove(bolsa)
+
+        if bolsasAluno != []:
+            raise Exception(f"O aluno em questão já tem uma bolsa ativa vinculada a si.")
+    
+    if data_fim < bolsa.data_inicio:
+        raise Exception(f"A data de início deve vir antes da data de fim.")
+
+    novaBolsa = Bolsa(
+        tipo_bolsa = tipo_bolsa,
+        percentual_desconto = percentual_desconto,
+        data_fim = data_fim,
+        status = status
+    )
+
+    dbEditarBolsa(idBolsa, novaBolsa)

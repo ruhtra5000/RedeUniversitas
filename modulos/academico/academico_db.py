@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
 from database.entidades.Aluno import Aluno
+from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from database.entidades.Disciplina import Disciplina
@@ -13,6 +14,7 @@ from database.entidades.PreRequisito import PreRequisito
 from database.entidades.Professor import Professor 
 import database.entidades
 from database.entidades.Turma import Turma
+from database.entidades.enums.StatusBolsa import StatusBolsa
 
 #  _____                                      
 # /  __ \                                     
@@ -438,5 +440,54 @@ def dbAtualizarCoefRendMediaGeral(idAluno: int, coef_rend: float, media_geral: f
 
         aluno.coef_rend = coef_rend
         aluno.media_geral = media_geral
+
+        session.commit()
+
+
+# ______         _                  
+# | ___ \       | |                 
+# | |_/ /  ___  | | ___   __ _  ___ 
+# | ___ \ / _ \ | |/ __| / _` |/ __|
+# | |_/ /| (_) || |\__ \| (_| |\__ \
+# \____/  \___/ |_||___/ \__,_||___/
+
+def dbListarBolsasAluno(idAluno: int):
+    with SessionLocal() as session:
+        query = select(Bolsa).where(Bolsa.aluno_id == idAluno)
+        bolsas = session.execute(query).scalars().all()
+
+        return bolsas
+
+def dbListarBolsasAtivas():
+    with SessionLocal() as session:
+        query = select(Bolsa).where(Bolsa.status == StatusBolsa.ATIVA)
+        bolsas = session.execute(query).scalars().all()
+
+        return bolsas    
+
+def dbListarBolsasAtivasAluno(idAluno: int):
+    with SessionLocal() as session:
+        query = select(Bolsa).where(Bolsa.aluno_id == idAluno, Bolsa.status == StatusBolsa.ATIVA)
+        bolsas = session.execute(query).scalars().all()
+
+        return bolsas
+
+def dbListarBolsaId(idBolsa: int):
+    with SessionLocal() as session:
+        query = select(Bolsa).where(Bolsa.id == idBolsa)
+        bolsa = session.execute(query).scalar_one_or_none()
+
+        return bolsa
+
+def dbEditarBolsa(idBolsa: int, novaBolsa: Bolsa):
+    # São editaveis: tipo_bolsa, percentual_desconto, data_fim e status
+    with SessionLocal() as session:
+        query = select(Bolsa).where(Bolsa.id == idBolsa)
+        bolsa = session.execute(query).scalar_one()
+
+        bolsa.tipo_bolsa = novaBolsa.tipo_bolsa
+        bolsa.percentual_desconto = novaBolsa.percentual_desconto
+        bolsa.data_fim = novaBolsa.data_fim
+        bolsa.status = novaBolsa.status
 
         session.commit()
