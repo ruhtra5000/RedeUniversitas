@@ -204,6 +204,23 @@ def alterarProfessorTurma(idTurma: int, idNovoProfessor: int):
     
     dbAlterarProfessorTurma(idTurma, idNovoProfessor)
 
+# Calcula a freq. relativa, atualiza coef. de rendimento e media geral e aprovacao de cada aluno
+def fecharTurma(idTurma: int):
+    turma = dbListarTurmaId(idTurma)
+
+    if turma == None:
+        raise Exception(f"Turma com id {idTurma} não existente.")
+    else:
+        for matr in turma.matriculas:
+            calcularFrequenciaRelativa(matr.aluno_id, idTurma)
+            atualizarCoefRendMediaGeral(matr.aluno_id)
+
+            # Se a aprovação não foi definida até aqui,
+            # significa que o aluno não atingiu a média mínima
+            # ou falou a todas as provas
+            if matr.aprovacao == None:
+                dbDefinirAprovacao(matr.aluno_id, idTurma, False)
+
 
 # ___  ___        _          _               _             
 # |  \/  |       | |        (_)             | |            
@@ -231,6 +248,22 @@ def lancarNota3(idAluno: int, idTurma: int, nota: Decimal):
         
 def lancarNotaFinal(idAluno: int, idTurma: int, nota: Decimal):
     dbLancarNotaFinal(idAluno, idTurma, nota)
+
+def cadastrarPresenca(idAluno: int, idTurma: int, qtdeAulas: int):
+    dbCadastrarPresenca(idAluno, idTurma, qtdeAulas)
+        
+def calcularFrequenciaRelativa(idAluno: int, idTurma: int):
+    matricula = listarMatriculaId(idAluno, idTurma)
+
+    # Considerando aulas de 45 MINUTOS CADA
+    aulasTotais: float = matricula.disciplina.carga_horaria * 0.75 
+
+    freqRelativa: float = matricula.frequencia_abs / aulasTotais
+
+    dbCalcularFrequenciaRelativa(idAluno, idTurma, freqRelativa)
+
+    if freqRelativa < 0.75: # Freq. Minima: 75%
+        dbDefinirAprovacao(idAluno, idTurma, False)
     
 
 # ______                __                                         

@@ -257,10 +257,10 @@ def dbLancarNota2(idAluno: int, idTurma: int, nota: Decimal):
 
                 # Atualizar Aprovacao
                 if matricula.media >= 7:
-                    matricula.aprovacao = True
+                    dbDefinirAprovacao(idAluno, idTurma, True)
             
             elif matricula.nota1 == -1 and matricula.nota2 == -1:
-                matricula.aprovacao = False
+                dbDefinirAprovacao(idAluno, idTurma, False)
             
             session.add(matricula)
             session.commit()
@@ -275,7 +275,7 @@ def dbLancarNota3(idAluno: int, idTurma: int, nota: Decimal):
             matricula.nota3 = nota
 
             if (matricula.aprovacao == False) or ((matricula.nota1 == -1 or matricula.nota2 == -1) and matricula.nota3 == -1):
-               matricula.aprovacao = False
+               dbDefinirAprovacao(idAluno, idTurma, False)
             else:
                 # Atualizar Media
                 notas = [matricula.nota1, matricula.nota2, matricula.nota3]
@@ -287,7 +287,7 @@ def dbLancarNota3(idAluno: int, idTurma: int, nota: Decimal):
 
                 # Atualizar Aprovacao
                 if matricula.media >= 7:
-                    matricula.aprovacao = True
+                    dbDefinirAprovacao(idAluno, idTurma, True)
             
             session.add(matricula)
             session.commit()
@@ -311,18 +311,47 @@ def dbLancarNotaFinal(idAluno: int, idTurma: int, nota: Decimal):
 
                 # Atualizar Aprovacao
                 if matricula.media >= 5:
-                    matricula.aprovacao = True
+                    dbDefinirAprovacao(idAluno, idTurma, True)
                 else:
-                    matricula.aprovacao = False
+                    dbDefinirAprovacao(idAluno, idTurma, False)
             
             session.add(matricula)
             session.commit()
         else:
             raise SQLAlchemyError
-        
 
-# FALTA A LÓGICA DE FREQUENCIA NA MATRICULA
+def dbDefinirAprovacao(idAluno: int, idTurma: int, aprovacao: bool):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        if matricula != None:
+            matricula.aprovacao = aprovacao
+
+            session.add(matricula)
+            session.commit()
+        else:
+            raise SQLAlchemyError
+
         
+# Soma um valor a frequencia_abs na Matricula
+def dbCadastrarPresenca(idAluno: int, idTurma: int, qtdeAulas: int):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        matricula.frequencia_abs += qtdeAulas
+
+        session.add(matricula)
+        session.commit()
+        
+def dbCalcularFrequenciaRelativa(idAluno: int, idTurma: int, freqRel: float):
+    with SessionLocal() as session:
+        matricula = dbListarMatriculaId(idAluno, idTurma)
+
+        matricula.frequencia_rel = freqRel
+
+        session.add(matricula)
+        session.commit()
+
 
 # ______                __                                         
 # | ___ \              / _|                                        
