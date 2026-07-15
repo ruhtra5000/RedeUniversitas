@@ -23,7 +23,7 @@ class Matricula(Base):
     nota3: Mapped[Decimal] = mapped_column(Numeric(4, 2))
     final: Mapped[Decimal] = mapped_column(Numeric(4, 2))
     media: Mapped[Decimal] = mapped_column(Numeric(4, 2), default=0)
-    frequencia_abs: Mapped[int] = mapped_column(Integer)
+    frequencia_abs: Mapped[int] = mapped_column(Integer, default=0)
     frequencia_rel: Mapped[float] = mapped_column(Float) #Ver como vai funcionar
     aprovacao: Mapped[bool] = mapped_column(Boolean)
 
