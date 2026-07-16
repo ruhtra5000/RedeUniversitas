@@ -10,11 +10,12 @@ from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from database.entidades.Disciplina import Disciplina
 from database.entidades.Matricula import Matricula
+from database.entidades.Mensalidade import Mensalidade
 from database.entidades.PreRequisito import PreRequisito
 from database.entidades.Professor import Professor 
-import database.entidades
 from database.entidades.Turma import Turma
 from database.entidades.enums.StatusBolsa import StatusBolsa
+import database.entidades
 
 #  _____                                      
 # /  __ \                                     
@@ -491,3 +492,52 @@ def dbEditarBolsa(idBolsa: int, novaBolsa: Bolsa):
         bolsa.status = novaBolsa.status
 
         session.commit()
+
+
+# ___  ___                          _  _      _             _            
+# |  \/  |                         | |(_)    | |           | |           
+# | .  . |  ___  _ __   ___   __ _ | | _   __| |  __ _   __| |  ___  ___ 
+# | |\/| | / _ \| '_ \ / __| / _` || || | / _` | / _` | / _` | / _ \/ __|
+# | |  | ||  __/| | | |\__ \| (_| || || || (_| || (_| || (_| ||  __/\__ \
+# \_|  |_/ \___||_| |_||___/ \__,_||_||_| \__,_| \__,_| \__,_| \___||___/
+
+def dbListarMensalidades():
+    with SessionLocal() as session:
+        query = select(Mensalidade)
+        mensalidades = session.execute(query).scalars().all()
+
+        return mensalidades
+
+def dbListarMensalidadesCampus(idCampus: int):
+    with SessionLocal() as session:
+        query = select(select(Mensalidade)
+                .join(Mensalidade.aluno)
+                .where(Aluno.campus_id == idCampus))
+        
+        mensalidades = session.execute(query).scalars().all()
+
+        return mensalidades
+
+def dbListarMensalidadesCurso(idCurso: int):
+    with SessionLocal() as session:
+        query = select(select(Mensalidade)
+                .join(Mensalidade.aluno)
+                .where(Aluno.curso_id == idCurso))
+        
+        mensalidades = session.execute(query).scalars().all()
+
+        return mensalidades
+
+def dbListarMensalidadesAluno(idAluno: int):
+    with SessionLocal() as session:
+        query = select(select(Mensalidade).where(Mensalidade.aluno_id == idAluno))
+        mensalidades = session.execute(query).scalars().all()
+
+        return mensalidades
+    
+def dbListarMensalidadeId(idMensalidade: int):
+    with SessionLocal() as session:
+        query = select(select(Mensalidade).where(Mensalidade.id == idMensalidade))
+        mensalidade = session.execute(query).scalar_one_or_none()
+
+        return mensalidade

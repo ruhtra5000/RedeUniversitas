@@ -407,3 +407,31 @@ def editarBolsa(idBolsa: int, tipo_bolsa: str, percentual_desconto: float, data_
     )
 
     dbEditarBolsa(idBolsa, novaBolsa)
+
+
+# ___  ___                          _  _      _             _            
+# |  \/  |                         | |(_)    | |           | |           
+# | .  . |  ___  _ __   ___   __ _ | | _   __| |  __ _   __| |  ___  ___ 
+# | |\/| | / _ \| '_ \ / __| / _` || || | / _` | / _` | / _` | / _ \/ __|
+# | |  | ||  __/| | | |\__ \| (_| || || || (_| || (_| || (_| ||  __/\__ \
+# \_|  |_/ \___||_| |_||___/ \__,_||_||_| \__,_| \__,_| \__,_| \___||___/
+
+def listarMensalidades():
+    return dbListarMensalidades()
+
+def listarMensalidadesCampus(idCampus: int):
+    return dbListarMensalidadesCampus(idCampus)
+
+def listarMensalidadesCurso(idCurso: int):
+    return dbListarMensalidadesCurso(idCurso)
+
+def listarMensalidadesAluno(idAluno: int):
+    return dbListarMensalidadesAluno(idAluno)
+    
+def listarMensalidadeId(idMensalidade: int):
+    mensalidade = dbListarMensalidadeId(idMensalidade)
+
+    if mensalidade == None:
+        raise Exception(f"Mensalidade com id {idMensalidade} não existente.")
+    
+    return mensalidade
