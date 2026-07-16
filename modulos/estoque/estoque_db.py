@@ -8,7 +8,13 @@ from database.entidades.Movimentacao import Movimentacao
 from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
 import database.entidades 
 
-# Produtos
+# ______                   _         _               
+# | ___ \                 | |       | |              
+# | |_/ / _ __   ___    __| | _   _ | |_   ___   ___ 
+# |  __/ | '__| / _ \  / _` || | | || __| / _ \ / __|
+# | |    | |   | (_) || (_| || |_| || |_ | (_) |\__ \
+# \_|    |_|    \___/  \__,_| \__,_| \__| \___/ |___/
+
 def dbListarProdutos(idCampus: int):
     with SessionLocal() as session:
         query = select(Estoque).where(Estoque.campus_id == idCampus)
@@ -47,7 +53,23 @@ def dbEditarProduto(idProduto: int, novoProduto: Estoque):
             session.rollback()
             raise
 
-# Movimentações
+def dbAdicionarQtdeProduto(idProduto: int, qtdeAdd: int):
+    with SessionLocal() as session:
+        query = select(Estoque).where(Estoque.id == idProduto)
+        produto = session.execute(query).scalar_one()
+
+        produto.qtde += qtdeAdd
+
+        session.commit()
+
+
+# ___  ___               _                          _                                  
+# |  \/  |              (_)                        | |                                 
+# | .  . |  ___  __   __ _  _ __ ___    ___  _ __  | |_   __ _   ___   ___    ___  ___ 
+# | |\/| | / _ \ \ \ / /| || '_ ` _ \  / _ \| '_ \ | __| / _` | / __| / _ \  / _ \/ __|
+# | |  | || (_) | \ V / | || | | | | ||  __/| | | || |_ | (_| || (__ | (_) ||  __/\__ \
+# \_|  |_/ \___/   \_/  |_||_| |_| |_| \___||_| |_| \__| \__,_| \___| \___/  \___||___/
+
 def dbCriarMovimentacao(movimentacao: Movimentacao):
     with SessionLocal() as session:
         try:
