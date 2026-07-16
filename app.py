@@ -5,8 +5,12 @@ from database.Conexao import SessionLocal
 import database.entidades 
 from database.entidades.Pessoa import Pessoa
 from modulos.cadastros.campus import telaCadastroCampus
+from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
 from modulos.home import telaHome
 from modulos.cadastros.cadastros import telaCadastros
+
+# Gerar mensalidades automaticamente
+geracaoAutomaticaMensalidade()
 
 # Funções de login
 def telaLogin():
