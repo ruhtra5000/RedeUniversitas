@@ -29,7 +29,8 @@ class Movimentacao(Base):
     )
 
     almoxarife: Mapped["Almoxarife"] = relationship(
-        foreign_keys=[pessoa_id]
+        foreign_keys=[pessoa_id],
+        back_populates="movimentacoes"
     )
 
     # Constraints da tabela
