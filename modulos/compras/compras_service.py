@@ -48,3 +48,26 @@ def editarFornecedor(idFornecedor: int, nome: str, email: str, telefone: str):
     
     dbEditarFornecedor(idFornecedor, fornecedor)
     
+
+#  _____                                            
+# /  __ \                                           
+# | /  \/  ___   _ __ ___   _ __   _ __   __ _  ___ 
+# | |     / _ \ | '_ ` _ \ | '_ \ | '__| / _` |/ __|
+# | \__/\| (_) || | | | | || |_) || |   | (_| |\__ \
+#  \____/ \___/ |_| |_| |_|| .__/ |_|    \__,_||___/
+#                          | |                      
+#                          |_|                      
+
+def listarComprasCampus(idCampus: int):
+    return dbListarComprasCampus(idCampus)
+
+def listarCompraId(idCompra: int):
+    compra = dbListarCompraId(idCompra)
+
+    if compra == None:
+        raise Exception(f"Compra com id {idCompra} não existente.")
+    
+    return compra
+    
+def definirDataRecebimento(idCompra: int, dataReceb: date):
+    dbDefinirDataRecebimento(idCompra, dataReceb)
