@@ -33,6 +33,9 @@ def criarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):
     except SQLAlchemyError:    
         raise
 
+    except Exception:
+        raise
+
 
 # Dados
 def dbCriarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):

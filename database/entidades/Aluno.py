@@ -43,7 +43,7 @@ class Aluno(Base):
         back_populates="aluno"
     )
 
-    bolsa: Mapped[list["Bolsa"]] = relationship(
+    bolsas: Mapped[list["Bolsa"]] = relationship(
         foreign_keys="Bolsa.aluno_id",
         back_populates="aluno"
     )
