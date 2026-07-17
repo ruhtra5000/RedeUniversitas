@@ -25,7 +25,7 @@ class Curso(Base):
     dur_min_semestre: Mapped[int] = mapped_column(nullable=False)
     dur_max_semestre: Mapped[int] = mapped_column(nullable=False)
     campus_id: Mapped[int] = mapped_column(ForeignKey("campus.id"))
-    coordenador_id: Mapped[int] = mapped_column(ForeignKey("professor.pessoa_id"), nullable=True)
+    coordenador_id: Mapped[int | None] = mapped_column(ForeignKey("professor.pessoa_id"), nullable=True)
 
     # Ligações de ORM
     coordenador: Mapped["Professor"] = relationship(
