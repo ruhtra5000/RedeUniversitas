@@ -19,10 +19,10 @@ class ContaReceber(Base):
     descricao: Mapped[str] = mapped_column(String(50))
     valor: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     data_vencimento: Mapped[date] = mapped_column(Date, nullable=False)
-    data_pagamento: Mapped[date] = mapped_column(Date)
+    data_pagamento: Mapped[date] = mapped_column(Date, nullable=True)
     mensalidade_id: Mapped[int] = mapped_column(ForeignKey("mensalidade.id"))
     caixa_id: Mapped[int] = mapped_column(ForeignKey("caixa.id"))
-    financeiro_id: Mapped[int] = mapped_column(ForeignKey("financeiro.pessoa_id"))
+    financeiro_id: Mapped[int] = mapped_column(ForeignKey("financeiro.pessoa_id"), nullable=True)
 
     # Ligações de ORM
     mensalidade: Mapped["Mensalidade"] = relationship(
