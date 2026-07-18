@@ -1,8 +1,11 @@
+from decimal import Decimal
+
 from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
 from validate_docbr.CNPJ import CNPJ
 
 from database.Conexao import SessionLocal
+from database.entidades.Caixa import Caixa
 from database.entidades.Campus import Campus
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
@@ -37,7 +40,7 @@ def telaCadastroCampus():
 
 # Aqui seria a "camada de serviço", onde voce pode pegar 
 # os dados da interface e/ou fazer alguma validação de regra de negocio 
-def criarCampus(campus: Campus):
+def criarCampus(campus: Campus, valorInicialCaixa: int = 0):
     try:
         if not CNPJ().validate(campus.cnpj):
             raise Exception("O CNPJ disponibilizado não é válido.")
@@ -50,18 +53,33 @@ def criarCampus(campus: Campus):
             if not validarTelefone(campus.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 
-        dbCriarCampus(campus)
+        # Criar Caixa vinculado a esse Campus
+        caixa = Caixa(
+            valor_caixa = Decimal(valorInicialCaixa)
+        )
+
+        dbCriarCampus(campus, caixa)
 
     except SQLAlchemyError:
         raise
 
 
 # Aqui seria a camada de dados (somente ela deve interagir diretamente com o banco)
-def dbCriarCampus(campus: Campus):
+def dbCriarCampus(campus: Campus, caixa: Caixa):
     with SessionLocal() as session:
         try:
+            # Criação do Campus
             session.add(campus)
+            session.commit()
+            
+            # Pegando o id atribuido
+            session.refresh(campus)
+            caixa.campus_id = campus.id
+
+            # Criando o Caixa
+            session.add(caixa)
             session.commit()
         
         except SQLAlchemyError:
+            session.rollback()
             raise
