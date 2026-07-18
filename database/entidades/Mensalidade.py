@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, Date, ForeignKey, Integer, Numeric
+from sqlalchemy import Boolean, CheckConstraint, Date, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.Base import Base
@@ -20,6 +20,7 @@ class Mensalidade(Base):
     valor: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     data_inicio: Mapped[date] = mapped_column(Date, nullable=False)
     data_vencimento: Mapped[date] = mapped_column(Date, nullable=False)
+    foi_paga: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     # Ligações de ORM
     aluno: Mapped["Aluno"] = relationship(
