@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
+from database.entidades.Almoxarife import Almoxarife
 from database.entidades.Estoque import Estoque
 from database.entidades.Movimentacao import Movimentacao
 from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
@@ -111,3 +112,23 @@ def dbListarMovimentacaoId(idMovimentacao: int):
         return movimentacao
 
 
+#   ___   _                                       _   __       
+#  / _ \ | |                                     (_) / _|      
+# / /_\ \| | _ __ ___    ___  __  __  __ _  _ __  _ | |_   ___ 
+# |  _  || || '_ ` _ \  / _ \ \ \/ / / _` || '__|| ||  _| / _ \
+# | | | || || | | | | || (_) | >  < | (_| || |   | || |  |  __/
+# \_| |_/|_||_| |_| |_| \___/ /_/\_\ \__,_||_|   |_||_|   \___|
+
+def dbListarAlmoxarifes():
+    with SessionLocal() as session:
+        query = select(Almoxarife)
+        almoxarifes = session.execute(query).scalars().all()
+
+        return almoxarifes
+    
+def dbListarAlmoxarifeId(idAlmoxarife: int):
+    with SessionLocal() as session:
+        query = select(Almoxarife).where(Almoxarife.pessoa_id == idAlmoxarife)
+        almoxarife = session.execute(query).scalar_one_or_none()
+
+        return almoxarife
