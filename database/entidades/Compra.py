@@ -1,7 +1,8 @@
+from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, ForeignKey, Integer, Numeric
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.Base import Base
@@ -20,6 +21,8 @@ class Compra(Base):
     produto_id: Mapped[int] = mapped_column(ForeignKey("estoque.id"))
     qtde: Mapped[int] = mapped_column(Integer, default=1)
     valor_unit: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
+    data_compra: Mapped[date] = mapped_column(Date, nullable=False)
+    data_recebimento: Mapped[date] = mapped_column(Date, nullable=True)
     financeiro_id: Mapped[int] = mapped_column(ForeignKey("financeiro.pessoa_id"))
     fornecedor_id: Mapped[int] = mapped_column(ForeignKey("fornecedor.id"))
 
