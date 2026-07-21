@@ -1,6 +1,13 @@
 from sqlalchemy import select
 import streamlit as st
 
+st.set_page_config(
+    page_title="RedeUniversitas",
+    page_icon="🎓",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
 from database.Conexao import SessionLocal
 import database.entidades 
 from database.entidades.Pessoa import Pessoa
@@ -14,10 +21,16 @@ geracaoAutomaticaMensalidade()
 
 # Funções de login
 def telaLogin():
-    st.title("Login")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    with st.container():
+        # TODO: colocar logo depois
+        st.title("🎓 RedeUniversitas", text_alignment="center")
+        st.divider()
 
-    if not st.user.is_logged_in:
-        if st.button("Login com Google"):
+        if st.button(
+            "![Google](https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg) Entrar com Google",
+            use_container_width=True,
+        ):
             st.login()
             st.stop()
     
@@ -46,6 +59,7 @@ def verificarLogin():
 # Lógica de login
 if not st.user.is_logged_in:
     telaLogin()
+    st.stop()
 else:
     verificarLogin() 
     # fica gerando mensagem de login toda hora 
