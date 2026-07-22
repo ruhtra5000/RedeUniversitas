@@ -1,6 +1,12 @@
 from sqlalchemy import select
-from modulos.utils.text_utils import *
 import streamlit as st
+
+from database.Conexao import SessionLocal
+import database.entidades 
+from database.entidades.Pessoa import Pessoa
+from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
+from modulos.rotas import ROTA_HOME, get_rotas
+from modulos.sidebar import renderizar_sidebar
 
 st.set_page_config(
     page_title="RedeUniversitas",
@@ -67,47 +73,15 @@ else:
 
 # Lógica de paginas inicial (MUDAR)
 if "pagina" not in st.session_state:
-    st.session_state.pagina = "home"
+    st.session_state.pagina = ROTA_HOME
 
-# Ícones e rotas da sidebar
-nav_items = [
-    {"id": "home", "label": "Página Inicial", "icon": ":material/home:", "view": telaHome},
-    {"id": "cadastros", "label": "Cadastros", "icon": ":material/folder:", "view": telaCadastros},
-    {"id": "academico", "label": "Acadêmico", "icon": ":material/school:", "view": None},
-    {"id": "financeiro", "label": "Financeiro", "icon": ":material/money_bag:", "view": None},
-    {"id": "almoxarifado", "label": "Almoxarifado", "icon": ":material/inventory_2:", "view": None},
-    {"id": "relatorios", "label": "Relatórios", "icon": ":material/analytics:", "view": None},
-]
+# Renderização da Sidebar
+renderizar_sidebar()
 
-st.sidebar.subheader("Navegação")
-for item in nav_items:
-    if st.sidebar.button(
-        f"{item['icon']} {item['label']}",
-        key=f"nav_{item['id']}",
-        use_container_width=True,
-        type="primary" if st.session_state.pagina == item["id"] else "secondary",
-    ):
-        st.session_state.pagina = item["id"]
-        st.rerun()
+# Renderização da Página Atual
+view_atual = get_rotas().get(st.session_state.pagina)
 
-st.sidebar.divider()
-
-# Usuario e Logout
-st.sidebar.text(f"Olá, {formata_primeiro_nome(st.user.name)}!")
-if st.sidebar.button(":material/logout: Logout", use_container_width=True):
-    st.logout()
-    st.stop()
-
-# Encontrar a página selecionada pela navegação
-pagina_selecionada = (item for item in nav_items if item["id"] == st.session_state.pagina)
-
-# Obtém o próximo item do generator, ou retorna a primeira página (home) se nenhuma for encontrada
-pagina_atual = next(pagina_selecionada, nav_items[0])
-
-# Verifica se a página selecionada possui uma view definida
-if pagina_atual["view"] is not None:
-    # Se houver, executa a função view associada à página
-    pagina_atual["view"]()
+if view_atual is not None:
+    view_atual()
 else:
-    # Caso contrário, exibe uma mensagem informando que a página está em desenvolvimento
-    st.info(f"A página **{pagina_atual['label']}** ainda está em desenvolvimento.")
+    st.info(f"A página **{st.session_state.pagina}** ainda está em desenvolvimento!")
