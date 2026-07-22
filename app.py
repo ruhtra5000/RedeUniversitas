@@ -22,6 +22,13 @@ from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
 from modulos.home import telaHome
 from modulos.cadastros.cadastros import telaCadastros
 
+st.set_page_config(
+    page_title="RedeUniversitas",
+    page_icon="🎓",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
 # Gerar mensalidades automaticamente
 geracaoAutomaticaMensalidade()
 
@@ -48,10 +55,7 @@ def verificarLogin():
         query = select(Pessoa).where(Pessoa.google_id == google_id)
         pessoa = session.execute(query).scalar_one_or_none()
 
-        if pessoa != None:
-            st.success("Usuário logado.")
-
-        else:
+        if pessoa == None:
             query = select(Pessoa).where(Pessoa.email == email)
             pessoaEmail = session.execute(query).scalar_one_or_none()
 
