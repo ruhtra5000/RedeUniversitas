@@ -1,6 +1,13 @@
 from sqlalchemy import select
 import streamlit as st
 
+from database.Conexao import SessionLocal
+import database.entidades 
+from database.entidades.Pessoa import Pessoa
+from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
+from modulos.rotas import ROTA_HOME, get_rotas
+from modulos.sidebar import renderizar_sidebar
+
 st.set_page_config(
     page_title="RedeUniversitas",
     page_icon="🎓",
@@ -11,7 +18,6 @@ st.set_page_config(
 from database.Conexao import SessionLocal
 import database.entidades 
 from database.entidades.Pessoa import Pessoa
-from modulos.cadastros.campus import telaCadastroCampus
 from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
 from modulos.home import telaHome
 from modulos.cadastros.cadastros import telaCadastros
@@ -64,29 +70,18 @@ else:
     verificarLogin() 
     # fica gerando mensagem de login toda hora 
     # (acho que dá pra juntar na parte de logica de paginas)
-    if st.button("Logout"):
-        st.logout()
 
 # Lógica de paginas inicial (MUDAR)
 if "pagina" not in st.session_state:
-    st.session_state.pagina = "" 
+    st.session_state.pagina = ROTA_HOME
 
-match st.session_state.pagina:
-    case "home":
-        telaHome()
+# Renderização da Sidebar
+renderizar_sidebar()
 
-    case "cadastro":
-        telaCadastroCampus()
+# Renderização da Página Atual
+view_atual = get_rotas().get(st.session_state.pagina)
 
-# Sidebar paia
-pagina = st.sidebar.radio(
-    "Módulos",
-    [
-        "Home",
-        "Cadastros",
-        "Acadêmico",
-        "Financeiro",
-        "Almoxarifado",
-        "Relatórios"
-    ]
-)
+if view_atual is not None:
+    view_atual()
+else:
+    st.info(f"A página **{st.session_state.pagina}** ainda está em desenvolvimento!")
