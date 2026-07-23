@@ -132,6 +132,9 @@ def removerCoordenador(idCurso: int):
 def listarDisciplinas(idCurso: int):
     return dbListarDisciplinas(idCurso)
 
+def listarDisciplinasGeral():
+    return dbListarDisciplinasGeral()
+
 def listarDisciplinaId(idDisciplina: int):
     disciplina = dbListarDisciplinaId(idDisciplina)
 
@@ -435,3 +438,18 @@ def listarMensalidadeId(idMensalidade: int):
         raise Exception(f"Mensalidade com id {idMensalidade} não existente.")
     
     return mensalidade
+
+
+# ______                               
+# | ___ \                              
+# | |_/ /__  ___ ___  ___   __ _ ___   
+# |  __/ _ \/ __/ __|/ _ \ / _` / __|  
+# | | |  __/\__ \__ \ (_) | (_| \__ \  
+# \_|  \___||___/___/\___/ \__,_|___/  
+#                                      
+
+def existeCpf(cpf: str) -> bool:
+    return dbExisteCpf(cpf)
+
+def existeEmail(email: str) -> bool:
+    return dbExisteEmail(email)

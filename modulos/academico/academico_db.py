@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
+from sqlalchemy.orm import joinedload
 from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
@@ -145,6 +146,10 @@ def dbListarDisciplinas(idCurso: int):
         disciplinas = session.execute(query).scalars().all()
 
         return disciplinas
+
+def dbListarDisciplinasGeral():
+    with SessionLocal() as session:
+        return session.query(Disciplina).all()
 
 def dbListarDisciplinaId(idDisciplina: int):
     with SessionLocal() as session:
@@ -365,7 +370,7 @@ def dbCalcularFrequenciaRelativa(idAluno: int, idTurma: int, freqRel: float):
                                                                  
 def dbListarProfessores():
     with SessionLocal() as session:
-        query = select(Professor)
+        query = select(Professor).options(joinedload(Professor.pessoa))
         professores = session.execute(query).scalars().all()
 
         return professores
@@ -541,3 +546,22 @@ def dbListarMensalidadeId(idMensalidade: int):
         mensalidade = session.execute(query).scalar_one_or_none()
 
         return mensalidade
+        
+
+# ______                               
+# | ___ \                              
+# | |_/ /__  ___ ___  ___   __ _ ___   
+# |  __/ _ \/ __/ __|/ _ \ / _` / __|  
+# | | |  __/\__ \__ \ (_) | (_| \__ \  
+# \_|  \___||___/___/\___/ \__,_|___/  
+#   
+
+def dbExisteCpf(cpf: str) -> bool:
+    with SessionLocal() as session:
+        return session.query(Pessoa).filter(Pessoa.cpf == cpf).first() is not None
+
+def dbExisteEmail(email: str) -> bool:
+    with SessionLocal() as session:
+        return session.query(Pessoa).filter(Pessoa.email == email).first() is not None
+
+
