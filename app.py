@@ -15,20 +15,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-from database.Conexao import SessionLocal
-import database.entidades 
-from database.entidades.Pessoa import Pessoa
-from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
-from modulos.home import telaHome
-from modulos.cadastros.cadastros import telaCadastros
-
-st.set_page_config(
-    page_title="RedeUniversitas",
-    page_icon="🎓",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
-
 # Gerar mensalidades automaticamente
 geracaoAutomaticaMensalidade()
 
