@@ -47,12 +47,14 @@ def telaCadastros():
                 st.markdown(f"<div style='{estilo_texto}'>Criação de turmas, definição de semestre, disciplina e professores.</div>", unsafe_allow_html=True)
                 turma_btn = st.button("Acessar", key="btn_turma", use_container_width=True)
 
+    from modulos.rotas import cadastro_aluno, cadastro_prof, cadastro_curso, cadastro_disc, cadastro_turma
+    
     rota_destino = None
-    if aluno_btn: rota_destino = "cadastro_aluno"
-    if prof_btn: rota_destino = "cadastro_professor"
-    if curso_btn: rota_destino = "cadastro_curso"
-    if disc_btn: rota_destino = "cadastro_disciplina"
-    if turma_btn: rota_destino = "cadastro_turma"
+    if aluno_btn: rota_destino = cadastro_aluno
+    if prof_btn: rota_destino = cadastro_prof
+    if curso_btn: rota_destino = cadastro_curso
+    if disc_btn: rota_destino = cadastro_disc
+    if turma_btn: rota_destino = cadastro_turma
 
     if rota_destino:
         st.switch_page(rota_destino)
