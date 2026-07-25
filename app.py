@@ -5,8 +5,8 @@ from database.Conexao import SessionLocal
 import database.entidades 
 from database.entidades.Pessoa import Pessoa
 from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
-from modulos.rotas import ROTA_HOME, get_rotas
-from modulos.sidebar import renderizar_sidebar
+from modulos.rotas import get_navigation
+from modulos.sidebar import renderizar_perfil_usuario
 
 st.set_page_config(
     page_title="RedeUniversitas",
@@ -61,17 +61,10 @@ else:
     # fica gerando mensagem de login toda hora 
     # (acho que dá pra juntar na parte de logica de paginas)
 
-# Lógica de paginas inicial (MUDAR)
-if "pagina" not in st.session_state:
-    st.session_state.pagina = ROTA_HOME
+# Renderização do Perfil na Sidebar
+with st.sidebar:
+    renderizar_perfil_usuario()
 
-# Renderização da Sidebar
-renderizar_sidebar()
-
-# Renderização da Página Atual
-view_atual = get_rotas().get(st.session_state.pagina)
-
-if view_atual is not None:
-    view_atual()
-else:
-    st.info(f"A página **{st.session_state.pagina}** ainda está em desenvolvimento!")
+# Configuração e Execução das Rotas
+pg = st.navigation(get_navigation())
+pg.run()
