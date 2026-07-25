@@ -24,7 +24,7 @@ def criarCampus(campus: Campus, valorInicialCaixa: int = 0):
             if not validarEmail(campus.email):
                 raise Exception("O E-mail disponibilizado não é válido.")
             
-        if campus.telefone != "":
+        if campus.telefone is not None and campus.telefone != "":
             if not validarTelefone(campus.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

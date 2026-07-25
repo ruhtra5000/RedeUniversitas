@@ -36,7 +36,8 @@ def telaCadastroDisciplina():
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
-            st.switch_page("cadastros")
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
 
     if "cache_cursos" not in st.session_state:
         st.session_state.cache_cursos = dbListarCursos()

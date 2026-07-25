@@ -11,11 +11,14 @@ def telaHome():
             st.write("Cadastre alunos, professores, cursos...")
 
             if st.button("Entrar"):
-                st.switch_page("cadastros")
+                from modulos.rotas import cadastros_page # evita import circular
+                st.switch_page(cadastros_page)
 
     with col2:
         with st.container(border=True):
             st.subheader("🎓 Acadêmico")
-
-            if st.button("Entrar", key="acad"):
-                st.switch_page("academico")
+            
+            # TODO: implementar e importar a academico_page quando for criada
+            # if st.button("Entrar", key="acad"):
+            #     from modulos.rotas import academico_page
+            #     st.switch_page(academico_page)

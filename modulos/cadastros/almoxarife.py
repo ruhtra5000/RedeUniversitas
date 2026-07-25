@@ -18,7 +18,7 @@ def criarAlmoxarife(pessoa: Pessoa):
         if not validarEmail(pessoa.email):
             raise Exception("O E-mail disponibilizado não é válido.")
             
-        if pessoa.telefone != "" or pessoa.telefone != None:
+        if pessoa.telefone is not None and pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

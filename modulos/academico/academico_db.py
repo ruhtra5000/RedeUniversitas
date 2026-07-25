@@ -17,7 +17,7 @@ from database.entidades.Professor import Professor
 from database.entidades.Turma import Turma
 from database.entidades.enums.StatusBolsa import StatusBolsa
 import database.entidades
-
+from database.entidades.Pessoa import Pessoa
 #  _____                                      
 # /  __ \                                     
 # | /  \/  __ _  _ __ ___   _ __   _   _  ___ 

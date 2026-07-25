@@ -18,7 +18,7 @@ def criarFornecedor(fornecedor: Fornecedor):
             if not validarEmail(fornecedor.email):
                 raise Exception("O E-mail disponibilizado não é válido.")
             
-        if fornecedor.telefone != "":
+        if fornecedor.telefone is not None and fornecedor.telefone != "":
             if not validarTelefone(fornecedor.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

@@ -26,7 +26,7 @@ def criarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):
         if dbExisteEmail(pessoa.email):
             raise Exception("Já existe um aluno cadastrado com este e-mail.")
             
-        if pessoa.telefone != "":
+        if pessoa.telefone is not None and pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
                 

@@ -42,7 +42,8 @@ def telaCadastroCurso():
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
-            st.switch_page("cadastros")
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
 
     with st.form(key=f"cadastro_curso_{st.session_state.form_key_curso}", border=False):
 

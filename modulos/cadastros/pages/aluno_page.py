@@ -10,6 +10,7 @@ from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail, dbListarCampus, dbListarCursos
+from modulos.cadastros.aluno import criarAluno
 
 def telaCadastroAluno():
 
@@ -37,7 +38,8 @@ def telaCadastroAluno():
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
-            st.switch_page("cadastros")
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = dbListarCampus()
@@ -150,11 +152,12 @@ def telaCadastroAluno():
 
         else:
             try:
+                import re
                 nova_pessoa = Pessoa(
                     nome=nome.strip(),
-                    cpf=cpf.strip(),
+                    cpf=re.sub(r'\D', '', cpf),
                     email=email.strip(),
-                    telefone=telefone.strip()
+                    telefone=telefone.strip() if telefone.strip() != "" else None
                 )
 
                 criarAluno(
@@ -167,8 +170,8 @@ def telaCadastroAluno():
                 st.session_state["cadastro_realizado"] = True
                 st.rerun()
 
-            except SQLAlchemyError:
-                st.error("Erro ao salvar os dados no banco.")
+            except SQLAlchemyError as e:
+                st.error(f"Erro ao salvar os dados no banco: {e}")
 
             except Exception as e:
-                st.error(str(e))
+                st.error(f"Algo deu errado na criação de aluno: {str(e)}")

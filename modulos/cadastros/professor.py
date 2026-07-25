@@ -20,7 +20,7 @@ def criarProfessor(pessoa: Pessoa, idCampus: int):
         if not validarEmail(pessoa.email):
             raise Exception("O E-mail disponibilizado não é válido.")
             
-        if pessoa.telefone:
+        if pessoa.telefone is not None and pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

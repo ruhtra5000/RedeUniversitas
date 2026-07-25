@@ -36,7 +36,8 @@ def telaCadastroProfessor():
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
-            st.switch_page("cadastros")
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = dbListarCampus()
@@ -122,13 +123,12 @@ def telaCadastroProfessor():
             st.error("Por favor, selecione um Campus.")
         else:
             try:
-                telefone_tratado = telefone.strip() if telefone.strip() else None
-
+                import re
                 nova_pessoa = Pessoa(
                     nome=nome.strip(),
-                    cpf=cpf.strip(),
+                    cpf=re.sub(r'\D', '', cpf),
                     email=email.strip(),
-                    telefone=telefone_tratado
+                    telefone=telefone.strip() if telefone.strip() != "" else None
                 )
                 
                 criarProfessor(pessoa=nova_pessoa, idCampus=campus.id)
@@ -140,6 +140,6 @@ def telaCadastroProfessor():
                 st.rerun()
                 
             except SQLAlchemyError as e:
-                st.error(f"Erro no banco de dados: {e}")
+                st.error(f"Erro ao salvar os dados no banco: {e}")
             except Exception as e:
                 st.error(str(e))
