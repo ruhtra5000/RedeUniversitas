@@ -22,7 +22,7 @@ class Compra(Base):
     qtde: Mapped[int] = mapped_column(Integer, default=1)
     valor_unit: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     data_compra: Mapped[date] = mapped_column(Date, nullable=False)
-    data_recebimento: Mapped[date] = mapped_column(Date, nullable=True)
+    data_recebimento: Mapped[date | None] = mapped_column(Date, nullable=True)
     financeiro_id: Mapped[int] = mapped_column(ForeignKey("financeiro.pessoa_id"))
     fornecedor_id: Mapped[int] = mapped_column(ForeignKey("fornecedor.id"))
 

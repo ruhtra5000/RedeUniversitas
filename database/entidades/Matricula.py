@@ -18,14 +18,14 @@ class Matricula(Base):
     aluno_id: Mapped[int] = mapped_column(ForeignKey("aluno.pessoa_id"), primary_key=True)
     turma_id: Mapped[int] = mapped_column(ForeignKey("turma.id"), primary_key=True)
     disciplina_id: Mapped[int] = mapped_column(ForeignKey("disciplina.id"))
-    nota1: Mapped[Decimal] = mapped_column(Numeric(4, 2))
-    nota2: Mapped[Decimal] = mapped_column(Numeric(4, 2))
-    nota3: Mapped[Decimal] = mapped_column(Numeric(4, 2))
-    final: Mapped[Decimal] = mapped_column(Numeric(4, 2))
+    nota1: Mapped[Decimal | None] = mapped_column(Numeric(4, 2), nullable=True)
+    nota2: Mapped[Decimal | None] = mapped_column(Numeric(4, 2), nullable=True)
+    nota3: Mapped[Decimal | None] = mapped_column(Numeric(4, 2), nullable=True)
+    final: Mapped[Decimal | None] = mapped_column(Numeric(4, 2), nullable=True)
     media: Mapped[Decimal] = mapped_column(Numeric(4, 2), default=0)
     frequencia_abs: Mapped[int] = mapped_column(Integer, default=0)
-    frequencia_rel: Mapped[float] = mapped_column(Float) #Ver como vai funcionar
-    aprovacao: Mapped[bool] = mapped_column(Boolean)
+    frequencia_rel: Mapped[float] = mapped_column(Float, default=0.0) 
+    aprovacao: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
     # Ligações de ORM
     aluno: Mapped["Aluno"] = relationship(

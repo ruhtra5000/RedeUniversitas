@@ -19,7 +19,7 @@ class Movimentacao(Base):
     produto_id: Mapped[int] = mapped_column(ForeignKey("estoque.id"))
     pessoa_id: Mapped[int] = mapped_column(ForeignKey("almoxarife.pessoa_id"))
     qtde_mov: Mapped[int] = mapped_column(default=1)
-    data: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    data: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
     tipo: Mapped["StatusMovimentacao"] = mapped_column(Enum(StatusMovimentacao), nullable=False) 
 
     # Ligações de ORM

@@ -19,7 +19,7 @@ class Campus(Base):
     cnpj: Mapped[str] = mapped_column(String(14), unique=True, nullable=False)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
     # endereco: ... 
-    email: Mapped[str | None] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(50))
     telefone: Mapped[str | None] = mapped_column(String(25))
     reitor_id: Mapped[int | None] = mapped_column(ForeignKey("professor.pessoa_id"), nullable=True)
 

@@ -16,8 +16,8 @@ class Fornecedor(Base):
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
     cnpj: Mapped[str] = mapped_column(String(14), unique=True, nullable=False)
     # endereco: ... 
-    email: Mapped[str | None] = mapped_column(String(50))
-    telefone: Mapped[str | None] = mapped_column(String(25))
+    email: Mapped[str] = mapped_column(String(50))
+    telefone: Mapped[str] = mapped_column(String(25))
 
     # Ligações de ORM
     compras: Mapped[list["Compra"]] = relationship(
