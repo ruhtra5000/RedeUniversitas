@@ -6,7 +6,6 @@ from database.Conexao import SessionLocal
 from database.entidades.Almoxarife import Almoxarife
 from database.entidades.Estoque import Estoque
 from database.entidades.Movimentacao import Movimentacao
-from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
 import database.entidades 
 
 # ______                   _         _               
@@ -70,27 +69,6 @@ def dbAdicionarQtdeProduto(idProduto: int, qtdeAdd: int):
 # | |\/| | / _ \ \ \ / /| || '_ ` _ \  / _ \| '_ \ | __| / _` | / __| / _ \  / _ \/ __|
 # | |  | || (_) | \ V / | || | | | | ||  __/| | | || |_ | (_| || (__ | (_) ||  __/\__ \
 # \_|  |_/ \___/   \_/  |_||_| |_| |_| \___||_| |_| \__| \__,_| \___| \___/  \___||___/
-
-def dbCriarMovimentacao(movimentacao: Movimentacao):
-    with SessionLocal() as session:
-        try:
-            query = select(Estoque).where(Estoque.id == movimentacao.produto_id)
-            produto = session.execute(query).scalar_one()
-
-            if movimentacao.tipo == StatusMovimentacao.ENTRADA:
-                produto.qtde += movimentacao.qtde_mov
-            else: 
-                if produto.qtde >= movimentacao.qtde_mov:
-                    produto.qtde -= movimentacao.qtde_mov
-                else:
-                    raise SQLAlchemyError
-
-            session.add(movimentacao)
-            session.commit()
-
-        except SQLAlchemyError:
-            session.rollback()
-            raise
 
 def dbListarMovimentacoes(idCampus: int):
     with SessionLocal() as session:

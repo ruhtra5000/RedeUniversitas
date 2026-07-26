@@ -44,13 +44,6 @@ def adicionarQtdeProduto(idProduto: int, qtde: int):
 # | |  | || (_) | \ V / | || | | | | ||  __/| | | || |_ | (_| || (__ | (_) ||  __/\__ \
 # \_|  |_/ \___/   \_/  |_||_| |_| |_| \___||_| |_| \__| \__,_| \___| \___/  \___||___/
 
-def criarMovimentacao(movimentacao: Movimentacao):
-    try:
-        dbCriarMovimentacao(movimentacao)
-
-    except SQLAlchemyError:
-        raise
-
 def listarMovimentacoes(idCampus: int):
     return dbListarMovimentacoes(idCampus)
 
