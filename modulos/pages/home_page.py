@@ -1,7 +1,5 @@
 import streamlit as st
 
-# Tentativa falha de interface
-
 def telaHome():
     st.title("Rede Universitas")
 
@@ -9,20 +7,18 @@ def telaHome():
 
     with col1:
         with st.container(border=True):
-
             st.subheader("📁 Cadastros")
-
             st.write("Cadastre alunos, professores, cursos...")
 
             if st.button("Entrar"):
-                st.session_state.pagina = "cadastro"
-                st.rerun()
+                from modulos.rotas import cadastros_page # evita import circular
+                st.switch_page(cadastros_page)
 
     with col2:
         with st.container(border=True):
-
             st.subheader("🎓 Acadêmico")
-
-            if st.button("Entrar", key="acad"):
-                st.session_state.pagina = "academico"
-                st.rerun()
+            
+            # TODO: implementar e importar a academico_page quando for criada
+            # if st.button("Entrar", key="acad"):
+            #     from modulos.rotas import academico_page
+            #     st.switch_page(academico_page)

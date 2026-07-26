@@ -1,5 +1,4 @@
 from sqlalchemy.exc import SQLAlchemyError
-import streamlit as st
 from validate_docbr.CPF import CPF
 
 from database.Conexao import SessionLocal
@@ -8,9 +7,6 @@ from database.entidades.Almoxarife import Almoxarife
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
 
-# Interface
-def telaCadastroAlmoxarife():
-    st.title("Cadastro de Almoxarife")
 
 
 # Service
@@ -22,7 +18,7 @@ def criarAlmoxarife(pessoa: Pessoa):
         if not validarEmail(pessoa.email):
             raise Exception("O E-mail disponibilizado não é válido.")
             
-        if pessoa.telefone != "" or pessoa.telefone != None:
+        if pessoa.telefone is not None and pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 

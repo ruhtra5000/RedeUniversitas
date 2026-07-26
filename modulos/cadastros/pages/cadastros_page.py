@@ -1,5 +1,4 @@
 import streamlit as st
-from modulos.rotas import ROTA_CADASTRO_ALUNO, ROTA_CADASTRO_PROFESSOR, ROTA_CADASTRO_CURSO, ROTA_CADASTRO_DISCIPLINA, ROTA_CADASTRO_TURMA
 
 def telaCadastros():
     placeholder_principal = st.empty()
@@ -48,14 +47,14 @@ def telaCadastros():
                 st.markdown(f"<div style='{estilo_texto}'>Criação de turmas, definição de semestre, disciplina e professores.</div>", unsafe_allow_html=True)
                 turma_btn = st.button("Acessar", key="btn_turma", use_container_width=True)
 
+    from modulos.rotas import cadastro_aluno, cadastro_prof, cadastro_curso, cadastro_disc, cadastro_turma
+    
     rota_destino = None
-    if aluno_btn: rota_destino = ROTA_CADASTRO_ALUNO
-    if prof_btn: rota_destino = ROTA_CADASTRO_PROFESSOR
-    if curso_btn: rota_destino = ROTA_CADASTRO_CURSO
-    if disc_btn: rota_destino = ROTA_CADASTRO_DISCIPLINA
-    if turma_btn: rota_destino = ROTA_CADASTRO_TURMA
+    if aluno_btn: rota_destino = cadastro_aluno
+    if prof_btn: rota_destino = cadastro_prof
+    if curso_btn: rota_destino = cadastro_curso
+    if disc_btn: rota_destino = cadastro_disc
+    if turma_btn: rota_destino = cadastro_turma
 
     if rota_destino:
-        placeholder_principal.empty() 
-        st.session_state.pagina = rota_destino
-        st.rerun()
+        st.switch_page(rota_destino)

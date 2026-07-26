@@ -1,5 +1,4 @@
 from sqlalchemy.exc import SQLAlchemyError
-import streamlit as st
 from validate_docbr.CPF import CPF
 
 from database.Conexao import SessionLocal
@@ -8,9 +7,6 @@ from database.entidades.Financeiro import Financeiro
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
 
-# Interface
-def telaCadastroFinanceiro():
-    st.title("Cadastro de Financeiro")
 
 
 # Service
@@ -22,7 +18,7 @@ def criarFinanceiro(pessoa: Pessoa, idCampus: int):
         if not validarEmail(pessoa.email):
             raise Exception("O E-mail disponibilizado não é válido.")
             
-        if pessoa.telefone != "":
+        if pessoa.telefone is not None and pessoa.telefone != "":
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 
