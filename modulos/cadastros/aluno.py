@@ -8,8 +8,17 @@ from database.entidades.Aluno import Aluno
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
-from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail, dbListarCampus, dbListarCursos
+from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail
 
+
+# === Dados recebidos ===
+# - pessoa:
+#       cpf: str
+#       nome: str
+#       email: str 
+#       telefone: str | None (opcional)
+# - idCampus: int
+# - idCurso: int
 
 # Service
 def criarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):

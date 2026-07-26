@@ -8,7 +8,16 @@ from database.entidades.ContaPagar import ContaPagar
 from modulos.estoque.estoque_service import adicionarQtdeProduto
 import database.entidades
 
-
+# === Dados recebidos ===
+# - compra:
+#       produto_id: int
+#       qtde: int
+#       valor_unit: Decimal
+#       data_compra: date
+#       data_recebimento: date | None (opcional)
+#       financeiro_id: int (usuário logado)
+#       fornecedor_id: int
+# - dataVencimentoContaPagar: date 
 
 # Service
 def criarCompra(compra: Compra, dataVencimentoContaPagar: date):

@@ -10,11 +10,14 @@ from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone
 import database.entidades
 
 
+# === Dados recebidos ===
+# - campus:
+#       cnpj: str
+#       nome: str
+#       email: str 
+#       telefone: str | None (opcional)
+# - valorInicialCaixa: int (valor inicial do caixa da faculdade, se houver)
 
-
-
-# Aqui seria a "camada de serviço", onde voce pode pegar 
-# os dados da interface e/ou fazer alguma validação de regra de negocio 
 def criarCampus(campus: Campus, valorInicialCaixa: int = 0):
     try:
         if not CNPJ().validate(campus.cnpj):
@@ -39,7 +42,6 @@ def criarCampus(campus: Campus, valorInicialCaixa: int = 0):
         raise
 
 
-# Aqui seria a camada de dados (somente ela deve interagir diretamente com o banco)
 def dbCriarCampus(campus: Campus, caixa: Caixa):
     with SessionLocal() as session:
         try:

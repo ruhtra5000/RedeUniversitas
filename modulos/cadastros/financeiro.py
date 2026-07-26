@@ -7,7 +7,13 @@ from database.entidades.Financeiro import Financeiro
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
 
-
+# === Dados recebidos ===
+# - pessoa:
+#       cpf: str
+#       nome: str
+#       email: str 
+#       telefone: str | None (opcional)
+# - idCampus: int
 
 # Service
 def criarFinanceiro(pessoa: Pessoa, idCampus: int):

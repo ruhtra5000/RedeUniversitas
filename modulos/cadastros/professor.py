@@ -9,7 +9,13 @@ import database.entidades
 from modulos.academico.academico_db import dbListarCampus
 
 
-
+# === Dados recebidos ===
+# - pessoa:
+#       cpf: str
+#       nome: str
+#       email: str 
+#       telefone: str | None (opcional)
+# - idCampus: int
 
 # Service
 def criarProfessor(pessoa: Pessoa, idCampus: int):

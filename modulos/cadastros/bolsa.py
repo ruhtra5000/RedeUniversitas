@@ -7,7 +7,14 @@ from database.entidades.Bolsa import Bolsa
 from modulos.academico.academico_db import dbListarBolsasAtivasAluno
 import database.entidades
 
-
+# === Dados recebidos ===
+# - bolsa:
+#       aluno_id: int
+#       tipo_bolsa: str (descrição basica)
+#       percentual_desconto: float (Faixa: [0, 1])
+#       data_inicio: date
+#       data_fim: date
+#       status: StatusBolsa
 
 # Service
 def criarBolsa(bolsa: Bolsa):

@@ -5,6 +5,13 @@ from database.entidades.Matricula import Matricula
 import database.entidades
 
 
+# === Dados recebidos ===
+# - matricula:
+#       aluno_id: int
+#       turma_id: int
+#       disciplina_id: int
+#       aluno: Aluno
+#       disciplina: Disciplina
 
 # Service
 def criarMatricula(matricula: Matricula):
@@ -19,7 +26,7 @@ def criarMatricula(matricula: Matricula):
             for matr in matricula.aluno.matriculas:
                 if preReq.prerequisito_id == matr.disciplina_id:
                     cursado = True
-                    if matr.aprovacao == False:
+                    if matr.aprovacao == None or matr.aprovacao == False:
                         flag = False
 
             if not cursado or not flag:

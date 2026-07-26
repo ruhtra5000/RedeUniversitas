@@ -10,6 +10,13 @@ import database.entidades
 from modulos.academico.academico_db import dbListarCursos
 
 
+# === Dados recebidos ===
+# - disciplina:
+#       nome: str
+#       carga_horaria: int
+#       obrigatoria: bool
+#       curso_id: int
+# - preRequisitos: list[int] (IDs das disciplinas pre-requisito)
 
 # Service
 def criarDisciplina(disciplina: Disciplina, preRequisitos: list[int]):

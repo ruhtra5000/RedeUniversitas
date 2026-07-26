@@ -3,9 +3,17 @@ from sqlalchemy.exc import SQLAlchemyError
 from database.Conexao import SessionLocal
 from database.entidades.Turma import Turma
 import database.entidades
-from modulos.academico.academico_db import (dbListarCursos, dbListarDisciplinasGeral, dbListarProfessores)
 
 
+# === Dados recebidos ===
+# - turma:
+#       semestre: str
+#       curso_id: int
+#       disciplina_id: int
+#       professor_id: int
+#       curso: Curso
+#       disciplina: Disciplina
+#       professor: Professor
 
 # Service
 def criarTurma(turma: Turma):

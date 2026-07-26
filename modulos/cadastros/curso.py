@@ -2,9 +2,19 @@ from sqlalchemy.exc import SQLAlchemyError
 from database.Conexao import SessionLocal
 from database.entidades.Curso import Curso
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
-from modulos.academico.academico_db import (dbListarCursos,dbListarProfessorId,dbListarCampus,dbListarProfessores)
+from modulos.academico.academico_db import dbListarProfessorId
 import database.entidades
 
+# === Dados recebidos ===
+# - curso:
+#       nome: str
+#       modalidade: ModalidadeCurso
+#       mensalidade_base: Decimal
+#       carga_horaria: int
+#       dur_min_semestre: int
+#       dur_max_semestre: int
+#       campus_id: int
+#       coordenador_id: int | None
 
 # Service
 def criarCurso(curso: Curso):

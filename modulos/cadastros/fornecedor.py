@@ -6,7 +6,12 @@ from database.entidades.Fornecedor import Fornecedor
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 import database.entidades
 
-
+# === Dados recebidos ===
+# - fornecedor:
+#       nome: str
+#       cnpj: str (somente numeros)
+#       email: str
+#       telefone: str
 
 # Service
 def criarFornecedor(fornecedor: Fornecedor):
@@ -14,13 +19,11 @@ def criarFornecedor(fornecedor: Fornecedor):
         if not CNPJ().validate(fornecedor.cnpj):
             raise Exception("O CNPJ disponibilizado não é válido.")
         
-        if fornecedor.email != "":
-            if not validarEmail(fornecedor.email):
-                raise Exception("O E-mail disponibilizado não é válido.")
+        if not validarEmail(fornecedor.email):
+            raise Exception("O E-mail disponibilizado não é válido.")
             
-        if fornecedor.telefone is not None and fornecedor.telefone != "":
-            if not validarTelefone(fornecedor.telefone):
-                raise Exception("O telefone disponibilizado não é válido.")
+        if not validarTelefone(fornecedor.telefone):
+            raise Exception("O telefone disponibilizado não é válido.")
 
         dbCriarFornecedor(fornecedor)
     
