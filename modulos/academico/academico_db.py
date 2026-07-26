@@ -535,14 +535,14 @@ def dbListarMensalidadesCurso(idCurso: int):
 
 def dbListarMensalidadesAluno(idAluno: int):
     with SessionLocal() as session:
-        query = select(select(Mensalidade).where(Mensalidade.aluno_id == idAluno))
+        query = select(Mensalidade).where(Mensalidade.aluno_id == idAluno)
         mensalidades = session.execute(query).scalars().all()
 
         return mensalidades
     
 def dbListarMensalidadeId(idMensalidade: int):
     with SessionLocal() as session:
-        query = select(select(Mensalidade).where(Mensalidade.id == idMensalidade))
+        query = select(Mensalidade).where(Mensalidade.id == idMensalidade)
         mensalidade = session.execute(query).scalar_one_or_none()
 
         return mensalidade
@@ -555,6 +555,43 @@ def dbListarMensalidadeId(idMensalidade: int):
 # | | |  __/\__ \__ \ (_) | (_| \__ \  
 # \_|  \___||___/___/\___/ \__,_|___/  
 #   
+
+def dbListarPessoas():
+    with SessionLocal() as session:
+        query = select(Pessoa)
+        pessoas = session.execute(query).scalars().all()
+
+        return pessoas
+
+def dbListarPessoaId(idPessoa: int):
+    with SessionLocal() as session:
+        query = select(Pessoa).where(Pessoa.id == idPessoa)
+        pessoa = session.execute(query).scalar_one_or_none()
+
+        return pessoa
+
+def dbListarPessoaGoogleId(googleId: str):
+    with SessionLocal() as session:
+        query = select(Pessoa).where(Pessoa.google_id == googleId)
+        pessoa = session.execute(query).scalar_one_or_none()
+
+        return pessoa
+
+def dbEditarPessoa(idPessoa: int, novaPessoa: Pessoa):
+    # São editaveis: email, telefone
+    with SessionLocal() as session:
+        try: 
+            query = select(Pessoa).where(Pessoa.id == idPessoa)
+            pessoa = session.execute(query).scalar_one()
+        
+            pessoa.email = novaPessoa.email
+            pessoa.telefone = novaPessoa.telefone
+
+            session.commit()
+
+        except Exception:
+            session.rollback()
+            raise
 
 def dbExisteCpf(cpf: str) -> bool:
     with SessionLocal() as session:

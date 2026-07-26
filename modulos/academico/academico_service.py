@@ -448,6 +448,43 @@ def listarMensalidadeId(idMensalidade: int):
 # \_|  \___||___/___/\___/ \__,_|___/  
 #                                      
 
+def listarPessoas():
+    return dbListarPessoas()
+
+def listarPessoaId(idPessoa: int):
+    pessoa = dbListarPessoaId(idPessoa)
+
+    if pessoa == None:
+        raise Exception(f"Pessoa com id {idPessoa} não existente.")
+
+    return pessoa
+
+def listarPessoaGoogleId(googleId: str):
+    pessoa = dbListarPessoaGoogleId(googleId)
+    
+    if pessoa == None:
+        raise Exception(f"Pessoa com Google ID {googleId} não existente.")
+    
+    return pessoa
+
+def editarPessoa(idPessoa: int, email: str, telefone: str = None):
+    if not validarEmail(email):
+        raise Exception("O E-mail disponibilizado não é válido.")
+            
+    if dbExisteEmail(email):
+        raise Exception("Já existe um aluno cadastrado com este e-mail.")
+                
+    if telefone is not None and telefone != "":
+        if not validarTelefone(telefone):
+            raise Exception("O telefone disponibilizado não é válido.")
+
+    novaPessoa = Pessoa(
+        email=email, 
+        telefone=telefone
+    )
+
+    dbEditarPessoa(idPessoa, novaPessoa)
+
 def existeCpf(cpf: str) -> bool:
     return dbExisteCpf(cpf)
 
