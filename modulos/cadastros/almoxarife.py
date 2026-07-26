@@ -10,7 +10,7 @@ import database.entidades
 
 
 # Service
-def criarAlmoxarife(pessoa: Pessoa):
+def criarAlmoxarife(pessoa: Pessoa, idCampus: int):
     try:
         if not CPF().validate(pessoa.cpf):
             raise Exception("O CPF disponibilizado não é válido.")
@@ -22,14 +22,14 @@ def criarAlmoxarife(pessoa: Pessoa):
             if not validarTelefone(pessoa.telefone):
                 raise Exception("O telefone disponibilizado não é válido.")
 
-        dbCriarAlmoxarife(pessoa)
+        dbCriarAlmoxarife(pessoa, idCampus)
     
     except SQLAlchemyError:    
         raise
 
 
 # Dados
-def dbCriarAlmoxarife(pessoa: Pessoa):
+def dbCriarAlmoxarife(pessoa: Pessoa, idCampus: int):
     with SessionLocal() as session:
         try:
             session.add(pessoa)
@@ -38,6 +38,7 @@ def dbCriarAlmoxarife(pessoa: Pessoa):
 
             almoxarife = Almoxarife(
                 pessoa_id = pessoa.id,
+                campus_id = idCampus
             )
 
             session.add(almoxarife)

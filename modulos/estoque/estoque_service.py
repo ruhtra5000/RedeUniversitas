@@ -72,6 +72,9 @@ def listarMovimentacaoId(idMovimentacao: int):
 
 def listarAlmoxarifes():
     return dbListarAlmoxarifes()
+
+def listarAlmoxarifesCampus(idCampus: int):
+    return dbListarAlmoxarifesCampus(idCampus)
     
 def listarAlmoxarifeId(idAlmoxarife: int):
     almoxarife = dbListarAlmoxarifeId(idAlmoxarife)

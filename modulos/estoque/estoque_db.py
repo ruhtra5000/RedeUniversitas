@@ -125,6 +125,13 @@ def dbListarAlmoxarifes():
         almoxarifes = session.execute(query).scalars().all()
 
         return almoxarifes
+
+def dbListarAlmoxarifesCampus(idCampus: int):
+    with SessionLocal() as session:
+        query = select(Almoxarife).where(Almoxarife.campus_id == idCampus)
+        almoxarifes = session.execute(query).scalars().all()
+    
+        return almoxarifes
     
 def dbListarAlmoxarifeId(idAlmoxarife: int):
     with SessionLocal() as session:
