@@ -25,7 +25,7 @@ def telaCadastroCampus():
 
     if enviar:
         campus = Campus(
-            cnpj = cnpj,
+            cnpj = str(cnpj),
             nome = nome,
             email = email,
             telefone = telefone
