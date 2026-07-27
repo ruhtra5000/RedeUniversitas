@@ -32,7 +32,7 @@ def telaCadastroDisciplina():
     if st.session_state.pop("cadastro_disc_realizado", False):
         st.toast("Disciplina cadastrada com sucesso!", icon="🎉")
 
-    col1, col2 = st.columns([1, 6])
+    col1, _ = st.columns([1, 6])
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
@@ -62,57 +62,57 @@ def telaCadastroDisciplina():
         with st.container(border=True):
             st.subheader("📚 Dados da Disciplina")
             
-            nome = st.text_input(
-                "Nome da Disciplina *",
-                placeholder="Ex.: Banco de Dados I",
-                key=f"disc_nome_{st.session_state.form_key_disc}"
-            )
-            
-            c1, c2 = st.columns(2)
-            with c1:
-                carga_horaria = st.number_input(
-                    "Carga Horária (Horas) *",
-                    min_value=1,
-                    value=60,
-                    step=10,
-                    key=f"disc_carga_{st.session_state.form_key_disc}"
+            with st.container(horizontal=True):
+                nome = st.text_input(
+                    "Nome da Disciplina *",
+                    placeholder="Ex.: Banco de Dados I",
+                    key=f"disc_nome_{st.session_state.form_key_disc}"
                 )
-                
-            with c2:
-                obrigatoria_str = st.selectbox(
-                    "Disciplina Obrigatória? *",
-                    options=["Sim", "Não"],
-                    key=f"disc_obrigatoria_{st.session_state.form_key_disc}"
+                codigo = st.text_input(
+                    "Código *",
+                    placeholder="Ex.: LOG-01",
+                    key=f"disc_codigo_{st.session_state.form_key_disc}"
                 )
-                obrigatoria = True if obrigatoria_str == "Sim" else False
 
         st.write("")
 
         with st.container(border=True):
-            st.subheader("🔗 Vínculos e Pré-requisitos")
-            
-            c3, c4 = st.columns(2)
-            with c3:
+            st.subheader("🎓 Vínculo e Carga Horária")
+
+            with st.container(horizontal=True):
                 curso_selecionado = st.selectbox(
-                    "Curso *",
+                    "Curso Vinculado *",
                     options=lista_cursos if lista_cursos else [],
                     format_func=lambda c: c.nome,
                     index=None,
                     placeholder="Selecione um curso...",
                     disabled=not lista_cursos,
-                    help="Selecione o curso ao qual esta disciplina pertence.",
                     key=f"disc_curso_{st.session_state.form_key_disc}"
                 )
-                
-            with c4:
-                pre_requisitos_selecionados = st.multiselect(
-                    "Pré-requisitos",
-                    options=lista_disciplinas_existentes,
-                    format_func=lambda d: d.nome,
-                    placeholder="Selecione uma ou mais disciplinas...",
-                    help="Opcional. Selecione as disciplinas que são pré-requisito.",
-                    key=f"disc_prereq_{st.session_state.form_key_disc}"
+                carga_horaria = st.number_input(
+                    "Carga Horária (Horas) *",
+                    min_value=1,
+                    value=60,
+                    step=10,
+                    key=f"disc_ch_{st.session_state.form_key_disc}"
                 )
+            
+            obrigatoria_str = st.selectbox(
+                "Disciplina Obrigatória? *",
+                options=["Sim", "Não"],
+                key=f"disc_obrigatoria_{st.session_state.form_key_disc}"
+            )
+            obrigatoria = True if obrigatoria_str == "Sim" else False
+
+            
+            pre_requisitos_selecionados = st.multiselect(
+                "Pré-requisitos",
+                options=lista_disciplinas_existentes,
+                format_func=lambda d: d.nome,
+                placeholder="Selecione uma ou mais disciplinas...",
+                help="Opcional. Selecione as disciplinas que são pré-requisito.",
+                key=f"disc_prereq_{st.session_state.form_key_disc}"
+            )
 
         st.write("")
 

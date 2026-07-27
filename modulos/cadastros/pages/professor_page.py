@@ -32,7 +32,7 @@ def telaCadastroProfessor():
     if st.session_state.pop("cadastro_prof_realizado", False):
         st.toast("Professor cadastrado com sucesso!", icon="🎉")
 
-    col1, col2 = st.columns([1, 6])
+    col1, _ = st.columns([1, 6])
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
@@ -59,27 +59,24 @@ def telaCadastroProfessor():
         with st.container(border=True):
             st.subheader("👤 Dados Pessoais")
             
-            c1, c2 = st.columns(2)
-            with c1:
+            with st.container(horizontal=True):
                 nome = st.text_input(
                     "Nome Completo *",
                     placeholder="Ex.: Carlos Mendes",
                     key=f"prof_nome_{st.session_state.form_key_prof}"
                 )
-                
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"prof_cpf_{st.session_state.form_key_prof}"
-                )
-                
-            with c2:
                 email = st.text_input(
                     "E-mail *",
                     placeholder="email@exemplo.com",
                     key=f"prof_email_{st.session_state.form_key_prof}"
                 )
-                
+
+            with st.container(horizontal=True):
+                cpf = st.text_input(
+                    "CPF *",
+                    placeholder="Somente números",
+                    key=f"prof_cpf_{st.session_state.form_key_prof}"
+                )
                 telefone = st.text_input(
                     "Telefone",
                     placeholder="Opcional",

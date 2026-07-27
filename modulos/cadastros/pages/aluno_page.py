@@ -34,7 +34,7 @@ def telaCadastroAluno():
     if st.session_state.pop("cadastro_realizado", False):
         st.toast("Aluno cadastrado com sucesso!", icon="🎉")
 
-    col1, col2 = st.columns([1, 6])
+    col1, _ = st.columns([1, 6])
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
@@ -66,28 +66,24 @@ def telaCadastroAluno():
 
         with st.container(border=True):
             st.subheader("👤 Dados Pessoais")
-            c1, c2 = st.columns(2)
-
-            with c1:
+            with st.container(horizontal=True):
                 nome = st.text_input(
                     "Nome Completo *",
                     placeholder="Ex.: João da Silva",
                     key=f"aluno_nome_{st.session_state.form_key_aluno}"
                 )
-
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"aluno_cpf_{st.session_state.form_key_aluno}"
-                )
-
-            with c2:
                 email = st.text_input(
                     "E-mail *",
                     placeholder="email@exemplo.com",
                     key=f"aluno_email_{st.session_state.form_key_aluno}"
                 )
 
+            with st.container(horizontal=True):
+                cpf = st.text_input(
+                    "CPF *",
+                    placeholder="Somente números",
+                    key=f"aluno_cpf_{st.session_state.form_key_aluno}"
+                )
                 telefone = st.text_input(
                     "Telefone",
                     placeholder="Opcional",
@@ -100,9 +96,8 @@ def telaCadastroAluno():
 
         with st.container(border=True):
             st.subheader("🎓 Dados Acadêmicos")
-            c1, c2 = st.columns(2)
-
-            with c1:
+            
+            with st.container(horizontal=True):
                 campus = st.selectbox(
                     "Campus *",
                     options=lista_campus if lista_campus else [],
@@ -113,7 +108,6 @@ def telaCadastroAluno():
                     key=f"aluno_campus_{st.session_state.form_key_aluno}"
                 )
 
-            with c2:
                 curso = st.selectbox(
                     "Curso *",
                     options=lista_cursos if lista_cursos else [],

@@ -3,9 +3,8 @@ import streamlit as st
 def telaHome():
     st.title("Rede Universitas")
 
-    col1, col2 = st.columns(2)
 
-    with col1:
+    with st.container(horizontal=True):
         with st.container(border=True):
             st.subheader("📁 Cadastros")
             st.write("Cadastre alunos, professores, cursos...")
@@ -14,7 +13,6 @@ def telaHome():
                 from modulos.rotas import cadastros_page # evita import circular
                 st.switch_page(cadastros_page)
 
-    with col2:
         with st.container(border=True):
             st.subheader("🎓 Acadêmico")
             

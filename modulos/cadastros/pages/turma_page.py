@@ -28,7 +28,7 @@ def telaCadastroTurma():
     if st.session_state.pop("cadastro_turma_realizado", False):
         st.toast("Turma cadastrada com sucesso!", icon="🎉")
 
-    col1, col2 = st.columns([1, 6])
+    col1, _ = st.columns([1, 6])
 
     with col1:
         if st.button("⬅ Voltar", use_container_width=True):
@@ -65,14 +65,7 @@ def telaCadastroTurma():
             st.subheader("📚 Dados da Turma")
             
             c1, c2 = st.columns(2)
-            with c1:
-                semestre = st.text_input(
-                    "Semestre *",
-                    placeholder="Ex.: 2026.1",
-                    key=f"turma_semestre_{st.session_state.form_key_turma}"
-                )
-                
-            with c2:
+            with st.container(horizontal=True):
                 curso_selecionado = st.selectbox(
                     "Curso *",
                     options=lista_cursos if lista_cursos else [],
@@ -82,14 +75,6 @@ def telaCadastroTurma():
                     disabled=not lista_cursos,
                     key=f"turma_curso_{st.session_state.form_key_turma}"
                 )
-
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("🔗 Vínculos Acadêmicos")
-            
-            c3, c4 = st.columns(2)
-            with c3:
                 disciplina_selecionada = st.selectbox(
                     "Disciplina *",
                     options=lista_disciplinas if lista_disciplinas else [],
@@ -97,11 +82,10 @@ def telaCadastroTurma():
                     index=None,
                     placeholder="Selecione uma disciplina...",
                     disabled=not lista_disciplinas,
-                    help="A disciplina deve pertencer ao curso selecionado acima.",
-                    key=f"turma_disciplina_{st.session_state.form_key_turma}"
+                    key=f"turma_disc_{st.session_state.form_key_turma}"
                 )
-                
-            with c4:
+
+            with st.container(horizontal=True):
                 professor_selecionado = st.selectbox(
                     "Professor *",
                     options=lista_professores if lista_professores else [],
@@ -109,8 +93,12 @@ def telaCadastroTurma():
                     index=None,
                     placeholder="Selecione um professor...",
                     disabled=not lista_professores,
-                    help="O professor deve pertencer ao mesmo campus do curso.",
-                    key=f"turma_professor_{st.session_state.form_key_turma}"
+                    key=f"turma_prof_{st.session_state.form_key_turma}"
+                )
+                semestre = st.text_input(
+                    "Semestre *",
+                    placeholder="Ex.: 2026.1",
+                    key=f"turma_semestre_{st.session_state.form_key_turma}"
                 )
 
         st.write("")
