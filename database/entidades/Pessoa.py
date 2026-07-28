@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Integer, String
+from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.Base import Base
@@ -17,6 +17,7 @@ class Pessoa(Base):
     # Colunas
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     google_id: Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     cpf: Mapped[str] = mapped_column(String(11), unique=True, nullable=False)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
