@@ -456,7 +456,8 @@ def dbListarAlunoId(idAluno: int):
         from sqlalchemy.orm import joinedload
         query = select(Aluno).options(
             joinedload(Aluno.pessoa),
-            joinedload(Aluno.matriculas).joinedload(Matricula.disciplina)
+            joinedload(Aluno.matriculas).joinedload(Matricula.disciplina),
+            joinedload(Aluno.matriculas).joinedload(Matricula.turma)
         ).where(Aluno.pessoa_id == idAluno)
         aluno = session.execute(query).unique().scalar_one_or_none()
 

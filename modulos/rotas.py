@@ -13,6 +13,9 @@ from modulos.cadastros.pages.financeiro_page import telaCadastroFinanceiro
 from modulos.cadastros.pages.fornecedor_page import telaCadastroFornecedor
 from modulos.cadastros.pages.matricula_page import telaCadastroMatricula
 from modulos.cadastros.pages.estoque_page import telaCadastroEstoque
+from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
+from modulos.academico.pages.boletim_page import telaBoletim
+from modulos.academico.pages.financeiro_aluno_page import telaFinanceiroAluno
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -43,6 +46,10 @@ operacao_diario = st.Page(telaDiarioClasse, title="Diário de Classe", icon=":ma
 gestao_cargos = st.Page(telaDesignacaoCargos, title="Designação de Cargos", icon=":material/badge:", url_path="designacao_cargos")
 gestao_bolsas = st.Page(telaGestaoBolsas, title="Gestão de Bolsas", icon=":material/loyalty:", url_path="gestao_bolsas")
 
+# Portal do Aluno
+meu_boletim = st.Page(telaBoletim, title="Meu Boletim", icon=":material/school:", url_path="meu_boletim")
+meu_financeiro = st.Page(telaFinanceiroAluno, title="Meu Financeiro", icon=":material/payments:", url_path="meu_financeiro")
+
 def get_navigation():
     roles = st.session_state.get("roles", [])
 
@@ -52,6 +59,10 @@ def get_navigation():
             home_page
         ]
     }
+
+    # Aluno
+    if "ALUNO" in roles:
+        pages["Portal do Aluno"] = [meu_boletim, meu_financeiro]
 
     # Professor
     if "PROFESSOR" in roles:
