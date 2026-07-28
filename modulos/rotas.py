@@ -77,25 +77,26 @@ def get_navigation():
     cadastros_list = []
     operacoes_list = []
 
-    # Reitor tem acesso massivo
-    if "REITOR" in roles:
+    # Admin tem acesso a absolutamente tudo
+    if "ADMIN" in roles:
         pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
         cadastros_list.extend([
-            cadastro_aluno,
-            cadastro_prof,
-            cadastro_financeiro,
-            cadastro_almoxarife,
-            cadastro_campus,
-            cadastro_curso,
-            cadastro_disc,
-            cadastro_turma,
-            cadastro_matricula,
-            cadastro_bolsa
+            cadastro_aluno, cadastro_prof, cadastro_financeiro, cadastro_almoxarife,
+            cadastro_campus, cadastro_curso, cadastro_disc, cadastro_turma,
+            cadastro_matricula, cadastro_bolsa, cadastro_compra, cadastro_fornecedor, cadastro_estoque
         ])
         operacoes_list.append(gestao_financeira)
 
+    # Reitor tem acesso executivo (C-Level)
+    elif "REITOR" in roles:
+        pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
+        cadastros_list.extend([
+            cadastro_prof,
+            cadastro_curso
+        ])
+
     # Financeiro
-    if "FINANCEIRO" in roles:
+    if "FINANCEIRO" in roles and "ADMIN" not in roles:
         if cadastro_compra not in cadastros_list:
             cadastros_list.append(cadastro_compra)
         if cadastro_fornecedor not in cadastros_list:
@@ -104,7 +105,7 @@ def get_navigation():
             operacoes_list.append(gestao_financeira)
 
     # Almoxarife
-    if "ALMOXARIFE" in roles:
+    if "ALMOXARIFE" in roles and "ADMIN" not in roles:
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
 

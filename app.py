@@ -79,6 +79,7 @@ def verificarLogin():
             if pessoa.almoxarife: roles.append("ALMOXARIFE")
             if pessoa.aluno: roles.append("ALUNO")
             if pessoa.financeiro: roles.append("FINANCEIRO")
+            if pessoa.is_admin: roles.append("ADMIN")
             
             st.session_state.roles = roles
             st.session_state.pessoa_logada = pessoa.nome
