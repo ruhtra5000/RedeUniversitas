@@ -51,7 +51,7 @@ def telaCadastroMatricula():
             """
         )
 
-    with st.form(key=f"cadastro_matr_{st.session_state.form_key_matr}", border=False):
+    with st.container(border=False):
         
         with st.container(border=True):
             st.subheader("📚 Informações da Matrícula")
@@ -66,13 +66,19 @@ def telaCadastroMatricula():
                     disabled=not lista_alunos,
                     key=f"matr_aluno_{st.session_state.form_key_matr}"
                 )
+                
+                if aluno_selecionado:
+                    turmas_filtradas = [t for t in lista_turmas if t.curso_id == aluno_selecionado.curso_id]
+                else:
+                    turmas_filtradas = []
+
                 turma_selecionada = st.selectbox(
                     "Turma *",
-                    options=lista_turmas if lista_turmas else [],
+                    options=turmas_filtradas,
                     format_func=lambda t: f"{t.codigo} - {t.disciplina.nome}",
                     index=None,
-                    placeholder="Selecione uma turma...",
-                    disabled=not lista_turmas,
+                    placeholder="Selecione uma turma..." if aluno_selecionado else "Selecione o Aluno primeiro",
+                    disabled=not aluno_selecionado,
                     help="A disciplina da turma deve pertencer ao mesmo curso do aluno.",
                     key=f"matr_turma_{st.session_state.form_key_matr}"
                 )
@@ -81,10 +87,11 @@ def telaCadastroMatricula():
 
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
-            cadastrar = st.form_submit_button(
+            cadastrar = st.button(
                 "💾 Matricular Aluno", 
                 type="primary", 
-                use_container_width=True
+                use_container_width=True,
+                key=f"btn_cad_matr_{st.session_state.form_key_matr}"
             )
 
     if cadastrar:

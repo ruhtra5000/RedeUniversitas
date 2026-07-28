@@ -45,7 +45,7 @@ def telaCadastroCurso():
             from modulos.rotas import cadastros_page # evita import circular
             st.switch_page(cadastros_page)
 
-    with st.form(key=f"cadastro_curso_{st.session_state.form_key_curso}", border=False):
+    with st.container(border=False):
 
         # Dados do Curso
         with st.container(border=True):
@@ -107,13 +107,19 @@ def telaCadastroCurso():
                     disabled=not lista_campus,
                     key=f"curso_campus_{st.session_state.form_key_curso}"
                 )
+                
+                if campus_selecionado:
+                    professores_filtrados = [p for p in lista_professores if p.campus_id == campus_selecionado.id]
+                else:
+                    professores_filtrados = []
+
                 coordenador_selecionado = st.selectbox(
                     "Coordenador",
-                    options=lista_professores if lista_professores else [],
+                    options=professores_filtrados,
                     format_func=lambda p: p.pessoa.nome,
                     index=None,
-                    placeholder="Selecione um professor...",
-                    disabled=not lista_professores,
+                    placeholder="Selecione um professor..." if campus_selecionado else "Selecione o Campus primeiro",
+                    disabled=not campus_selecionado,
                     key=f"curso_coord_{st.session_state.form_key_curso}"
                 )
 
@@ -122,10 +128,11 @@ def telaCadastroCurso():
         _, centro, _ = st.columns([2, 3, 2])
         
         with centro:
-            cadastrar = st.form_submit_button(
+            cadastrar = st.button(
                 "💾 Cadastrar Curso", 
                 type="primary", 
-                use_container_width=True
+                use_container_width=True,
+                key=f"btn_cad_curso_{st.session_state.form_key_curso}"
             )
 
     # Processamento

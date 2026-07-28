@@ -57,7 +57,7 @@ def telaCadastroDisciplina():
             """
         )
 
-    with st.form(key=f"cadastro_disc_{st.session_state.form_key_disc}", border=False):
+    with st.container(border=False):
 
         with st.container(border=True):
             st.subheader("📚 Dados da Disciplina")
@@ -104,13 +104,18 @@ def telaCadastroDisciplina():
             )
             obrigatoria = True if obrigatoria_str == "Sim" else False
 
+            if curso_selecionado:
+                disciplinas_filtradas = [d for d in lista_disciplinas_existentes if d.curso_id == curso_selecionado.id]
+            else:
+                disciplinas_filtradas = []
             
             pre_requisitos_selecionados = st.multiselect(
                 "Pré-requisitos",
-                options=lista_disciplinas_existentes,
+                options=disciplinas_filtradas,
                 format_func=lambda d: d.nome,
-                placeholder="Selecione uma ou mais disciplinas...",
+                placeholder="Selecione uma ou mais disciplinas..." if curso_selecionado else "Selecione o Curso primeiro",
                 help="Opcional. Selecione as disciplinas que são pré-requisito.",
+                disabled=not curso_selecionado,
                 key=f"disc_prereq_{st.session_state.form_key_disc}"
             )
 
@@ -119,10 +124,11 @@ def telaCadastroDisciplina():
         _, centro, _ = st.columns([2, 3, 2])
         
         with centro:
-            cadastrar = st.form_submit_button(
+            cadastrar = st.button(
                 "💾 Cadastrar Disciplina", 
                 type="primary", 
-                use_container_width=True
+                use_container_width=True,
+                key=f"btn_cad_disc_{st.session_state.form_key_disc}"
             )
 
     # Processamento

@@ -59,7 +59,7 @@ def telaCadastroTurma():
             """
         )
 
-    with st.form(key=f"cadastro_turma_{st.session_state.form_key_turma}", border=False):
+    with st.container(border=False):
 
         with st.container(border=True):
             st.subheader("📚 Dados da Turma")
@@ -75,13 +75,19 @@ def telaCadastroTurma():
                     disabled=not lista_cursos,
                     key=f"turma_curso_{st.session_state.form_key_turma}"
                 )
+                
+                if curso_selecionado:
+                    disciplinas_filtradas = [d for d in lista_disciplinas if d.curso_id == curso_selecionado.id]
+                else:
+                    disciplinas_filtradas = []
+
                 disciplina_selecionada = st.selectbox(
                     "Disciplina *",
-                    options=lista_disciplinas if lista_disciplinas else [],
+                    options=disciplinas_filtradas,
                     format_func=lambda d: d.nome,
                     index=None,
-                    placeholder="Selecione uma disciplina...",
-                    disabled=not lista_disciplinas,
+                    placeholder="Selecione uma disciplina..." if curso_selecionado else "Selecione o Curso primeiro",
+                    disabled=not curso_selecionado,
                     key=f"turma_disc_{st.session_state.form_key_turma}"
                 )
 
@@ -106,10 +112,11 @@ def telaCadastroTurma():
         _, centro, _ = st.columns([2, 3, 2])
         
         with centro:
-            cadastrar = st.form_submit_button(
+            cadastrar = st.button(
                 "💾 Cadastrar Turma", 
                 type="primary", 
-                use_container_width=True
+                use_container_width=True,
+                key=f"btn_cad_turma_{st.session_state.form_key_turma}"
             )
 
     # Processamento

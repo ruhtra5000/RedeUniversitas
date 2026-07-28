@@ -60,7 +60,7 @@ def telaCadastroAluno():
             """
         )
 
-    with st.form(f"cadastro_aluno_{st.session_state.form_key_aluno}", border=False):
+    with st.container(border=False):
 
         # Dados pessoais
 
@@ -107,14 +107,19 @@ def telaCadastroAluno():
                     disabled=not lista_campus,
                     key=f"aluno_campus_{st.session_state.form_key_aluno}"
                 )
+                
+                if campus:
+                    cursos_filtrados = [c for c in lista_cursos if c.campus_id == campus.id]
+                else:
+                    cursos_filtrados = []
 
                 curso = st.selectbox(
                     "Curso *",
-                    options=lista_cursos if lista_cursos else [],
+                    options=cursos_filtrados,
                     format_func=lambda x: x.nome,
                     index=None,
-                    placeholder="Selecione um curso...",
-                    disabled=not lista_cursos,
+                    placeholder="Selecione um curso..." if campus else "Selecione o Campus primeiro",
+                    disabled=not campus,
                     key=f"aluno_curso_{st.session_state.form_key_aluno}"
                 )
 
@@ -123,10 +128,11 @@ def telaCadastroAluno():
         _, centro, _ = st.columns([2, 3, 2])
 
         with centro:
-            cadastrar = st.form_submit_button(
+            cadastrar = st.button(
                 "💾 Cadastrar Aluno",
                 use_container_width=True,
-                type="primary"
+                type="primary",
+                key=f"btn_cad_aluno_{st.session_state.form_key_aluno}"
             )
 
     # Processamento
