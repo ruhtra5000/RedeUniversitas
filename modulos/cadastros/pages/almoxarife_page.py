@@ -30,7 +30,7 @@ def telaCadastroAlmoxarife():
 
     col1, _ = st.columns([1, 6])
     with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button("⬅ Voltar", width="stretch"):
             from modulos.rotas import cadastros_page
             st.switch_page(cadastros_page)
 
@@ -98,7 +98,7 @@ def telaCadastroAlmoxarife():
             cadastrar = st.form_submit_button(
                 "💾 Cadastrar Almoxarife", 
                 type="primary", 
-                use_container_width=True
+                width="stretch"
             )
 
     if cadastrar:

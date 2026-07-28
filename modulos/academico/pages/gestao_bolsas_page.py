@@ -61,7 +61,7 @@ def telaGestaoBolsas():
     st.dataframe(
         df_bolsas,
         column_config=col_config,
-        use_container_width=True,
+        width="stretch",
         hide_index=True
     )
 
@@ -112,7 +112,7 @@ def telaGestaoBolsas():
                     
                     _, centro, _ = st.columns([2, 3, 2])
                     with centro:
-                        if st.form_submit_button("Salvar Alterações", type="primary", use_container_width=True):
+                        if st.form_submit_button("Salvar Alterações", type="primary", width="stretch"):
                             try:
                                 editarBolsa(
                                     idBolsa=bolsa.id,

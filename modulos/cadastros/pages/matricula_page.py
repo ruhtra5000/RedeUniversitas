@@ -29,7 +29,7 @@ def telaCadastroMatricula():
 
     col1, _ = st.columns([1, 6])
     with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button("⬅ Voltar", width="stretch"):
             from modulos.rotas import cadastros_page
             st.switch_page(cadastros_page)
 
@@ -90,7 +90,7 @@ def telaCadastroMatricula():
             cadastrar = st.button(
                 "💾 Matricular Aluno", 
                 type="primary", 
-                use_container_width=True,
+                width="stretch",
                 key=f"btn_cad_matr_{st.session_state.form_key_matr}"
             )
 

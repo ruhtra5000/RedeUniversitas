@@ -73,7 +73,7 @@ def telaDesignacaoCargos():
                         )
                     
                     with col2:
-                        if st.button("Designar Novo Reitor", type="primary", use_container_width=True, disabled=not novo_reitor):
+                        if st.button("Designar Novo Reitor", type="primary", width="stretch", disabled=not novo_reitor):
                             try:
                                 definirReitor(campus_real.id, novo_reitor.pessoa_id)
                                 st.session_state.cargo_sucesso = True
@@ -144,7 +144,7 @@ def telaDesignacaoCargos():
                         )
                     
                     with col2:
-                        if st.button("Designar Novo Coordenador", type="primary", use_container_width=True, disabled=not novo_coord, key="btn_designar_coord"):
+                        if st.button("Designar Novo Coordenador", type="primary", width="stretch", disabled=not novo_coord, key="btn_designar_coord"):
                             try:
                                 definirCoordenador(curso_real.id, novo_coord.pessoa_id)
                                 st.session_state.cargo_sucesso = True

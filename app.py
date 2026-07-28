@@ -28,7 +28,7 @@ def telaLogin():
 
         if st.button(
             "![Google](https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg) Entrar com Google",
-            use_container_width=True,
+            width="stretch",
         ):
             st.login()
             st.stop()

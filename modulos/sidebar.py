@@ -7,6 +7,6 @@ def renderizar_perfil_usuario():
     nome_usuario = formata_primeiro_nome(st.user.name)
     st.markdown(f"**Olá, {nome_usuario}!**")
     
-    if st.button(":material/logout: Logout", use_container_width=True):
+    if st.button(":material/logout: Logout", width="stretch"):
         st.logout()
         st.stop()

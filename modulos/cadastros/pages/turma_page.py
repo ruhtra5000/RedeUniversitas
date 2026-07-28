@@ -31,7 +31,7 @@ def telaCadastroTurma():
     col1, _ = st.columns([1, 6])
 
     with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button("⬅ Voltar", width="stretch"):
             from modulos.rotas import cadastros_page # evita import circular
             st.switch_page(cadastros_page)
 
@@ -115,7 +115,7 @@ def telaCadastroTurma():
             cadastrar = st.button(
                 "💾 Cadastrar Turma", 
                 type="primary", 
-                use_container_width=True,
+                width="stretch",
                 key=f"btn_cad_turma_{st.session_state.form_key_turma}"
             )
 

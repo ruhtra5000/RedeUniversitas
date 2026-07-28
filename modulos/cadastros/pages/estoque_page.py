@@ -28,7 +28,7 @@ def telaCadastroEstoque():
 
     col1, col2 = st.columns([1, 6])
     with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button("⬅ Voltar", width="stretch"):
             from modulos.rotas import cadastros_page
             st.switch_page(cadastros_page)
 
@@ -96,7 +96,7 @@ def telaCadastroEstoque():
             cadastrar = st.form_submit_button(
                 "💾 Cadastrar Produto", 
                 type="primary", 
-                use_container_width=True
+                width="stretch"
             )
 
     if cadastrar:

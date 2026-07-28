@@ -104,7 +104,7 @@ def telaDiarioClasse():
                 original_data,
                 disabled=["ID Aluno", "Nome", "Média", "Presenças", "Total Aulas", "Frequência %", "Situação"],
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 column_config={
                     "ID Aluno": None, # Oculta a coluna
                     "Nota 1": st.column_config.NumberColumn(min_value=0.0, max_value=10.0, step=0.1, format="%.1f"),
@@ -121,10 +121,10 @@ def telaDiarioClasse():
             c1, c2, c3 = st.columns([1, 1, 1])
             
             with c1:
-                salvar = st.button("💾 Salvar Lançamentos", type="primary", use_container_width=True)
+                salvar = st.button("💾 Salvar Lançamentos", type="primary", width="stretch")
             
             with c3:
-                fechar = st.button("🔒 Consolidar Turma", use_container_width=True, help="Calcula a situação final de todos os alunos e fecha a turma.")
+                fechar = st.button("🔒 Consolidar Turma", width="stretch", help="Calcula a situação final de todos os alunos e fecha a turma.")
 
             if salvar:
                 try:
