@@ -199,8 +199,11 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
 def dbListarTurmasGeral():
     with SessionLocal() as session:
         from sqlalchemy.orm import joinedload
-        query = select(Turma).options(joinedload(Turma.disciplina))
-        turmas = session.execute(query).scalars().all()
+        query = select(Turma).options(
+            joinedload(Turma.disciplina),
+            joinedload(Turma.matriculas).joinedload(Matricula.aluno).joinedload(Aluno.pessoa)
+        )
+        turmas = session.execute(query).unique().scalars().all()
         return turmas
 
 def dbListarTurmasProfessor(idProfessor: int, semestre: str):
@@ -219,8 +222,12 @@ def dbListarTurmasCurso(idCurso: int, semestre: str):
     
 def dbListarTurmaId(idTurma: int):
     with SessionLocal() as session:
-        query = select(Turma).where(Turma.id == idTurma)
-        turma = session.execute(query).scalar_one_or_none()
+        from sqlalchemy.orm import joinedload
+        query = select(Turma).options(
+            joinedload(Turma.disciplina),
+            joinedload(Turma.matriculas).joinedload(Matricula.aluno).joinedload(Aluno.pessoa)
+        ).where(Turma.id == idTurma)
+        turma = session.execute(query).unique().scalar_one_or_none()
 
         return turma
 
@@ -242,7 +249,8 @@ def dbAlterarProfessorTurma(idTurma: int, idNovoProfessor: int):
 
 def dbListarMatriculaId(idAluno: int, idTurma: int):
     with SessionLocal() as session:
-        query = select(Matricula).where(Matricula.aluno_id == idAluno, Matricula.turma_id == idTurma)
+        from sqlalchemy.orm import joinedload
+        query = select(Matricula).options(joinedload(Matricula.disciplina)).where(Matricula.aluno_id == idAluno, Matricula.turma_id == idTurma)
         matricula = session.execute(query).scalar_one_or_none()
 
         return matricula
@@ -442,8 +450,12 @@ def dbListarAlunosCurso(idCurso: int):
     
 def dbListarAlunoId(idAluno: int):
     with SessionLocal() as session:
-        query = select(Aluno).where(Aluno.pessoa_id == idAluno)
-        aluno = session.execute(query).scalar_one_or_none()
+        from sqlalchemy.orm import joinedload
+        query = select(Aluno).options(
+            joinedload(Aluno.pessoa),
+            joinedload(Aluno.matriculas).joinedload(Matricula.disciplina)
+        ).where(Aluno.pessoa_id == idAluno)
+        aluno = session.execute(query).unique().scalar_one_or_none()
 
         return aluno
     

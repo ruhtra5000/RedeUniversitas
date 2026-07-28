@@ -8,7 +8,7 @@ from modulos.academico.academico_service import (
 )
 
 def telaDiarioClasse():
-    st.title("👨‍🏫 Diário de Classe")
+    st.title("Diário de Classe")
     st.caption("Faça o lançamento de notas, faltas e o fechamento do semestre para as suas turmas.")
 
     if st.session_state.pop("diario_salvo", False):
@@ -17,6 +17,9 @@ def telaDiarioClasse():
     if st.session_state.pop("turma_fechada", False):
         st.toast("Turma consolidada com sucesso!", icon="🔒")
         
+    if "form_key_diario" not in st.session_state:
+        st.session_state.form_key_diario = 0
+
     # --- PROVISÓRIO ---
     # Até implementarmos o sistema de login, o usuário seleciona quem ele é
     if "cache_professores" not in st.session_state:
@@ -57,12 +60,17 @@ def telaDiarioClasse():
     st.write("")
 
     if turma_selecionada:
-        matriculas = turma_selecionada.matriculas
+        # Busca a turma atualizada pelo ID (evita que o selectbox retenha um objeto antigo na memória)
+        turma = next((t for t in lista_turmas_geral if t.id == turma_selecionada.id), None)
+        if not turma:
+            return
+        
+        matriculas = turma.matriculas
 
         if not matriculas:
             st.info("Nenhum aluno matriculado nesta turma ainda.")
         else:
-            st.subheader(f"Lançamentos: {turma_selecionada.disciplina.nome}")
+            st.subheader(f"Lançamentos para {turma_selecionada.disciplina.nome}")
             
             # Montar a estrutura de dados para o data_editor
             original_data = []
@@ -72,26 +80,29 @@ def telaDiarioClasse():
                 if matr.aprovacao is True: status = "Aprovado"
                 elif matr.aprovacao is False: status = "Reprovado"
                 
+                aulas_totais = int(turma_selecionada.disciplina.carga_horaria * 0.75)
+
                 original_data.append({
                     "ID Aluno": matr.aluno_id,
                     "Nome": matr.aluno.pessoa.nome,
-                    "Nota 1": float(matr.nota1) if matr.nota1 != -1 else None,
-                    "Nota 2": float(matr.nota2) if matr.nota2 != -1 else None,
-                    "Nota 3": float(matr.nota3) if matr.nota3 != -1 else None,
-                    "Final": float(matr.final) if matr.final != -1 else None,
-                    "Média": float(matr.media) if matr.media != -1 else None,
-                    "Faltas": int(matr.frequencia_abs),
-                    "Frequência %": f"{(matr.frequencia_rel * 100):.1f}%" if matr.frequencia_rel is not None else "100.0%",
+                    "Nota 1": float(matr.nota1) if matr.nota1 is not None and matr.nota1 != -1 else None,
+                    "Nota 2": float(matr.nota2) if matr.nota2 is not None and matr.nota2 != -1 else None,
+                    "Nota 3": float(matr.nota3) if matr.nota3 is not None and matr.nota3 != -1 else None,
+                    "Final": float(matr.final) if matr.final is not None and matr.final != -1 else None,
+                    "Média": float(matr.media) if matr.media is not None and matr.media != -1 else None,
+                    "Presenças": int(matr.frequencia_abs) if matr.frequencia_abs is not None else 0,
+                    "Total Aulas": aulas_totais,
+                    "Frequência %": f"{(matr.frequencia_rel * 100):.1f}%" if matr.frequencia_rel is not None else "0.0%",
                     "Situação": status,
-                    "Adicionar Faltas": 0
+                    "Adicionar Presenças": 0
                 })
 
-            st.caption("Dica: Você pode preencher as notas e faltas diretamente na tabela como se fosse no Excel.")
+            st.caption("Dica: Você pode preencher as notas e presenças diretamente na tabela como se fosse no Excel.")
             
             # Exibe o editor de dados
             edited_data = st.data_editor(
                 original_data,
-                disabled=["ID Aluno", "Nome", "Média", "Faltas", "Frequência %", "Situação"],
+                disabled=["ID Aluno", "Nome", "Média", "Presenças", "Total Aulas", "Frequência %", "Situação"],
                 hide_index=True,
                 use_container_width=True,
                 column_config={
@@ -101,9 +112,9 @@ def telaDiarioClasse():
                     "Nota 3": st.column_config.NumberColumn(min_value=0.0, max_value=10.0, step=0.1, format="%.1f"),
                     "Final": st.column_config.NumberColumn(min_value=0.0, max_value=10.0, step=0.1, format="%.1f"),
                     "Média": st.column_config.NumberColumn(format="%.1f"),
-                    "Adicionar Faltas": st.column_config.NumberColumn(min_value=0, max_value=100, step=1)
+                    "Adicionar Presenças": st.column_config.NumberColumn(min_value=0, max_value=100, step=1)
                 },
-                key=f"editor_turma_{turma_selecionada.id}"
+                key=f"editor_turma_{turma_selecionada.id}_{st.session_state.form_key_diario}"
             )
             
             st.write("")
@@ -132,12 +143,13 @@ def telaDiarioClasse():
                         if edit["Final"] != orig["Final"] and edit["Final"] is not None:
                             lancarNotaFinal(id_aluno, turma_selecionada.id, Decimal(str(edit["Final"])))
                             
-                        if edit["Adicionar Faltas"] > 0:
-                            cadastrarPresenca(id_aluno, turma_selecionada.id, int(edit["Adicionar Faltas"]))
+                        if edit.get("Adicionar Presenças", 0) > 0:
+                            cadastrarPresenca(id_aluno, turma_selecionada.id, int(edit["Adicionar Presenças"]))
                     
                     st.session_state["diario_salvo"] = True
-                    # Invalida o cache das turmas para que as novas notas apareçam ao recarregar
-                    st.session_state.pop("cache_turmas", None)
+                    if "cache_turmas" in st.session_state:
+                        del st.session_state["cache_turmas"]
+                    st.session_state.form_key_diario += 1
                     st.rerun()
 
                 except SQLAlchemyError as e:
@@ -149,7 +161,9 @@ def telaDiarioClasse():
                 try:
                     fecharTurma(turma_selecionada.id)
                     st.session_state["turma_fechada"] = True
-                    st.session_state.pop("cache_turmas", None)
+                    if "cache_turmas" in st.session_state:
+                        del st.session_state["cache_turmas"]
+                    st.session_state.form_key_diario += 1
                     st.rerun()
                 except SQLAlchemyError as e:
                     st.error(f"Erro no banco de dados: {e}")
