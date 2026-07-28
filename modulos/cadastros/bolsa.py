@@ -17,12 +17,15 @@ import database.entidades
 #       status: StatusBolsa
 
 # Service
-def criarBolsa(bolsa: Bolsa):
+def criarBolsa(bolsa: Bolsa, aluno):
     try:
         bolsasAtivas = dbListarBolsasAtivasAluno(bolsa.aluno_id)
         
         if bolsasAtivas == None or bolsasAtivas == []:
-            raise Exception(f"O aluno {bolsa.aluno.pessoa.nome} já tem uma bolsa ativa vinculada a si.")
+            pass
+        
+        else:
+            raise Exception(f"O aluno {aluno.pessoa.nome} já tem uma bolsa ativa vinculada a si.")
         
         if bolsa.data_fim < bolsa.data_inicio:
             raise Exception(f"A data de início deve vir antes da data de fim.")

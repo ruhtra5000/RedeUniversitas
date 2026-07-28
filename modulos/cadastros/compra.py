@@ -20,7 +20,7 @@ import database.entidades
 # - dataVencimentoContaPagar: date 
 
 # Service
-def criarCompra(compra: Compra, dataVencimentoContaPagar: date):
+def criarCompra(compra: Compra, dataVencimentoContaPagar: date, financeiro: Financeiro):
     try:
         if compra.qtde <= 0:
             raise Exception("A quantidade comprada deve ser maior que 0.")
@@ -39,14 +39,14 @@ def criarCompra(compra: Compra, dataVencimentoContaPagar: date):
             financeiro_id = compra.financeiro_id
         )
 
-        dbCriarCompraEContaPagar(compra, contaPagar)
+        dbCriarCompraEContaPagar(compra, contaPagar, financeiro)
     
     except Exception:    
         raise
 
 
 # Dados
-def dbCriarCompraEContaPagar(compra: Compra, contaPagar: ContaPagar):
+def dbCriarCompraEContaPagar(compra: Compra, contaPagar: ContaPagar, financeiro: Financeiro):
     with SessionLocal() as session:
         try:
             session.add(compra)
@@ -54,7 +54,7 @@ def dbCriarCompraEContaPagar(compra: Compra, contaPagar: ContaPagar):
             session.refresh(compra)
 
             contaPagar.compra_id = compra.id
-            contaPagar.caixa_id = compra.financeiro.campus.caixa.id,
+            contaPagar.caixa_id = financeiro.campus.caixa.id
             session.add(contaPagar)
             session.commit()
 
