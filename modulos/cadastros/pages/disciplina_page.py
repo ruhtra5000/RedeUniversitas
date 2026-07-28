@@ -60,7 +60,7 @@ def telaCadastroDisciplina():
     with st.container(border=False):
 
         with st.container(border=True):
-            st.subheader("📚 Dados da Disciplina")
+            st.subheader("Dados da Disciplina")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -68,16 +68,6 @@ def telaCadastroDisciplina():
                     placeholder="Ex.: Banco de Dados I",
                     key=f"disc_nome_{st.session_state.form_key_disc}"
                 )
-                codigo = st.text_input(
-                    "Código *",
-                    placeholder="Ex.: LOG-01",
-                    key=f"disc_codigo_{st.session_state.form_key_disc}"
-                )
-
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("🎓 Vínculo e Carga Horária")
 
             with st.container(horizontal=True):
                 curso_selecionado = st.selectbox(
