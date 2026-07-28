@@ -22,10 +22,10 @@ from modulos.listagem.listagem_professor_page import telaListagemProfessores
 from modulos.listagem.listagem_disciplina_page import telaListagemDisciplinas
 from modulos.listagem.listagem_turma_page import telaListagemTurmas
 from modulos.listagem.listagem_campus_page import telaListagemCampus
-from modulos.listagem.listagem_almoxarife_page import (telaListagemAlmoxarifes)
-from modulos.listagem.listagem_financeiro_page import (telaListagemFinanceiros)
-from modulos.listagem.listagem_bolsa_page import (telaListagemBolsas)
-from modulos.listagem.listagem_matricula_page import (telaListagemMatriculas)
+from modulos.listagem.listagem_almoxarife_page import telaListagemAlmoxarifes
+from modulos.listagem.listagem_financeiro_page import telaListagemFinanceiros
+from modulos.listagem.listagem_bolsa_page import telaListagemBolsas
+from modulos.listagem.listagem_matricula_page import telaListagemMatriculas
 from modulos.view.view_aluno_page import telaViewAluno
 from modulos.view.view_curso_page import telaViewCurso
 from modulos.view.view_professor_page import telaViewProfessor
@@ -143,6 +143,7 @@ def get_navigation():
             listagem_matricula_page,
             listagem_bolsa_page
         ]
+        
     if "ADMIN" in roles:
         pages["Visualizações"] = [view_aluno_page,
             view_professor_page,
