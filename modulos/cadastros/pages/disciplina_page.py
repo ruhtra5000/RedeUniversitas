@@ -4,10 +4,10 @@ from database.Conexao import SessionLocal
 from database.entidades.Curso import Curso
 from database.entidades.Disciplina import Disciplina
 from database.entidades.PreRequisito import PreRequisito
-from modulos.academico.academico_db import dbListarDisciplinaId
-from modulos.academico.academico_db import dbListarDisciplinasGeral
+from modulos.academico.academico_service import listarDisciplinaId
+from modulos.academico.academico_service import listarDisciplinasGeral
 import database.entidades
-from modulos.academico.academico_db import dbListarCursos
+from modulos.academico.academico_service import listarCursos
 from modulos.cadastros.disciplina import criarDisciplina
 
 def telaCadastroDisciplina():
@@ -40,10 +40,10 @@ def telaCadastroDisciplina():
             st.switch_page(cadastros_page)
 
     if "cache_cursos" not in st.session_state:
-        st.session_state.cache_cursos = dbListarCursos()
+        st.session_state.cache_cursos = listarCursos()
 
     if "cache_disciplinas" not in st.session_state:
-        st.session_state.cache_disciplinas = dbListarDisciplinasGeral()
+        st.session_state.cache_disciplinas = listarDisciplinasGeral()
 
     lista_cursos = st.session_state.cache_cursos
     lista_disciplinas_existentes = st.session_state.cache_disciplinas

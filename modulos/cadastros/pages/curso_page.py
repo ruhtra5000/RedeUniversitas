@@ -3,7 +3,7 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Curso import Curso
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
-from modulos.academico.academico_db import (dbListarCursos,dbListarProfessorId,dbListarCampus,dbListarProfessores)
+from modulos.academico.academico_service import (listarCursos,listarProfessorId,listarCampus,listarProfessores)
 import database.entidades
 from modulos.cadastros.curso import criarCurso
 
@@ -30,10 +30,10 @@ def telaCadastroCurso():
         st.toast("Curso cadastrado com sucesso!", icon="🎉")
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     if "cache_professores" not in st.session_state:
-        st.session_state.cache_professores = dbListarProfessores()
+        st.session_state.cache_professores = listarProfessores()
 
     lista_campus = st.session_state.cache_campus
     lista_professores = st.session_state.cache_professores

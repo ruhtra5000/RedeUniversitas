@@ -10,6 +10,9 @@ from modulos.estoque.estoque_db import *
 def listarProdutos(idCampus: int):
     return dbListarProdutos(idCampus)
 
+def listarProdutosGeral():
+    return dbListarProdutosGeral()
+
 def listarProdutoId(idProduto: int):
     produto = dbListarProdutoId(idProduto)
 

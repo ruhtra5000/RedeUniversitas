@@ -3,7 +3,7 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Turma import Turma
 import database.entidades
-from modulos.academico.academico_db import (dbListarCursos, dbListarDisciplinasGeral, dbListarProfessores)
+from modulos.academico.academico_service import (listarCursos, listarDisciplinasGeral, listarProfessores)
 from modulos.cadastros.turma import criarTurma
 
 def telaCadastroTurma():
@@ -36,13 +36,13 @@ def telaCadastroTurma():
             st.switch_page(cadastros_page)
 
     if "cache_cursos" not in st.session_state:
-        st.session_state.cache_cursos = dbListarCursos()
-
-    if "cache_disciplinas" not in st.session_state:
-        st.session_state.cache_disciplinas = dbListarDisciplinasGeral()
+        st.session_state.cache_cursos = listarCursos()
 
     if "cache_professores" not in st.session_state:
-        st.session_state.cache_professores = dbListarProfessores()
+        st.session_state.cache_professores = listarProfessores()
+        
+    if "cache_disciplinas" not in st.session_state:
+        st.session_state.cache_disciplinas = listarDisciplinasGeral()
 
     lista_cursos = st.session_state.cache_cursos
     lista_disciplinas = st.session_state.cache_disciplinas

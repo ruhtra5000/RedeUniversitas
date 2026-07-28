@@ -9,7 +9,7 @@ from database.entidades.Aluno import Aluno
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
-from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail, dbListarCampus, dbListarCursos
+from modulos.academico.academico_service import existeCpf, existeEmail, listarCampus, listarCursos
 from modulos.cadastros.aluno import criarAluno
 
 def telaCadastroAluno():
@@ -42,10 +42,10 @@ def telaCadastroAluno():
             st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     if "cache_cursos" not in st.session_state:
-        st.session_state.cache_cursos = dbListarCursos()
+        st.session_state.cache_cursos = listarCursos()
 
     lista_campus = st.session_state.cache_campus
     lista_cursos = st.session_state.cache_cursos
@@ -138,6 +138,11 @@ def telaCadastroAluno():
         elif not nome.strip() or not cpf.strip() or not email.strip():
             st.error("Preencha todos os campos obrigatórios (Nome, CPF e E-mail).")
             
+        elif existeCpf(cpf):
+            st.error("Já existe um aluno cadastrado com este CPF.")
+        elif existeEmail(email.strip()):
+            st.error("Já existe um aluno cadastrado com este e-mail.")
+
         elif campus is None:
             st.error("Por favor, selecione um Campus.")
             

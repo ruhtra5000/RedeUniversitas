@@ -5,9 +5,9 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Compra import Compra
 from modulos.cadastros.compra import criarCompra
-from modulos.financeiro.financeiro_db import dbListarFinanceiro
-from modulos.compras.compras_db import dbListarFornecedores
-from modulos.estoque.estoque_db import dbListarProdutosGeral
+from modulos.financeiro.financeiro_service import listarFinanceiro
+from modulos.compras.compras_service import listarFornecedores
+from modulos.estoque.estoque_service import listarProdutosGeral
 import database.entidades
 
 def telaCadastroCompra():
@@ -38,13 +38,13 @@ def telaCadastroCompra():
             st.switch_page(cadastros_page)
 
     if "cache_financeiros" not in st.session_state:
-        st.session_state.cache_financeiros = dbListarFinanceiro()
+        st.session_state.cache_financeiros = listarFinanceiro()
 
     if "cache_fornecedores" not in st.session_state:
-        st.session_state.cache_fornecedores = dbListarFornecedores()
+        st.session_state.cache_fornecedores = listarFornecedores()
         
     if "cache_produtos" not in st.session_state:
-        st.session_state.cache_produtos = dbListarProdutosGeral()
+        st.session_state.cache_produtos = listarProdutosGeral()
 
     lista_financeiros = st.session_state.cache_financeiros
     lista_fornecedores = st.session_state.cache_fornecedores

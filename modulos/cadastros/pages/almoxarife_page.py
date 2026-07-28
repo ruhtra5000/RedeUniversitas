@@ -4,7 +4,7 @@ from database.Conexao import SessionLocal
 from database.entidades.Pessoa import Pessoa
 from database.entidades.Almoxarife import Almoxarife
 from modulos.cadastros.almoxarife import criarAlmoxarife
-from modulos.academico.academico_db import dbListarCampus
+from modulos.academico.academico_service import listarCampus
 import database.entidades
 
 def telaCadastroAlmoxarife():
@@ -35,7 +35,7 @@ def telaCadastroAlmoxarife():
             st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     lista_campus = st.session_state.cache_campus
 

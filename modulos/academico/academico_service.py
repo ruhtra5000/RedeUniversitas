@@ -183,6 +183,9 @@ def removerPreRequisito(idDisciplina: int, idPreRequisito: int):
 def listarTurmasProfessor(idProfessor: int, semestre: str):
     return dbListarTurmasProfessor(idProfessor, semestre)
     
+def listarTurmasGeral():
+    return dbListarTurmasGeral()
+    
 def listarTurmasCurso(idCurso: int, semestre: str):
     return dbListarTurmasCurso(idCurso, semestre)
     

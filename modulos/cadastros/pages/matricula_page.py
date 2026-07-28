@@ -3,7 +3,7 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Matricula import Matricula
 from modulos.cadastros.matricula import criarMatricula
-from modulos.academico.academico_db import dbListarAlunos, dbListarTurmasGeral
+from modulos.academico.academico_service import listarAlunos, listarTurmasGeral
 import database.entidades
 
 def telaCadastroMatricula():
@@ -34,10 +34,10 @@ def telaCadastroMatricula():
             st.switch_page(cadastros_page)
 
     if "cache_alunos" not in st.session_state:
-        st.session_state.cache_alunos = dbListarAlunos()
+        st.session_state.cache_alunos = listarAlunos()
 
     if "cache_turmas" not in st.session_state:
-        st.session_state.cache_turmas = dbListarTurmasGeral()
+        st.session_state.cache_turmas = listarTurmasGeral()
 
     lista_alunos = st.session_state.cache_alunos
     lista_turmas = st.session_state.cache_turmas

@@ -5,11 +5,10 @@ from database.Conexao import SessionLocal
 from database.entidades.Pessoa import Pessoa
 from database.entidades.Professor import Professor
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
+from modulos.academico.academico_service import listarCampus
 from modulos.cadastros.professor import criarProfessor
 
 import database.entidades
-
-from modulos.academico.academico_db import dbListarCampus
 
 def telaCadastroProfessor():
 
@@ -40,7 +39,7 @@ def telaCadastroProfessor():
             st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     lista_campus = st.session_state.cache_campus
 

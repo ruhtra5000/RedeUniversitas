@@ -5,7 +5,7 @@ from database.Conexao import SessionLocal
 from database.entidades.Bolsa import Bolsa
 from database.entidades.enums.StatusBolsa import StatusBolsa
 from modulos.cadastros.bolsa import criarBolsa
-from modulos.academico.academico_db import dbListarAlunos
+from modulos.academico.academico_service import listarAlunos
 import database.entidades
 
 def telaCadastroBolsa():
@@ -36,7 +36,7 @@ def telaCadastroBolsa():
             st.switch_page(cadastros_page)
 
     if "cache_alunos" not in st.session_state:
-        st.session_state.cache_alunos = dbListarAlunos()
+        st.session_state.cache_alunos = listarAlunos()
 
     lista_alunos = st.session_state.cache_alunos
 

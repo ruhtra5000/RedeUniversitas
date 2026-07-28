@@ -2,7 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
 from database.entidades.Estoque import Estoque
 from modulos.cadastros.estoque import criarEstoque
-from modulos.academico.academico_db import dbListarCampus
+from modulos.academico.academico_service import listarCampus
 import database.entidades
 
 def telaCadastroEstoque():
@@ -33,7 +33,7 @@ def telaCadastroEstoque():
             st.switch_page(cadastros_page)
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     lista_campus = st.session_state.cache_campus
 
