@@ -1,0 +1,108 @@
+import streamlit as st
+from modulos.academico.academico_db import (dbListarMatriculasGeral)
+from modulos.utils.listagem_utils import separador
+
+# Função para formatar a situação da matrícula
+def formatarAprovacao(aprovacao):
+    if aprovacao is True:
+        return "Aprovado"
+
+    if aprovacao is False:
+        return "Reprovado"
+
+    return "Em andamento"
+
+# Tela de listagem de matrículas
+def telaListagemMatriculas():
+
+    st.title("📋 Listagem de Matrículas")
+    st.caption("Consulte as matrículas acadêmicas.")
+
+    colVoltar, _ = st.columns([1, 5])
+
+    with colVoltar:
+        if st.button("⬅ Voltar", use_container_width=True):
+            from modulos.rotas import home_page
+            st.switch_page(home_page)
+
+    listaMatriculas = dbListarMatriculasGeral()
+
+    if not listaMatriculas:
+        st.info("📝 Nenhuma matrícula cadastrada.")
+        return
+
+    st.write("")
+
+    st.caption(
+        f"📝 {len(listaMatriculas)} "
+        f"{'matrícula encontrada' if len(listaMatriculas) == 1 else 'matrículas encontradas'}"
+    )
+
+    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+
+    with st.container(border=True):
+
+        h1, h2, h3, h4, h5 = st.columns(
+            proporcoes,
+            vertical_alignment="center",
+        )
+
+        h1.markdown("**Aluno**")
+        h2.markdown("**Disciplina**")
+        h3.markdown("**Turma**")
+        h4.markdown("**Situação**")
+        h5.markdown("**Ações**")
+
+        separador()
+
+        for indice, matricula in enumerate(listaMatriculas):
+
+            c1, c2, c3, c4, c5 = st.columns(
+                proporcoes,
+                vertical_alignment="center",
+            )
+
+            with c1:
+                st.markdown(
+                    f"**{matricula.aluno.pessoa.nome}**"
+                )
+
+            with c2:
+                st.write(matricula.disciplina.nome)
+
+            with c3:
+                st.write(
+                    matricula.turma.codigo or
+                    f"Turma {matricula.turma_id}"
+                )
+
+            with c4:
+                st.write(
+                    formatarAprovacao(matricula.aprovacao)
+                )
+
+            with c5:
+                visualizar = st.button(
+                    "👁️",
+                    key=(
+                        f"view_matricula_"
+                        f"{matricula.aluno_id}_"
+                        f"{matricula.turma_id}_"
+                        f"{matricula.disciplina_id}"
+                    ),
+                    help="Visualizar matrícula",
+                    use_container_width=True,
+                )
+
+            if visualizar:
+                st.session_state["matricula_selecionada"] = {
+                    "aluno_id": matricula.aluno_id,
+                    "turma_id": matricula.turma_id,
+                    "disciplina_id": matricula.disciplina_id,
+                }
+
+                from modulos.rotas import view_matricula_page
+                st.switch_page(view_matricula_page)
+
+            if indice < len(listaMatriculas) - 1:
+                separador()
