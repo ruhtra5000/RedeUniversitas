@@ -2,7 +2,7 @@ import streamlit as st
 from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
 from modulos.academico.academico_service import (
-    listarProfessores, listarTurmasGeral,
+    listarTurmasGeral,
     lancarNota1, lancarNota2, lancarNota3, lancarNotaFinal,
     cadastrarPresenca, fecharTurma
 )
@@ -20,42 +20,24 @@ def telaDiarioClasse():
     if "form_key_diario" not in st.session_state:
         st.session_state.form_key_diario = 0
 
-    # --- PROVISÓRIO ---
-    # Até implementarmos o sistema de login, o usuário seleciona quem ele é
-    if "cache_professores" not in st.session_state:
-        st.session_state.cache_professores = listarProfessores()
     if "cache_turmas" not in st.session_state:
         st.session_state.cache_turmas = listarTurmasGeral()
 
-    lista_professores = st.session_state.cache_professores
     lista_turmas_geral = st.session_state.cache_turmas
+    pessoa_id = st.session_state.get("pessoa_id")
+    
+    turmas_filtradas = [t for t in lista_turmas_geral if t.professor_id == pessoa_id]
 
-    with st.container(border=True):
-        st.subheader("Filtro de Turma")
-        with st.container(horizontal=True):
-            professor_selecionado = st.selectbox(
-                "Professor (Simulação de Login)",
-                options=lista_professores if lista_professores else [],
-                format_func=lambda p: p.pessoa.nome,
-                index=None,
-                placeholder="Identifique-se como professor...",
-                key="diario_prof"
-            )
-            
-            if professor_selecionado:
-                turmas_filtradas = [t for t in lista_turmas_geral if t.professor_id == professor_selecionado.pessoa_id]
-            else:
-                turmas_filtradas = []
-
-            turma_selecionada = st.selectbox(
-                "Turma",
-                options=turmas_filtradas,
-                format_func=lambda t: f"{t.semestre} | {t.codigo} - {t.disciplina.nome}",
-                index=None,
-                placeholder="Selecione sua turma..." if professor_selecionado else "Selecione o Professor primeiro",
-                disabled=not professor_selecionado,
-                key="diario_turma"
-            )
+    with st.container():
+        turma_selecionada = st.selectbox(
+            "Sua Turma",
+            options=turmas_filtradas,
+            format_func=lambda t: f"{t.semestre} | {t.codigo} - {t.disciplina.nome}",
+            index=None,
+            placeholder="Selecione sua turma para abrir o diário..." if turmas_filtradas else "Nenhuma turma atribuída a você no momento.",
+            disabled=not turmas_filtradas,
+            key="diario_turma"
+        )
 
     st.write("")
 

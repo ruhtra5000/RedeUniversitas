@@ -1,22 +1,9 @@
 import streamlit as st
 
 def telaHome():
-    st.title("Rede Universitas")
+    pessoa_nome = st.session_state.get("pessoa_logada", st.user.name)
 
-
-    with st.container(horizontal=True):
-        with st.container(border=True):
-            st.subheader("📁 Cadastros")
-            st.write("Cadastre alunos, professores, cursos...")
-
-            if st.button("Entrar"):
-                from modulos.rotas import cadastros_page # evita import circular
-                st.switch_page(cadastros_page)
-
-        with st.container(border=True):
-            st.subheader("🎓 Acadêmico")
-            
-            # TODO: implementar e importar a academico_page quando for criada
-            # if st.button("Entrar", key="acad"):
-            #     from modulos.rotas import academico_page
-            #     st.switch_page(academico_page)
+    st.title("RedeUniversitas")
+    st.write(f"Bem-vindo(a) de volta, **{pessoa_nome}**!")
+    
+    st.caption("Selecione uma aba pelo painel lateral para utilizar o sistema")

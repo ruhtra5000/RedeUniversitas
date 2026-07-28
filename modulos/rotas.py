@@ -1,6 +1,5 @@
 import streamlit as st
 from modulos.pages.home_page import telaHome
-from modulos.cadastros.pages.cadastros_page import telaCadastros
 from modulos.cadastros.pages.aluno_page import telaCadastroAluno
 from modulos.cadastros.pages.professor_page import telaCadastroProfessor
 from modulos.cadastros.pages.curso_page import telaCadastroCurso
@@ -17,7 +16,6 @@ from modulos.cadastros.pages.estoque_page import telaCadastroEstoque
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
-cadastros_page = st.Page(telaCadastros, title="Central de Cadastros", icon=":material/folder:", url_path="cadastros")
 
 # Subpáginas de Cadastro
 cadastro_aluno = st.Page(telaCadastroAluno, title="Aluno", icon=":material/person_add:", url_path="cadastro_aluno")
@@ -46,36 +44,51 @@ gestao_cargos = st.Page(telaDesignacaoCargos, title="Designação de Cargos", ic
 gestao_bolsas = st.Page(telaGestaoBolsas, title="Gestão de Bolsas", icon=":material/loyalty:", url_path="gestao_bolsas")
 
 def get_navigation():
+    roles = st.session_state.get("roles", [])
+
     # Estrutura do menu lateral
     pages = {
         "Menu Principal": [
-            home_page,
-            cadastros_page,
-        ],
+            home_page
+        ]
+    }
 
-        "Portal do Professor": [
-            operacao_diario
-        ],
-        
-        "Gestão Acadêmica": [
-            gestao_cargos,
-            gestao_bolsas
-        ],
+    # Professor
+    if "PROFESSOR" in roles:
+        pages["Portal do Professor"] = [operacao_diario]
+    
+    # Cadastros e Gestões de Alto Nível
+    cadastros_list = []
 
-        "Cadastros": [
+    # Reitor tem acesso massivo
+    if "REITOR" in roles:
+        pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
+        cadastros_list.extend([
             cadastro_aluno,
             cadastro_prof,
             cadastro_financeiro,
-            cadastro_fornecedor,
-            cadastro_almoxarife,
             cadastro_campus,
             cadastro_curso,
             cadastro_disc,
             cadastro_turma,
-            cadastro_bolsa,
-            cadastro_compra,
             cadastro_matricula,
-            cadastro_estoque
-        ]
-    }
+            cadastro_almoxarife,
+            cadastro_bolsa
+        ])
+
+    # Financeiro
+    if "FINANCEIRO" in roles:
+        if cadastro_compra not in cadastros_list:
+            cadastros_list.append(cadastro_compra)
+        if cadastro_fornecedor not in cadastros_list:
+            cadastros_list.append(cadastro_fornecedor)
+
+    # Almoxarife
+    if "ALMOXARIFE" in roles:
+        if cadastro_estoque not in cadastros_list:
+            cadastros_list.append(cadastro_estoque)
+
+    if cadastros_list:
+        pages["Cadastros"] = cadastros_list
+
     return pages
