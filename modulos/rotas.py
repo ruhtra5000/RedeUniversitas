@@ -89,7 +89,7 @@ def get_navigation():
 
     # Reitor tem acesso executivo (C-Level)
     elif "REITOR" in roles:
-        pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
+        pages["Gestão Acadêmica"] = [gestao_bolsas]
         cadastros_list.extend([
             cadastro_prof,
             cadastro_curso
