@@ -19,7 +19,7 @@ def telaFinanceiroAluno():
     st.write("---")
 
     # Módulo de Bolsas
-    st.subheader(":material/loyalty: Minhas Bolsas")
+    st.subheader(":material/account_balance: Minhas Bolsas")
     
     if not bolsas:
         st.info("Nenhuma bolsa vinculada ao seu histórico acadêmico no momento.", icon=":material/info:")

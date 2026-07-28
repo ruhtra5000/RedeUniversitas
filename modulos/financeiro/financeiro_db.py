@@ -185,8 +185,10 @@ def dbListarContasPagar():
     with SessionLocal() as session:
         from sqlalchemy.orm import joinedload
         from database.entidades.Compra import Compra
+        from database.entidades.Estoque import Estoque
         query = select(ContaPagar).options(
-            joinedload(ContaPagar.compra).joinedload(Compra.fornecedor)
+            joinedload(ContaPagar.compra).joinedload(Compra.fornecedor),
+            joinedload(ContaPagar.compra).joinedload(Compra.produto)
         )
         contasPagar = session.execute(query).unique().scalars().all()
 

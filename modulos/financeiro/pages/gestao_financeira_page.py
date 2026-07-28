@@ -8,12 +8,30 @@ from modulos.financeiro.financeiro_service import (
     listarContasPagar,
     definirDataPagamentoContaReceber,
     definirDataPagamentoContaPagar,
-    definirFinanceiroContaReceber
+    definirFinanceiroContaReceber,
+    adicionarValorCaixa,
+    removerValorCaixa
 )
 
 def telaGestaoFinanceira():
     st.title(":material/account_balance: Gestão Financeira")
     st.caption("Controle de fluxo de caixa, mensalidades e pagamentos de compras do campus.")
+    
+    st.markdown(
+        """
+        <style>
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     pessoa_id = st.session_state.get("pessoa_id")
     
@@ -51,35 +69,35 @@ def telaGestaoFinanceira():
     
     val_caixa_str = f"R$ {float(caixa.valor_caixa):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     with col1:
-        st.caption(f"Saldo em Caixa ({campus.nome})")
+        st.caption(f":material/account_balance_wallet: Saldo em Caixa ({campus.nome})")
         st.subheader(val_caixa_str)
         
     total_receber = sum([c.valor for c in receber_pendentes])
     val_receber_str = f"R$ {float(total_receber):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     with col2:
-        st.caption("Total a Receber (Pendente)")
+        st.caption(":material/arrow_downward: Total a Receber (Pendente)")
         st.subheader(f":green[{val_receber_str}]")
         
     total_pagar = sum([c.valor for c in pagar_pendentes])
     val_pagar_str = f"R$ {float(total_pagar):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     with col3:
-        st.caption("Total a Pagar (Pendente)")
+        st.caption(":material/arrow_upward: Total a Pagar (Pendente)")
         st.subheader(f":red[{val_pagar_str}]")
 
 
     st.write("")
 
     # Abas Principais
-    tab_receber, tab_pagar = st.tabs(["Contas a Receber (Entradas)", "Contas a Pagar (Saídas)"])
+    tab_receber, tab_pagar, tab_ajustes = st.tabs([":material/input: Contas a Receber", ":material/output: Contas a Pagar", ":material/tune: Ajustes Manuais"])
 
     # ====== ABA CONTAS A RECEBER ======
     with tab_receber:
         if st.session_state.pop("baixa_receber_realizada", False):
             st.toast("Pagamento recebido e caixa atualizado!", icon=":material/check:")
             
-        opcao_receber = st.radio("Selecione a visão:", ["Pendentes", "Histórico de Pagamentos"], horizontal=True, key="rad_rec")
+        opcao_receber = st.radio("Selecione a visão:", [":material/pending_actions: Pendentes", ":material/history: Histórico de Pagamentos"], horizontal=True, key="rad_rec")
         
-        if opcao_receber == "Pendentes":
+        if opcao_receber == ":material/pending_actions: Pendentes":
             if not receber_pendentes:
                 st.info("Nenhuma conta a receber pendente neste caixa.", icon=":material/info:")
             else:
@@ -96,7 +114,7 @@ def telaGestaoFinanceira():
                 
                 st.write("")
                 with st.container():
-                    st.subheader("Registrar Pagamento")
+                    st.subheader(":material/payments: Registrar Pagamento")
                     with st.form("form_baixa_receber", border=False):
                         col_r1, col_r2 = st.columns(2)
                         with col_r1:
@@ -125,7 +143,7 @@ def telaGestaoFinanceira():
                             else:
                                 st.error("Nenhuma conta selecionada.")
 
-        elif opcao_receber == "Histórico de Pagamentos":
+        elif opcao_receber == ":material/history: Histórico de Pagamentos":
             if not receber_pagas:
                 st.info("Nenhum histórico de conta recebida.", icon=":material/info:")
             else:
@@ -146,15 +164,15 @@ def telaGestaoFinanceira():
         if st.session_state.pop("baixa_pagar_realizada", False):
             st.toast("Pagamento efetuado e caixa atualizado!", icon=":material/check:")
 
-        opcao_pagar = st.radio("", ["Pendentes", "Histórico de Pagamentos"], horizontal=True, key="rad_pag")
+        opcao_pagar = st.radio("Selecione a visão:", [":material/pending_actions: Pendentes", ":material/history: Histórico de Pagamentos"], horizontal=True, key="rad_pag")
         
-        if opcao_pagar == "Pendentes":
+        if opcao_pagar == ":material/pending_actions: Pendentes":
             if not pagar_pendentes:
                 st.info("Nenhuma conta a pagar pendente neste caixa.", icon=":material/info:")
             else:
                 df_pag = pd.DataFrame([{
                     "ID": c.id,
-                    "Compra ID": c.compra_id,
+                    "Produto": c.compra.produto.nome if hasattr(c, 'compra') and c.compra and c.compra.produto else "-",
                     "Fornecedor": c.compra.fornecedor.nome if hasattr(c, 'compra') and c.compra else "-",
                     "Vencimento": c.data_vencimento.strftime("%d/%m/%Y"),
                     "Valor": f"R$ {float(c.valor):.2f}"
@@ -164,7 +182,7 @@ def telaGestaoFinanceira():
                 
                 st.write("")
                 with st.container():
-                    st.subheader("Registrar Pagamento")
+                    st.subheader(":material/payments: Registrar Pagamento")
                     with st.form("form_baixa_pagar", border=False):
                         col_p1, col_p2 = st.columns(2)
                         with col_p1:
@@ -191,16 +209,58 @@ def telaGestaoFinanceira():
                             else:
                                 st.error("Nenhuma conta selecionada.")
         
-        elif opcao_pagar == "Histórico de Pagamentos":
+        elif opcao_pagar == ":material/history: Histórico de Pagamentos":
             if not pagar_pagas:
                 st.info("Nenhum histórico de conta paga.", icon=":material/info:")
             else:
                 df_pag_pagas = pd.DataFrame([{
                     "ID": c.id,
-                    "Compra ID": c.compra_id,
+                    "Produto": c.compra.produto.nome if hasattr(c, 'compra') and c.compra and c.compra.produto else "-",
                     "Fornecedor": c.compra.fornecedor.nome if hasattr(c, 'compra') and c.compra else "-",
                     "Vencimento": c.data_vencimento.strftime("%d/%m/%Y"),
                     "Data Pagamento": c.data_pagamento.strftime("%d/%m/%Y"),
                     "Valor Pago": f"R$ {float(c.valor):.2f}"
                 } for c in pagar_pagas])
                 st.dataframe(df_pag_pagas, use_container_width=True, hide_index=True)
+
+    # ====== ABA AJUSTES MANUAIS ======
+    with tab_ajustes:
+        if st.session_state.pop("ajuste_manual_realizado", False):
+            st.toast("Caixa ajustado com sucesso!", icon=":material/check:")
+            
+        st.subheader("Entrada e Saída Manual de Caixa")
+        
+        with st.container(horizontal=True):
+            with st.container():
+                st.write("**:material/add_circle: Registrar Entrada (Depósito)**")
+                with st.form("form_entrada_manual", border=False):
+                    valor_deposito = st.number_input("Valor da Entrada (R$)", min_value=0.01, format="%.2f", step=None)
+                    submit_deposito = st.form_submit_button("Confirmar Entrada", type="primary")
+                    
+                    if submit_deposito:
+                        try:
+                            from decimal import Decimal
+                            adicionarValorCaixa(caixa.id, Decimal(str(valor_deposito)))
+                            st.session_state["ajuste_manual_realizado"] = True
+                            st.rerun()
+                        except SQLAlchemyError as e:
+                            st.error(f"Erro de banco de dados: {e}")
+                        except Exception as e:
+                            st.error(str(e))
+                            
+            with st.container():
+                st.write("**:material/remove_circle: Registrar Saída (Retirada)**")
+                with st.form("form_saida_manual", border=False):
+                    valor_retirada = st.number_input("Valor da Saída (R$)", min_value=0.01, format="%.2f", step=None)
+                    submit_retirada = st.form_submit_button("Confirmar Saída", type="primary")
+                    
+                    if submit_retirada:
+                        try:
+                            from decimal import Decimal
+                            removerValorCaixa(caixa.id, Decimal(str(valor_retirada)))
+                            st.session_state["ajuste_manual_realizado"] = True
+                            st.rerun()
+                        except SQLAlchemyError as e:
+                            st.error(f"Erro de banco de dados: {e}")
+                        except Exception as e:
+                            st.error(str(e))
