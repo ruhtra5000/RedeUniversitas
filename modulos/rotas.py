@@ -37,9 +37,11 @@ cadastro_matricula = st.Page(telaCadastroMatricula, title="Matrícula", icon=":m
 cadastro_estoque = st.Page(telaCadastroEstoque, title="Estoque", icon=":material/inventory_2:", url_path="cadastro_estoque")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
+from modulos.academico.pages.Designação_cargos_page import telaDesignacaoCargos
 
 # Operações
 operacao_diario = st.Page(telaDiarioClasse, title="Diário de Classe", icon=":material/edit_document:", url_path="diario_classe")
+gestao_cargos = st.Page(telaDesignacaoCargos, title="Designação de Cargos", icon=":material/badge:", url_path="designacao_cargos")
 
 def get_navigation():
     # Estrutura do menu lateral
@@ -51,6 +53,10 @@ def get_navigation():
 
         "Portal do Professor": [
             operacao_diario
+        ],
+        
+        "Gestão Acadêmica": [
+            gestao_cargos
         ],
 
         "Cadastros": [

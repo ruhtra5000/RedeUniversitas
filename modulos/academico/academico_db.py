@@ -29,7 +29,8 @@ from database.entidades.Pessoa import Pessoa
        
 def dbListarCampus():
     with SessionLocal() as session:
-        query = select(Campus)
+        from sqlalchemy.orm import joinedload
+        query = select(Campus).options(joinedload(Campus.reitor).joinedload(Professor.pessoa))
         campus = session.execute(query).scalars().all()
 
         return campus
@@ -86,7 +87,8 @@ def dbRemoverReitor(idCampus: int):
 
 def dbListarCursos():
     with SessionLocal() as session:
-        query = select(Curso)
+        from sqlalchemy.orm import joinedload
+        query = select(Curso).options(joinedload(Curso.coordenador).joinedload(Professor.pessoa), joinedload(Curso.campus))
         cursos = session.execute(query).scalars().all()
 
         return cursos
@@ -392,7 +394,8 @@ def dbListarProfessores():
     
 def dbListarProfessoresCampus(idCampus: int):
     with SessionLocal() as session:
-        query = select(Professor).where(Professor.campus_id == idCampus)
+        from sqlalchemy.orm import joinedload
+        query = select(Professor).options(joinedload(Professor.pessoa)).where(Professor.campus_id == idCampus)
         professores = session.execute(query).scalars().all()
 
         return professores
