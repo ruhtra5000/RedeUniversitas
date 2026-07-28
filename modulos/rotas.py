@@ -36,12 +36,21 @@ cadastro_fornecedor = st.Page(telaCadastroFornecedor, title="Fornecedor", icon="
 cadastro_matricula = st.Page(telaCadastroMatricula, title="Matrícula", icon=":material/assignment_add:", url_path="cadastro_matricula")
 cadastro_estoque = st.Page(telaCadastroEstoque, title="Estoque", icon=":material/inventory_2:", url_path="cadastro_estoque")
 
+from modulos.academico.pages.diario_classe_page import telaDiarioClasse
+
+# Operações
+operacao_diario = st.Page(telaDiarioClasse, title="Diário de Classe", icon=":material/edit_document:", url_path="diario_classe")
+
 def get_navigation():
     # Estrutura do menu lateral
     pages = {
         "Menu Principal": [
             home_page,
             cadastros_page,
+        ],
+
+        "Portal do Professor": [
+            operacao_diario
         ],
 
         "Cadastros": [
