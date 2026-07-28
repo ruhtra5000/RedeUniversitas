@@ -6,6 +6,7 @@ from database.Conexao import SessionLocal
 from database.entidades.Compra import Compra
 from database.entidades.ContaPagar import ContaPagar
 from modulos.estoque.estoque_service import adicionarQtdeProduto
+from database.entidades.Financeiro import Financeiro
 import database.entidades
 
 # === Dados recebidos ===
