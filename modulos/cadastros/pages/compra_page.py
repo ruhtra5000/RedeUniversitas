@@ -29,7 +29,7 @@ def telaCadastroCompra():
     )
 
     if st.session_state.pop("cadastro_compra_realizado", False):
-        st.toast("Compra registrada com sucesso!", icon="🎉")
+        st.toast("Compra registrada com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
     with col1:

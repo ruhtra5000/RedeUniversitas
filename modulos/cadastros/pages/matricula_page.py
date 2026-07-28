@@ -25,7 +25,7 @@ def telaCadastroMatricula():
     )
 
     if st.session_state.pop("cadastro_matr_realizado", False):
-        st.toast("Matrícula realizada com sucesso!", icon="🎉")
+        st.toast("Matrícula realizada com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
     with col1:

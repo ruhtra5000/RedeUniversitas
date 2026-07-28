@@ -24,7 +24,7 @@ def telaCadastroEstoque():
     )
 
     if st.session_state.pop("cadastro_estoque_realizado", False):
-        st.toast("Produto cadastrado com sucesso!", icon="🎉")
+        st.toast("Produto cadastrado com sucesso!", icon=":material/check:")
 
     col1, col2 = st.columns([1, 6])
     with col1:

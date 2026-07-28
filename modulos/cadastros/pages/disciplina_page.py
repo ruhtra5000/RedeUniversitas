@@ -30,7 +30,7 @@ def telaCadastroDisciplina():
     )
 
     if st.session_state.pop("cadastro_disc_realizado", False):
-        st.toast("Disciplina cadastrada com sucesso!", icon="🎉")
+        st.toast("Disciplina cadastrada com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
 

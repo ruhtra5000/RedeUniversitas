@@ -29,7 +29,7 @@ def telaCadastroProfessor():
     )
 
     if st.session_state.pop("cadastro_prof_realizado", False):
-        st.toast("Professor cadastrado com sucesso!", icon="🎉")
+        st.toast("Professor cadastrado com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
 

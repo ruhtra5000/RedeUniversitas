@@ -26,7 +26,7 @@ def telaCadastroFinanceiro():
     )
 
     if st.session_state.pop("cadastro_fin_realizado", False):
-        st.toast("Funcionário financeiro cadastrado com sucesso!", icon="🎉")
+        st.toast("Funcionário financeiro cadastrado com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
     with col1:

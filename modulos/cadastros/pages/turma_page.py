@@ -26,7 +26,7 @@ def telaCadastroTurma():
     )
 
     if st.session_state.pop("cadastro_turma_realizado", False):
-        st.toast("Turma cadastrada com sucesso!", icon="🎉")
+        st.toast("Turma cadastrada com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
 

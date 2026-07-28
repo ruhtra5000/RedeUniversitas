@@ -12,10 +12,10 @@ def telaDiarioClasse():
     st.caption("Faça o lançamento de notas, faltas e o fechamento do semestre para as suas turmas.")
 
     if st.session_state.pop("diario_salvo", False):
-        st.toast("Lançamentos salvos com sucesso!", icon="💾")
+        st.toast("Lançamentos salvos com sucesso!", icon=":material/check:")
         
     if st.session_state.pop("turma_fechada", False):
-        st.toast("Turma consolidada com sucesso!", icon="🔒")
+        st.toast("Turma consolidada com sucesso!", icon=":material/check:")
         
     if "form_key_diario" not in st.session_state:
         st.session_state.form_key_diario = 0

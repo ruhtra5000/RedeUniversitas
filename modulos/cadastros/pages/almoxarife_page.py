@@ -26,7 +26,7 @@ def telaCadastroAlmoxarife():
     )
 
     if st.session_state.pop("cadastro_alm_realizado", False):
-        st.toast("Almoxarife cadastrado com sucesso!", icon="🎉")
+        st.toast("Almoxarife cadastrado com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
     with col1:

@@ -27,7 +27,7 @@ def telaCadastroBolsa():
     )
 
     if st.session_state.pop("cadastro_bolsa_realizado", False):
-        st.toast("Bolsa cadastrada com sucesso!", icon="🎉")
+        st.toast("Bolsa cadastrada com sucesso!", icon=":material/check:")
 
     col1, _ = st.columns([1, 6])
     with col1:

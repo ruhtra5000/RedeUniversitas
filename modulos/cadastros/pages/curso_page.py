@@ -27,7 +27,7 @@ def telaCadastroCurso():
     )
 
     if st.session_state.pop("cadastro_curso_realizado", False):
-        st.toast("Curso cadastrado com sucesso!", icon="🎉")
+        st.toast("Curso cadastrado com sucesso!", icon=":material/check:")
 
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
