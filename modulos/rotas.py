@@ -13,6 +13,7 @@ from modulos.cadastros.pages.compra_page import telaCadastroCompra
 from modulos.cadastros.pages.financeiro_page import telaCadastroFinanceiro
 from modulos.cadastros.pages.fornecedor_page import telaCadastroFornecedor
 from modulos.cadastros.pages.matricula_page import telaCadastroMatricula
+from modulos.cadastros.pages.estoque_page import telaCadastroEstoque
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -33,6 +34,7 @@ cadastro_compra = st.Page(telaCadastroCompra, title="Compra", icon=":material/sh
 cadastro_financeiro = st.Page(telaCadastroFinanceiro, title="Financeiro", icon=":material/payments:", url_path="cadastro_financeiro")
 cadastro_fornecedor = st.Page(telaCadastroFornecedor, title="Fornecedor", icon=":material/local_shipping:", url_path="cadastro_fornecedor")
 cadastro_matricula = st.Page(telaCadastroMatricula, title="Matrícula", icon=":material/assignment_ind:", url_path="cadastro_matricula")
+cadastro_estoque = st.Page(telaCadastroEstoque, title="Estoque", icon=":material/inventory_2:", url_path="cadastro_estoque")
 
 def get_navigation():
     # Estrutura do menu lateral
@@ -53,7 +55,8 @@ def get_navigation():
             cadastro_compra,
             cadastro_financeiro,
             cadastro_fornecedor,
-            cadastro_matricula
+            cadastro_matricula,
+            cadastro_estoque
         ]
     }
     return pages
