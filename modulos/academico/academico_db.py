@@ -9,6 +9,8 @@ from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
+from database.entidades.Almoxarife import Almoxarife
+from database.entidades.Financeiro import Financeiro
 from database.entidades.Disciplina import Disciplina
 from database.entidades.Matricula import Matricula
 from database.entidades.Mensalidade import Mensalidade
@@ -18,6 +20,7 @@ from database.entidades.Turma import Turma
 from database.entidades.enums.StatusBolsa import StatusBolsa
 import database.entidades
 from database.entidades.Pessoa import Pessoa
+
 #  _____                                      
 # /  __ \                                     
 # | /  \/  __ _  _ __ ___   _ __   _   _  ___ 
@@ -38,6 +41,17 @@ def dbListarCampus():
 def dbListarCampusId(idCampus: int):
     with SessionLocal() as session:
         query = select(Campus).where(Campus.id == idCampus)
+        campus = session.execute(query).scalar_one_or_none()
+
+        return campus
+
+def dbListarCampusCnpj(cnpjCampus: str):
+    with SessionLocal() as session:
+        query = (
+            select(Campus)
+            .where(Campus.cnpj == cnpjCampus)
+        )
+
         campus = session.execute(query).scalar_one_or_none()
 
         return campus
@@ -93,12 +107,18 @@ def dbListarCursos():
 
         return cursos
 
-def dbListarCursoId(idCurso: int):
+def dbListarCursoId(curso_id: int):
     with SessionLocal() as session:
-        query = select(Curso).where(Curso.id == idCurso)
-        curso = session.execute(query).scalar_one_or_none()
-
-        return curso
+        return (
+            session.query(Curso)
+            .options(
+                joinedload(Curso.campus),
+                joinedload(Curso.coordenador)
+                .joinedload(Professor.pessoa),
+            )
+            .filter(Curso.id == curso_id)
+            .first()
+        )
     
 def dbEditarCurso(idCurso: int, novoCurso: Curso):
     # São editaveis: nome, modalidade, mensalidade_base, carga_horaria,
@@ -142,24 +162,75 @@ def dbRemoverCoordenador(idCurso: int):
 #                         | |                             
 #                         |_|                             
 
+
 def dbListarDisciplinas(idCurso: int):
     with SessionLocal() as session:
-        query = select(Disciplina).where(Disciplina.curso_id == idCurso)
+        query = (
+            select(Disciplina)
+            .options(joinedload(Disciplina.curso))
+            .where(Disciplina.curso_id == idCurso)
+            .order_by(Disciplina.nome)
+        )
+
         disciplinas = session.execute(query).scalars().all()
 
         return disciplinas
 
+
 def dbListarDisciplinasGeral():
     with SessionLocal() as session:
-        return session.query(Disciplina).all()
+        query = (
+            select(Disciplina)
+            .options(joinedload(Disciplina.curso))
+            .order_by(Disciplina.nome)
+        )
+
+        disciplinas = session.execute(query).scalars().all()
+
+        return disciplinas
 
 def dbListarDisciplinaId(idDisciplina: int):
     with SessionLocal() as session:
-        query = select(Disciplina).where(Disciplina.id == idDisciplina)
+        query = (
+            select(Disciplina)
+            .options(joinedload(Disciplina.curso))
+            .where(Disciplina.id == idDisciplina)
+        )
+
         disciplina = session.execute(query).scalar_one_or_none()
 
         return disciplina
-    
+
+def dbListarDisciplinaCodigo(codigoDisciplina: str):
+    with SessionLocal() as session:
+        query = (
+            select(Disciplina)
+            .options(joinedload(Disciplina.curso))
+            .where(Disciplina.codigo == codigoDisciplina)
+        )
+
+        disciplina = session.execute(query).scalar_one_or_none()
+
+        return disciplina
+
+
+def dbListarPreRequisitosDisciplina(idDisciplina: int):
+    with SessionLocal() as session:
+        query = (
+            select(Disciplina)
+            .join(
+                PreRequisito,
+                Disciplina.id == PreRequisito.prerequisito_id,
+            )
+            .options(joinedload(Disciplina.curso))
+            .where(PreRequisito.disciplina_id == idDisciplina)
+            .order_by(Disciplina.nome)
+        )
+
+        preRequisitos = session.execute(query).scalars().all()
+
+        return preRequisitos
+
 def dbEditarDisciplina(idDisciplina: int, novaDisciplina: Disciplina):
     # São editaveis: nome, carga_horaria, obrigatoria
     with SessionLocal() as session:
@@ -221,6 +292,23 @@ def dbListarTurmasCurso(idCurso: int, semestre: str):
         turmas = session.execute(query).scalars().all()
 
         return turmas
+
+def dbListarTurmaCodigo(codigoTurma: str):
+    with SessionLocal() as session:
+        query = (
+            select(Turma)
+            .options(
+                joinedload(Turma.curso),
+                joinedload(Turma.disciplina),
+                joinedload(Turma.professor)
+                .joinedload(Professor.pessoa),
+            )
+            .where(Turma.codigo == codigoTurma)
+        )
+
+        turma = session.execute(query).scalar_one_or_none()
+
+        return turma
     
 def dbListarTurmaId(idTurma: int):
     with SessionLocal() as session:
@@ -377,6 +465,48 @@ def dbCalcularFrequenciaRelativa(idAluno: int, idTurma: int, freqRel: float):
         session.add(matricula)
         session.commit()
 
+def dbListarMatriculasGeral():
+    with SessionLocal() as session:
+        query = (
+            select(Matricula)
+            .options(
+                joinedload(Matricula.aluno)
+                .joinedload(Aluno.pessoa),
+                joinedload(Matricula.turma),
+                joinedload(Matricula.disciplina),
+            )
+            .order_by(
+                Matricula.aluno_id,
+                Matricula.turma_id,
+            )
+        )
+
+        return session.execute(query).scalars().all()
+
+
+def dbListarMatricula(
+    idAluno: int,
+    idTurma: int,
+    idDisciplina: int,
+):
+    with SessionLocal() as session:
+        query = (
+            select(Matricula)
+            .options(
+                joinedload(Matricula.aluno)
+                .joinedload(Aluno.pessoa),
+                joinedload(Matricula.turma),
+                joinedload(Matricula.disciplina),
+            )
+            .where(
+                Matricula.aluno_id == idAluno,
+                Matricula.turma_id == idTurma,
+                Matricula.disciplina_id == idDisciplina,
+            )
+        )
+
+        return session.execute(query).scalar_one_or_none()
+
 
 # ______                __                                         
 # | ___ \              / _|                                        
@@ -387,10 +517,14 @@ def dbCalcularFrequenciaRelativa(idAluno: int, idTurma: int, freqRel: float):
                                                                  
 def dbListarProfessores():
     with SessionLocal() as session:
-        query = select(Professor).options(joinedload(Professor.pessoa))
-        professores = session.execute(query).scalars().all()
-
-        return professores
+        return (
+            session.query(Professor)
+            .options(
+                joinedload(Professor.pessoa),
+                joinedload(Professor.campus),
+            )
+            .all()
+        )
     
 def dbListarProfessoresCampus(idCampus: int):
     with SessionLocal() as session:
@@ -400,12 +534,17 @@ def dbListarProfessoresCampus(idCampus: int):
 
         return professores
     
-def dbListarProfessorId(idProfessor: int):
+def dbListarProfessorId(professor_id: int):
     with SessionLocal() as session:
-        query = select(Professor).where(Professor.pessoa_id == idProfessor)
-        professor = session.execute(query).scalar_one_or_none()
-
-        return professor
+        return (
+            session.query(Professor)
+            .options(
+                joinedload(Professor.pessoa),
+                joinedload(Professor.campus),
+            )
+            .filter(Professor.pessoa_id == professor_id)
+            .first()
+        )
     
 def dbListarProfessorNome(nomeProfessor: str):
     with SessionLocal() as session:
@@ -414,12 +553,18 @@ def dbListarProfessorNome(nomeProfessor: str):
 
         return professor
     
-def dbListarProfessorCpf(cpfProfessor: str):
+def dbListarProfessorCpf(cpf: str):
     with SessionLocal() as session:
-        query = select(Professor).where(Professor.pessoa.cpf.ilike(f"%{cpfProfessor}%"))
-        professor = session.execute(query).scalars().all()
-
-        return professor
+        return (
+            session.query(Professor)
+            .join(Professor.pessoa)
+            .options(
+                joinedload(Professor.pessoa),
+                joinedload(Professor.campus),
+            )
+            .filter(Pessoa.cpf == cpf)
+            .first()
+        )
 
  
 #   ___   _                      
@@ -467,6 +612,21 @@ def dbListarAlunoId(idAluno: int):
         aluno = session.execute(query).unique().scalar_one_or_none()
 
         return aluno
+
+def dbListarAlunoCpf(cpf: str) -> Aluno | None:
+    with SessionLocal() as session:
+        query = (
+            select(Aluno)
+            .join(Aluno.pessoa)
+            .options(
+                joinedload(Aluno.pessoa),
+                joinedload(Aluno.campus),
+                joinedload(Aluno.curso),
+            )
+            .where(Pessoa.cpf == cpf)
+        )
+
+        return session.execute(query).scalar_one_or_none()
     
 def dbAtualizarCoefRendMediaGeral(idAluno: int, coef_rend: float, media_geral: float):
     with SessionLocal() as session:
@@ -495,10 +655,33 @@ def dbListarBolsasAluno(idAluno: int):
 
 def dbListarBolsasGeral():
     with SessionLocal() as session:
-        from sqlalchemy.orm import joinedload
-        query = select(Bolsa).options(joinedload(Bolsa.aluno).joinedload(Aluno.pessoa))
-        bolsas = session.execute(query).scalars().all()
-        return bolsas
+        query = (
+            select(Bolsa)
+            .options(
+                joinedload(Bolsa.aluno)
+                .joinedload(Aluno.pessoa),
+            )
+            .order_by(
+                Bolsa.data_inicio.desc(),
+                Bolsa.id.desc(),
+            )
+        )
+
+        return session.execute(query).scalars().all()
+
+
+def dbListarBolsaId(idBolsa: int):
+    with SessionLocal() as session:
+        query = (
+            select(Bolsa)
+            .options(
+                joinedload(Bolsa.aluno)
+                .joinedload(Aluno.pessoa),
+            )
+            .where(Bolsa.id == idBolsa)
+        )
+
+        return session.execute(query).scalar_one_or_none()
 
 def dbListarBolsasAtivas():
     with SessionLocal() as session:
@@ -514,13 +697,6 @@ def dbListarBolsasAtivasAluno(idAluno: int):
         bolsas = session.execute(query).scalars().all()
 
         return bolsas
-
-def dbListarBolsaId(idBolsa: int):
-    with SessionLocal() as session:
-        query = select(Bolsa).where(Bolsa.id == idBolsa)
-        bolsa = session.execute(query).scalar_one_or_none()
-
-        return bolsa
 
 def dbEditarBolsa(idBolsa: int, novaBolsa: Bolsa):
     # São editaveis: tipo_bolsa, percentual_desconto, data_fim e status
@@ -638,4 +814,103 @@ def dbExisteEmail(email: str) -> bool:
     with SessionLocal() as session:
         return session.query(Pessoa).filter(Pessoa.email == email).first() is not None
 
+
+# ______ _                            _           
+# |  ___(_)                          (_)          
+# | |_   _ _ __   __ _ _ __   ___ ___ _ _ __ ___  
+# |  _| | | '_ \ / _` | '_ \ / __/ _ \ | '__/ _ \ 
+# | |   | | | | | (_| | | | | (_|  __/ | | | (_) |
+# \_|   |_|_| |_|\__,_|_| |_|\___\___|_|_|  \___/ 
+
+def dbListarFinanceiros():
+    with SessionLocal() as session:
+        query = (
+            select(Financeiro)
+            .options(
+                joinedload(Financeiro.pessoa),
+                joinedload(Financeiro.campus),
+            )
+            .order_by(Financeiro.pessoa_id)
+        )
+
+        return session.execute(query).scalars().all()
+
+
+def dbListarFinanceiroId(idPessoa: int):
+    with SessionLocal() as session:
+        query = (
+            select(Financeiro)
+            .options(
+                joinedload(Financeiro.pessoa),
+                joinedload(Financeiro.campus),
+            )
+            .where(Financeiro.pessoa_id == idPessoa)
+        )
+
+        return session.execute(query).scalar_one_or_none()
+
+
+def dbListarFinanceiroCpf(cpf: str):
+    with SessionLocal() as session:
+        query = (
+            select(Financeiro)
+            .join(Financeiro.pessoa)
+            .options(
+                joinedload(Financeiro.pessoa),
+                joinedload(Financeiro.campus),
+            )
+            .where(Pessoa.cpf == cpf)
+        )
+
+        return session.execute(query).scalar_one_or_none()
+
+
+#   ___  _                               _  __     
+#  / _ \| |                             (_)/ _|    
+# / /_\ \ |_ __ ___   _____  ____ _ _ __ _| |_ ___ 
+# |  _  | | '_ ` _ \ / _ \ \/ / _` | '__| |  _/ _ \
+# | | | | | | | | | | (_) >  < (_| | |  | | ||  __/
+# \_| |_/_|_| |_| |_|\___/_/\_\__,_|_|  |_|_| \___|
+
+def dbListarAlmoxarifes():
+    with SessionLocal() as session:
+        query = (
+            select(Almoxarife)
+            .options(
+                joinedload(Almoxarife.pessoa),
+                joinedload(Almoxarife.campus),
+            )
+            .order_by(Almoxarife.pessoa_id)
+        )
+
+        return session.execute(query).scalars().all()
+
+
+def dbListarAlmoxarifeId(idPessoa: int):
+    with SessionLocal() as session:
+        query = (
+            select(Almoxarife)
+            .options(
+                joinedload(Almoxarife.pessoa),
+                joinedload(Almoxarife.campus),
+            )
+            .where(Almoxarife.pessoa_id == idPessoa)
+        )
+
+        return session.execute(query).scalar_one_or_none()
+
+
+def dbListarAlmoxarifeCpf(cpf: str):
+    with SessionLocal() as session:
+        query = (
+            select(Almoxarife)
+            .join(Almoxarife.pessoa)
+            .options(
+                joinedload(Almoxarife.pessoa),
+                joinedload(Almoxarife.campus),
+            )
+            .where(Pessoa.cpf == cpf)
+        )
+
+        return session.execute(query).scalar_one_or_none()
 
