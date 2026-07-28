@@ -141,12 +141,17 @@ def telaCadastroTurma():
                 nova_turma = Turma(
                     semestre=semestre.strip(),
                     codigo="",
+                    curso_id=curso_selecionado.id,
+                    disciplina_id=disciplina_selecionada.id,
+                    professor_id=professor_selecionado.pessoa_id
+                )
+                
+                criarTurma(
+                    turma=nova_turma,
                     curso=curso_selecionado,
                     disciplina=disciplina_selecionada,
                     professor=professor_selecionado
                 )
-                
-                criarTurma(turma=nova_turma)
                 
                 st.session_state.form_key_turma += 1 
                 st.session_state["cadastro_turma_realizado"] = True
