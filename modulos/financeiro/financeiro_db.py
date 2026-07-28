@@ -86,8 +86,13 @@ def dbListarFinanceiro():
     
 def dbListarFinanceiroId(idFinanceiro: int):
     with SessionLocal() as session:
-        query = select(Financeiro).where(Financeiro.pessoa_id == idFinanceiro)
-        financeiros = session.execute(query).scalar_one_or_none()
+        from sqlalchemy.orm import joinedload
+        from database.entidades.Campus import Campus
+        query = select(Financeiro).options(
+            joinedload(Financeiro.pessoa),
+            joinedload(Financeiro.campus).joinedload(Campus.caixa)
+        ).where(Financeiro.pessoa_id == idFinanceiro)
+        financeiros = session.execute(query).unique().scalar_one_or_none()
 
         return financeiros
     
@@ -101,8 +106,15 @@ def dbListarFinanceiroId(idFinanceiro: int):
 
 def dbListarContasReceber():
     with SessionLocal() as session:
-        query = select(ContaReceber)
-        contasReceber = session.execute(query).scalars().all()
+        from sqlalchemy.orm import joinedload
+        from database.entidades.Mensalidade import Mensalidade
+        from database.entidades.Aluno import Aluno
+        from database.entidades.Financeiro import Financeiro
+        query = select(ContaReceber).options(
+            joinedload(ContaReceber.mensalidade).joinedload(Mensalidade.aluno).joinedload(Aluno.pessoa),
+            joinedload(ContaReceber.financeiro).joinedload(Financeiro.pessoa)
+        )
+        contasReceber = session.execute(query).unique().scalars().all()
 
         return contasReceber
 
@@ -171,8 +183,12 @@ def dbDefinirFinanceiroContaReceber(idContaReceber: int, idFinanceiro: int):
 
 def dbListarContasPagar():
     with SessionLocal() as session:
-        query = select(ContaPagar)
-        contasPagar = session.execute(query).scalars().all()
+        from sqlalchemy.orm import joinedload
+        from database.entidades.Compra import Compra
+        query = select(ContaPagar).options(
+            joinedload(ContaPagar.compra).joinedload(Compra.fornecedor)
+        )
+        contasPagar = session.execute(query).unique().scalars().all()
 
         return contasPagar
     

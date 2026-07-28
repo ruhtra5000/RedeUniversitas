@@ -432,8 +432,13 @@ def dbListarProfessorCpf(cpfProfessor: str):
 def dbListarAlunos():
     with SessionLocal() as session:
         from sqlalchemy.orm import joinedload
-        query = select(Aluno).options(joinedload(Aluno.pessoa))
-        alunos = session.execute(query).scalars().all()
+        from database.entidades.Campus import Campus
+        query = select(Aluno).options(
+            joinedload(Aluno.pessoa),
+            joinedload(Aluno.curso),
+            joinedload(Aluno.campus).joinedload(Campus.caixa)
+        )
+        alunos = session.execute(query).unique().scalars().all()
 
         return alunos
 

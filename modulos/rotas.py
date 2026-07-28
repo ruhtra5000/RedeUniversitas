@@ -41,8 +41,13 @@ from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
 from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
 
+from modulos.financeiro.pages.gestao_financeira_page import telaGestaoFinanceira
+
 # Operações
 operacao_diario = st.Page(telaDiarioClasse, title="Diário de Classe", icon=":material/edit_document:", url_path="diario_classe")
+gestao_financeira = st.Page(telaGestaoFinanceira, title="Gestão Financeira", icon=":material/account_balance:", url_path="gestao_financeira")
+
+# Gestão Acadêmica
 gestao_cargos = st.Page(telaDesignacaoCargos, title="Designação de Cargos", icon=":material/badge:", url_path="designacao_cargos")
 gestao_bolsas = st.Page(telaGestaoBolsas, title="Gestão de Bolsas", icon=":material/loyalty:", url_path="gestao_bolsas")
 
@@ -70,6 +75,7 @@ def get_navigation():
     
     # Cadastros e Gestões de Alto Nível
     cadastros_list = []
+    operacoes_list = []
 
     # Reitor tem acesso massivo
     if "REITOR" in roles:
@@ -86,6 +92,7 @@ def get_navigation():
             cadastro_matricula,
             cadastro_bolsa
         ])
+        operacoes_list.append(gestao_financeira)
 
     # Financeiro
     if "FINANCEIRO" in roles:
@@ -93,11 +100,16 @@ def get_navigation():
             cadastros_list.append(cadastro_compra)
         if cadastro_fornecedor not in cadastros_list:
             cadastros_list.append(cadastro_fornecedor)
+        if gestao_financeira not in operacoes_list:
+            operacoes_list.append(gestao_financeira)
 
     # Almoxarife
     if "ALMOXARIFE" in roles:
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
+
+    if operacoes_list:
+        pages["Operações"] = operacoes_list
 
     if cadastros_list:
         pages["Cadastros"] = cadastros_list
