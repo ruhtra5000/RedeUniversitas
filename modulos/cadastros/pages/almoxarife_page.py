@@ -11,7 +11,13 @@ def telaCadastroAlmoxarife():
     if "form_key_alm" not in st.session_state:
         st.session_state.form_key_alm = 0
 
-    st.title("📦 Cadastro de Almoxarife")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Almoxarife")
     st.caption("Preencha as informações abaixo para cadastrar um novo almoxarife no sistema.")
 
     st.markdown(
@@ -28,12 +34,6 @@ def telaCadastroAlmoxarife():
     if st.session_state.pop("cadastro_alm_realizado", False):
         st.toast("Almoxarife cadastrado com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
-
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
 
@@ -42,15 +42,15 @@ def telaCadastroAlmoxarife():
     if not lista_campus:
         st.warning(
             """
-            ⚠️ Antes de cadastrar um almoxarife é necessário possuir:
+            :material/warning: Antes de cadastrar um almoxarife é necessário possuir:
             - Pelo menos **1 Campus**
             """
         )
 
     with st.form(key=f"cadastro_alm_{st.session_state.form_key_alm}", border=False):
         
-        with st.container(border=True):
-            st.subheader("👤 Dados Pessoais")
+        with st.container():
+            st.subheader("Dados Pessoais")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -78,8 +78,8 @@ def telaCadastroAlmoxarife():
 
         st.write("")
 
-        with st.container(border=True):
-            st.subheader("🔗 Vínculo Institucional")
+        with st.container():
+            st.subheader("Vínculo Institucional")
 
             campus = st.selectbox(
                 "Campus *",
@@ -96,7 +96,7 @@ def telaCadastroAlmoxarife():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Almoxarife", 
+                "Cadastrar Almoxarife", 
                 type="primary", 
                 width="stretch"
             )

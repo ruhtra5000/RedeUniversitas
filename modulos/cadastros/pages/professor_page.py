@@ -15,7 +15,14 @@ def telaCadastroProfessor():
     if "form_key_prof" not in st.session_state:
         st.session_state.form_key_prof = 0
 
-    st.title("👨‍🏫 Cadastro de Professor")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Professor")
     st.caption("Preencha as informações abaixo para cadastrar um novo professor.")
     st.markdown(
         """
@@ -31,13 +38,6 @@ def telaCadastroProfessor():
     if st.session_state.pop("cadastro_prof_realizado", False):
         st.toast("Professor cadastrado com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
-
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
 
@@ -46,7 +46,7 @@ def telaCadastroProfessor():
     if not lista_campus:
         st.warning(
             """
-            ⚠️ Antes de cadastrar um professor é necessário possuir:
+            :material/warning: Antes de cadastrar um professor é necessário possuir:
 
             - Pelo menos **1 Campus**
             """
@@ -55,8 +55,8 @@ def telaCadastroProfessor():
     with st.form(key=f"cadastro_prof_{st.session_state.form_key_prof}", border=False):
 
         # Dados Pessoais
-        with st.container(border=True):
-            st.subheader("👤 Dados Pessoais")
+        with st.container():
+            st.subheader("Dados Pessoais")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -82,11 +82,9 @@ def telaCadastroProfessor():
                     key=f"prof_telefone_{st.session_state.form_key_prof}"
                 )
 
-        st.write("")
-
         # Vínculo Institucional
-        with st.container(border=True):
-            st.subheader("🔗 Vínculo Institucional")
+        with st.container():
+            st.subheader("Vínculo Institucional")
 
             campus = st.selectbox(
                 "Campus *",
@@ -104,7 +102,7 @@ def telaCadastroProfessor():
         
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Professor", 
+                "Cadastrar Professor", 
                 type="primary", 
                 width="stretch"
             )

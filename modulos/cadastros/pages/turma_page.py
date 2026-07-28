@@ -11,7 +11,14 @@ def telaCadastroTurma():
     if "form_key_turma" not in st.session_state:
         st.session_state.form_key_turma = 0
 
-    st.title("🏫 Cadastro de Turma")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/group_add: Cadastro de Turma")
     st.caption("Preencha as informações abaixo para cadastrar uma nova turma.")
 
     st.markdown(
@@ -27,13 +34,6 @@ def telaCadastroTurma():
 
     if st.session_state.pop("cadastro_turma_realizado", False):
         st.toast("Turma cadastrada com sucesso!", icon=":material/check:")
-
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
 
     if "cache_cursos" not in st.session_state:
         st.session_state.cache_cursos = listarCursos()
@@ -51,7 +51,7 @@ def telaCadastroTurma():
     if not lista_cursos or not lista_disciplinas or not lista_professores:
         st.warning(
             """
-            ⚠️ Antes de cadastrar uma turma é necessário possuir pelo menos:
+            :material/warning: Antes de cadastrar uma turma é necessário possuir pelo menos:
 
             - **1 Curso**
             - **1 Disciplina**
@@ -61,10 +61,9 @@ def telaCadastroTurma():
 
     with st.container(border=False):
 
-        with st.container(border=True):
-            st.subheader("📚 Dados da Turma")
+        with st.container():
+            st.subheader("Dados da Turma")
             
-            c1, c2 = st.columns(2)
             with st.container(horizontal=True):
                 curso_selecionado = st.selectbox(
                     "Curso *",
@@ -113,7 +112,7 @@ def telaCadastroTurma():
         
         with centro:
             cadastrar = st.button(
-                "💾 Cadastrar Turma", 
+                "Cadastrar Turma", 
                 type="primary", 
                 width="stretch",
                 key=f"btn_cad_turma_{st.session_state.form_key_turma}"

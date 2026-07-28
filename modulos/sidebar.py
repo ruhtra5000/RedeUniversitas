@@ -14,8 +14,6 @@ def renderizar_perfil_usuario():
         roles_formatadas = " • ".join([r.title() for r in roles])
         st.caption(f"*{roles_formatadas}*")
 
-        # st.badge("Home", color="blue")
-
     
     if st.button(":material/logout: Logout", use_container_width=True):
         st.logout()

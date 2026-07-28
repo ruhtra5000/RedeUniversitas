@@ -9,7 +9,13 @@ def telaCadastroFornecedor():
     if "form_key_forn" not in st.session_state:
         st.session_state.form_key_forn = 0
 
-    st.title("🚚 Cadastro de Fornecedor")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Fornecedor")
     st.caption("Preencha as informações abaixo para cadastrar um novo fornecedor.")
 
     st.markdown(
@@ -26,16 +32,10 @@ def telaCadastroFornecedor():
     if st.session_state.pop("cadastro_forn_realizado", False):
         st.toast("Fornecedor cadastrado com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
-
     with st.form(key=f"cadastro_forn_{st.session_state.form_key_forn}", border=False):
         
-        with st.container(border=True):
-            st.subheader("🏢 Dados da Empresa")
+        with st.container():
+            st.subheader("Dados da Empresa")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -48,11 +48,6 @@ def telaCadastroFornecedor():
                     placeholder="Somente números",
                     key=f"forn_cnpj_{st.session_state.form_key_forn}"
                 )
-
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("📞 Contato")
 
             with st.container(horizontal=True):
                 telefone = st.text_input(
@@ -71,7 +66,7 @@ def telaCadastroFornecedor():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Fornecedor", 
+                "Cadastrar Fornecedor", 
                 type="primary", 
                 width="stretch"
             )

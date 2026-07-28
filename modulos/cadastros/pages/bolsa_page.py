@@ -28,7 +28,7 @@ def telaCadastroBolsa():
 
     col1, _ = st.columns([1, 6])
     with col1:
-        if st.button("⬅ Voltar", width="stretch"):
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
             from modulos.rotas import cadastros_page
             st.switch_page(cadastros_page)
 
@@ -40,7 +40,7 @@ def telaCadastroBolsa():
     if not lista_alunos:
         st.warning(
             """
-            ⚠️ Antes de cadastrar uma bolsa é necessário possuir:
+            :material/warning: Antes de cadastrar uma bolsa é necessário possuir:
             - Pelo menos **1 Aluno**
             """
         )
@@ -48,7 +48,7 @@ def telaCadastroBolsa():
     with st.form(key=f"cadastro_bolsa_{st.session_state.form_key_bolsa}", border=False):
         
         with st.container():
-            st.title("🏷️ Cadastro de Bolsa")
+            st.title(":material/account_balance: Cadastro de Bolsa")
             st.caption("Preencha as informações abaixo para conceder uma bolsa a um aluno.")
             
             with st.container(horizontal=True):
@@ -101,7 +101,7 @@ def telaCadastroBolsa():
         _, centro, direita = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Bolsa", 
+                "Cadastrar Bolsa", 
                 type="primary", 
                 width="stretch"
             )

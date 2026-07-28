@@ -5,7 +5,7 @@ from modulos.academico.academico_service import (
 )
 
 def telaDesignacaoCargos():
-    st.title("Designação de Cargos")
+    st.title(":material/badge: Designação de Cargos")
     st.caption("Faça a designação ou destituição de Reitores de Campus e Coordenadores de Curso.")
 
     if st.session_state.pop("cargo_sucesso", False):
@@ -22,7 +22,7 @@ def telaDesignacaoCargos():
     aba_reitor, aba_coordenador = st.tabs(["Reitores de Campus", "Coordenadores de Curso"])
 
     with aba_reitor:
-        with st.container(border=True):
+        with st.container():
             campus_selecionado = st.selectbox(
                 "Selecione o Campus",
                 options=lista_campus,
@@ -94,7 +94,7 @@ def telaDesignacaoCargos():
                                 st.error(f"Erro ao destituir: {e}")
 
     with aba_coordenador:
-        with st.container(border=True):
+        with st.container():
             curso_selecionado = st.selectbox(
                 "Selecione o Curso",
                 options=lista_cursos,

@@ -9,7 +9,13 @@ def telaCadastroEstoque():
     if "form_key_estoque" not in st.session_state:
         st.session_state.form_key_estoque = 0
 
-    st.title("📦 Cadastro de Produto (Estoque)")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/inventory_2: Cadastro de Produto")
     st.caption("Preencha as informações abaixo para cadastrar um novo produto no estoque do campus.")
 
     st.markdown(
@@ -26,23 +32,17 @@ def telaCadastroEstoque():
     if st.session_state.pop("cadastro_estoque_realizado", False):
         st.toast("Produto cadastrado com sucesso!", icon=":material/check:")
 
-    col1, col2 = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
-
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
 
     lista_campus = st.session_state.cache_campus
 
     if not lista_campus:
-        st.warning("⚠️ Antes de cadastrar um produto, é necessário cadastrar pelo menos 1 Campus.")
+        st.warning(":material/warning: Antes de cadastrar um produto, é necessário cadastrar pelo menos 1 Campus.")
 
     with st.form(key=f"cadastro_estoque_{st.session_state.form_key_estoque}", border=False):
-        with st.container(border=True):
-            st.subheader("📦 Dados do Produto")
+        with st.container():
+            st.subheader("Dados do Produto")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -56,11 +56,6 @@ def telaCadastroEstoque():
                     key=f"est_marca_{st.session_state.form_key_estoque}"
                 )
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("🏢 Vínculo e Quantidades Iniciais")
-            
             with st.container(horizontal=True):
                 campus_selecionado = st.selectbox(
                     "Campus de Alocação *",
@@ -94,7 +89,7 @@ def telaCadastroEstoque():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Produto", 
+                "Cadastrar Produto", 
                 type="primary", 
                 width="stretch"
             )

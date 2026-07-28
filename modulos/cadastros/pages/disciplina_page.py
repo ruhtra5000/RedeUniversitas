@@ -15,7 +15,14 @@ def telaCadastroDisciplina():
     if "form_key_disc" not in st.session_state:
         st.session_state.form_key_disc = 0
 
-    st.title("📘 Cadastro de Disciplina")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/post_add: Cadastro de Disciplina")
     st.caption("Preencha as informações abaixo para cadastrar uma nova disciplina no curso.")
 
     st.markdown(
@@ -32,13 +39,6 @@ def telaCadastroDisciplina():
     if st.session_state.pop("cadastro_disc_realizado", False):
         st.toast("Disciplina cadastrada com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
-
     if "cache_cursos" not in st.session_state:
         st.session_state.cache_cursos = listarCursos()
 
@@ -51,7 +51,7 @@ def telaCadastroDisciplina():
     if not lista_cursos:
         st.warning(
             """
-            ⚠️ Antes de cadastrar uma disciplina é necessário possuir:
+            :material/warning: Antes de cadastrar uma disciplina é necessário possuir:
 
             - Pelo menos **1 Curso**
             """
@@ -59,7 +59,7 @@ def telaCadastroDisciplina():
 
     with st.container(border=False):
 
-        with st.container(border=True):
+        with st.container():
             st.subheader("Dados da Disciplina")
             
             with st.container(horizontal=True):
@@ -115,7 +115,7 @@ def telaCadastroDisciplina():
         
         with centro:
             cadastrar = st.button(
-                "💾 Cadastrar Disciplina", 
+                "Cadastrar Disciplina", 
                 type="primary", 
                 width="stretch",
                 key=f"btn_cad_disc_{st.session_state.form_key_disc}"

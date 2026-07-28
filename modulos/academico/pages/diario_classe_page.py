@@ -8,7 +8,7 @@ from modulos.academico.academico_service import (
 )
 
 def telaDiarioClasse():
-    st.title("Diário de Classe")
+    st.title(":material/edit_document: Diário de Classe")
     st.caption("Faça o lançamento de notas, faltas e o fechamento do semestre para as suas turmas.")
 
     if st.session_state.pop("diario_salvo", False):
@@ -103,10 +103,10 @@ def telaDiarioClasse():
             c1, c2, c3 = st.columns([1, 1, 1])
             
             with c1:
-                salvar = st.button("💾 Salvar Lançamentos", type="primary", width="stretch")
+                salvar = st.button("Salvar Lançamentos", type="primary", width="stretch")
             
             with c3:
-                fechar = st.button("🔒 Consolidar Turma", width="stretch", help="Calcula a situação final de todos os alunos e fecha a turma.")
+                fechar = st.button(":material/lock: Consolidar Turma", width="stretch", help="Calcula a situação final de todos os alunos e fecha a turma.")
 
             if salvar:
                 try:

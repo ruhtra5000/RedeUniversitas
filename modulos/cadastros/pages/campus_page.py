@@ -11,7 +11,13 @@ def telaCadastroCampus():
     if "form_key_campus" not in st.session_state:
         st.session_state.form_key_campus = 0
 
-    st.title("🏢 Cadastro de Campus")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/domain_add: Cadastro de Campus")
     st.caption("Preencha as informações abaixo para cadastrar um novo campus.")
 
     st.markdown(
@@ -28,16 +34,10 @@ def telaCadastroCampus():
     if st.session_state.pop("cadastro_campus_realizado", False):
         st.toast("Campus cadastrado com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
-
     with st.form(key=f"cadastro_campus_{st.session_state.form_key_campus}", border=False):
         
-        with st.container(border=True):
-            st.subheader("🏢 Dados da Unidade")
+        with st.container():
+            st.subheader("Dados da Unidade")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -58,11 +58,7 @@ def telaCadastroCampus():
                     key=f"campus_caixa_{st.session_state.form_key_campus}"
                 )
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("📍 Localização")
-            
+        with st.container():
             with st.container(horizontal=True):
                 cidade = st.text_input(
                     "Cidade *",
@@ -76,11 +72,7 @@ def telaCadastroCampus():
                     key=f"campus_estado_{st.session_state.form_key_campus}"
                 )
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("📞 Contato")
-
+        with st.container():
             c3, c4 = st.columns(2)
             with c3:
                 email = st.text_input(
@@ -100,7 +92,7 @@ def telaCadastroCampus():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Campus", 
+                "Cadastrar Campus", 
                 type="primary", 
                 width="stretch"
             )

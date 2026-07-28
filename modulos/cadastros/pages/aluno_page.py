@@ -17,7 +17,14 @@ def telaCadastroAluno():
     if "form_key_aluno" not in st.session_state:
         st.session_state.form_key_aluno = 0
 
-    st.title("🎓 Cadastro de Aluno")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Aluno")
     st.caption("Preencha as informações abaixo para cadastrar um novo aluno.")
 
     st.markdown(
@@ -34,13 +41,6 @@ def telaCadastroAluno():
     if st.session_state.pop("cadastro_realizado", False):
         st.toast("Aluno cadastrado com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
-
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
 
@@ -53,19 +53,19 @@ def telaCadastroAluno():
     if not lista_campus or not lista_cursos:
         st.warning(
             """
-            ⚠️ Antes de cadastrar um aluno é necessário possuir:
+            :material/warning: Antes de cadastrar um aluno é necessário possuir:
 
             - Pelo menos **1 Campus**
             - Pelo menos **1 Curso**
             """
         )
 
-    with st.container(border=False):
+    with st.container():
 
         # Dados pessoais
 
-        with st.container(border=True):
-            st.subheader("👤 Dados Pessoais")
+        with st.container():
+            st.subheader("Dados Pessoais")
             with st.container(horizontal=True):
                 nome = st.text_input(
                     "Nome Completo *",
@@ -90,12 +90,7 @@ def telaCadastroAluno():
                     key=f"aluno_telefone_{st.session_state.form_key_aluno}"
                 )
 
-        st.write("")
-
-        # Dados acadêmicos
-
-        with st.container(border=True):
-            st.subheader("🎓 Dados Acadêmicos")
+            st.subheader("Dados Acadêmicos")
             
             with st.container(horizontal=True):
                 campus = st.selectbox(
@@ -129,7 +124,7 @@ def telaCadastroAluno():
 
         with centro:
             cadastrar = st.button(
-                "💾 Cadastrar Aluno",
+                "Cadastrar Aluno",
                 width="stretch",
                 type="primary",
                 key=f"btn_cad_aluno_{st.session_state.form_key_aluno}"

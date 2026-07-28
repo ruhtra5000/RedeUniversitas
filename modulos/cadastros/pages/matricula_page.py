@@ -10,7 +10,13 @@ def telaCadastroMatricula():
     if "form_key_matr" not in st.session_state:
         st.session_state.form_key_matr = 0
 
-    st.title("🎓 Cadastro de Matrícula")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/assignment_add: Cadastro de Matrícula")
     st.caption("Preencha as informações abaixo para matricular um aluno em uma turma.")
 
     st.markdown(
@@ -27,12 +33,6 @@ def telaCadastroMatricula():
     if st.session_state.pop("cadastro_matr_realizado", False):
         st.toast("Matrícula realizada com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
-
     if "cache_alunos" not in st.session_state:
         st.session_state.cache_alunos = listarAlunos()
 
@@ -45,7 +45,7 @@ def telaCadastroMatricula():
     if not lista_alunos or not lista_turmas:
         st.warning(
             """
-            ⚠️ Antes de matricular um aluno é necessário possuir:
+            :material/warning: Antes de matricular um aluno é necessário possuir:
             - Pelo menos **1 Aluno**
             - Pelo menos **1 Turma**
             """
@@ -53,8 +53,8 @@ def telaCadastroMatricula():
 
     with st.container(border=False):
         
-        with st.container(border=True):
-            st.subheader("📚 Informações da Matrícula")
+        with st.container():
+            st.subheader("Informações da Matrícula")
             
             with st.container(horizontal=True):
                 aluno_selecionado = st.selectbox(
@@ -88,7 +88,7 @@ def telaCadastroMatricula():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.button(
-                "💾 Matricular Aluno", 
+                "Matricular Aluno", 
                 type="primary", 
                 width="stretch",
                 key=f"btn_cad_matr_{st.session_state.form_key_matr}"

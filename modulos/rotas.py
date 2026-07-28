@@ -32,7 +32,7 @@ cadastro_compra = st.Page(telaCadastroCompra, title="Compra", icon=":material/ad
 cadastro_financeiro = st.Page(telaCadastroFinanceiro, title="Financeiro", icon=":material/person_add:", url_path="cadastro_financeiro")
 cadastro_fornecedor = st.Page(telaCadastroFornecedor, title="Fornecedor", icon=":material/person_add:", url_path="cadastro_fornecedor")
 cadastro_matricula = st.Page(telaCadastroMatricula, title="Matrícula", icon=":material/assignment_add:", url_path="cadastro_matricula")
-cadastro_estoque = st.Page(telaCadastroEstoque, title="Estoque", icon=":material/inventory_2:", url_path="cadastro_estoque")
+cadastro_estoque = st.Page(telaCadastroEstoque, title="Produto", icon=":material/inventory_2:", url_path="cadastro_estoque")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -67,12 +67,12 @@ def get_navigation():
             cadastro_aluno,
             cadastro_prof,
             cadastro_financeiro,
+            cadastro_almoxarife,
             cadastro_campus,
             cadastro_curso,
             cadastro_disc,
             cadastro_turma,
             cadastro_matricula,
-            cadastro_almoxarife,
             cadastro_bolsa
         ])
 

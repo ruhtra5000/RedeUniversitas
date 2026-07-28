@@ -12,7 +12,14 @@ def telaCadastroCurso():
     if "form_key_curso" not in st.session_state:
         st.session_state.form_key_curso = 0
 
-    st.title("📚 Cadastro de Curso")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/library_add: Cadastro de Curso")
     st.caption("Preencha as informações abaixo para cadastrar um novo curso.")
 
     st.markdown(
@@ -38,18 +45,11 @@ def telaCadastroCurso():
     lista_campus = st.session_state.cache_campus
     lista_professores = st.session_state.cache_professores
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
-
     with st.container(border=False):
 
         # Dados do Curso
-        with st.container(border=True):
-            st.subheader("📚 Dados Principais")
+        with st.container():
+            st.subheader("Dados Principais")
             
             with st.container(horizontal=True):
                 nome = st.text_input(
@@ -94,8 +94,8 @@ def telaCadastroCurso():
         st.write("")
 
         # Vínculos Institucionais
-        with st.container(border=True):
-            st.subheader("🔗 Vínculos Institucionais")
+        with st.container():
+            st.subheader("Vínculos Institucionais")
             
             with st.container(horizontal=True):
                 campus_selecionado = st.selectbox(
@@ -129,7 +129,7 @@ def telaCadastroCurso():
         
         with centro:
             cadastrar = st.button(
-                "💾 Cadastrar Curso", 
+                "Cadastrar Curso", 
                 type="primary", 
                 width="stretch",
                 key=f"btn_cad_curso_{st.session_state.form_key_curso}"

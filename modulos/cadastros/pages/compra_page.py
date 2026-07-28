@@ -14,7 +14,13 @@ def telaCadastroCompra():
     if "form_key_compra" not in st.session_state:
         st.session_state.form_key_compra = 0
 
-    st.title("🛒 Registro de Compra")
+    col1, _ = st.columns([1, 6])
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page
+            st.switch_page(cadastros_page)
+
+    st.title(":material/add_shopping_cart: Registro de Compra")
     st.caption("Preencha as informações abaixo para registrar uma compra de produtos.")
 
     st.markdown(
@@ -30,12 +36,6 @@ def telaCadastroCompra():
 
     if st.session_state.pop("cadastro_compra_realizado", False):
         st.toast("Compra registrada com sucesso!", icon=":material/check:")
-
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button("⬅ Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
 
     if "cache_financeiros" not in st.session_state:
         st.session_state.cache_financeiros = listarFinanceiro()
@@ -53,7 +53,7 @@ def telaCadastroCompra():
     if not lista_financeiros or not lista_fornecedores or not lista_produtos:
         st.warning(
             """
-            ⚠️ Antes de registrar uma compra é necessário possuir:
+            :material/warning: Antes de registrar uma compra é necessário possuir:
             - Pelo menos **1 Funcionário Financeiro**
             - Pelo menos **1 Fornecedor**
             - Pelo menos **1 Produto (Estoque)**
@@ -62,8 +62,8 @@ def telaCadastroCompra():
 
     with st.form(key=f"cadastro_compra_{st.session_state.form_key_compra}", border=False):
         
-        with st.container(border=True):
-            st.subheader("🛒 Informações da Compra")
+        with st.container():
+            st.subheader("Informações da Compra")
             
             with st.container(horizontal=True):
                 financeiro_selecionado = st.selectbox(
@@ -102,10 +102,7 @@ def telaCadastroCompra():
                     key=f"compra_qtde_{st.session_state.form_key_compra}"
                 )
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("💰 Valores e Datas")
+            st.subheader("Valores e Datas")
 
             with st.container(horizontal=True):
                 valor_unit = st.number_input(
@@ -121,10 +118,6 @@ def telaCadastroCompra():
                     key=f"compra_dcompra_{st.session_state.form_key_compra}"
                 )
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("💳 Condições de Pagamento")
 
             with st.container(horizontal=True):
                 data_vencimento = st.date_input(
@@ -138,7 +131,7 @@ def telaCadastroCompra():
         _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Registrar Compra", 
+                "Registrar Compra", 
                 type="primary", 
                 width="stretch"
             )

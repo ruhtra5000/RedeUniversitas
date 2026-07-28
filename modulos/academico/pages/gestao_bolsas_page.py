@@ -5,7 +5,7 @@ from database.entidades.enums.StatusBolsa import StatusBolsa
 from modulos.academico.academico_service import listarBolsasGeral, editarBolsa
 
 def telaGestaoBolsas():
-    st.title("Gestão de Bolsas")
+    st.title(":material/account_balance: Gestão de Bolsas")
     st.caption("Consulte e edite as informações das bolsas concedidas aos alunos.")
 
     if st.session_state.pop("bolsas_salvas", False):
