@@ -28,7 +28,7 @@ def telaLogin():
 
         if st.button(
             "![Google](https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg) Entrar com Google",
-            use_container_width=True,
+            width="stretch",
         ):
             st.login()
             st.stop()
@@ -38,19 +38,51 @@ def verificarLogin():
     email = st.user.email
 
     with SessionLocal() as session:
-        query = select(Pessoa).where(Pessoa.google_id == google_id)
+        from sqlalchemy.orm import joinedload
+        query = select(Pessoa).options(
+            joinedload(Pessoa.professor),
+            joinedload(Pessoa.almoxarife),
+            joinedload(Pessoa.aluno),
+            joinedload(Pessoa.financeiro)
+        ).where(Pessoa.google_id == google_id)
+        
         pessoa = session.execute(query).scalar_one_or_none()
 
         if pessoa == None:
-            query = select(Pessoa).where(Pessoa.email == email)
+            query = select(Pessoa).options(
+                joinedload(Pessoa.professor),
+                joinedload(Pessoa.almoxarife),
+                joinedload(Pessoa.aluno),
+                joinedload(Pessoa.financeiro)
+            ).where(Pessoa.email == email)
             pessoaEmail = session.execute(query).scalar_one_or_none()
 
             if pessoaEmail != None:
                 pessoaEmail.google_id = google_id
                 session.commit()
+                pessoa = pessoaEmail
             else:
                 st.warning("E-mail não cadastrado!")
                 st.logout()
+                st.stop()
+        
+        if "roles" not in st.session_state:
+            roles = []
+            if pessoa.professor: 
+                roles.append("PROFESSOR")
+                # Verifica se é reitor de algum campus
+                from database.entidades.Campus import Campus
+                reitor_campus = session.execute(select(Campus).where(Campus.reitor_id == pessoa.id)).scalar_one_or_none()
+                if reitor_campus:
+                    roles.append("REITOR")
+
+            if pessoa.almoxarife: roles.append("ALMOXARIFE")
+            if pessoa.aluno: roles.append("ALUNO")
+            if pessoa.financeiro: roles.append("FINANCEIRO")
+            
+            st.session_state.roles = roles
+            st.session_state.pessoa_logada = pessoa.nome
+            st.session_state.pessoa_id = pessoa.id
 
 # Lógica de login
 if not st.user.is_logged_in:

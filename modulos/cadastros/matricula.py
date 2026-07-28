@@ -14,23 +14,36 @@ import database.entidades
 #       disciplina: Disciplina
 
 # Service
-def criarMatricula(matricula: Matricula):
+def criarMatricula(matricula: Matricula, aluno, disciplina):
     try:
-        if matricula.aluno.curso_id != matricula.disciplina.curso_id:
+        if aluno.curso_id != disciplina.curso_id:
             raise Exception(f"O aluno deve pertencer ao mesmo curso da disciplina.")
         
-        # Checagem de pré-requisitos
-        flag = True
-        for preReq in matricula.disciplina.preRequisitos:
-            cursado = False
-            for matr in matricula.aluno.matriculas:
-                if preReq.prerequisito_id == matr.disciplina_id:
-                    cursado = True
-                    if matr.aprovacao == None or matr.aprovacao == False:
-                        flag = False
+        with SessionLocal() as session:
+            # Pegamos os pre requisitos da disciplina
+            from sqlalchemy import select
+            from database.entidades.PreRequisito import PreRequisito
+            from database.entidades.Matricula import Matricula as MatrDB
+            
+            preReqs = session.execute(
+                select(PreRequisito).where(PreRequisito.disciplina_id == disciplina.id)
+            ).scalars().all()
+            
+            matrAluno = session.execute(
+                select(MatrDB).where(MatrDB.aluno_id == aluno.pessoa_id)
+            ).scalars().all()
+            
+            flag = True
+            for preReq in preReqs:
+                cursado = False
+                for matr in matrAluno:
+                    if preReq.prerequisito_id == matr.disciplina_id:
+                        cursado = True
+                        if matr.aprovacao == None or matr.aprovacao == False:
+                            flag = False
 
-            if not cursado or not flag:
-                raise Exception(f"Algum dos pré-requisitos da disciplina não foi concluído ou cursado.")
+                if not cursado or not flag:
+                    raise Exception(f"Algum dos pré-requisitos da disciplina não foi concluído ou cursado.")
         
         dbCriarMatricula(matricula)
             

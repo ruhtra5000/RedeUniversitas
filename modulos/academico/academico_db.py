@@ -29,7 +29,8 @@ from database.entidades.Pessoa import Pessoa
        
 def dbListarCampus():
     with SessionLocal() as session:
-        query = select(Campus)
+        from sqlalchemy.orm import joinedload
+        query = select(Campus).options(joinedload(Campus.reitor).joinedload(Professor.pessoa))
         campus = session.execute(query).scalars().all()
 
         return campus
@@ -86,7 +87,8 @@ def dbRemoverReitor(idCampus: int):
 
 def dbListarCursos():
     with SessionLocal() as session:
-        query = select(Curso)
+        from sqlalchemy.orm import joinedload
+        query = select(Curso).options(joinedload(Curso.coordenador).joinedload(Professor.pessoa), joinedload(Curso.campus))
         cursos = session.execute(query).scalars().all()
 
         return cursos
@@ -196,6 +198,16 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
 #   | |  | |_| || |   | | | | | || (_| |
 #   \_/   \__,_||_|   |_| |_| |_| \__,_|
 
+def dbListarTurmasGeral():
+    with SessionLocal() as session:
+        from sqlalchemy.orm import joinedload
+        query = select(Turma).options(
+            joinedload(Turma.disciplina),
+            joinedload(Turma.matriculas).joinedload(Matricula.aluno).joinedload(Aluno.pessoa)
+        )
+        turmas = session.execute(query).unique().scalars().all()
+        return turmas
+
 def dbListarTurmasProfessor(idProfessor: int, semestre: str):
     with SessionLocal() as session:
         query = select(Turma).where(Turma.professor_id == idProfessor, Turma.semestre == semestre)
@@ -212,8 +224,12 @@ def dbListarTurmasCurso(idCurso: int, semestre: str):
     
 def dbListarTurmaId(idTurma: int):
     with SessionLocal() as session:
-        query = select(Turma).where(Turma.id == idTurma)
-        turma = session.execute(query).scalar_one_or_none()
+        from sqlalchemy.orm import joinedload
+        query = select(Turma).options(
+            joinedload(Turma.disciplina),
+            joinedload(Turma.matriculas).joinedload(Matricula.aluno).joinedload(Aluno.pessoa)
+        ).where(Turma.id == idTurma)
+        turma = session.execute(query).unique().scalar_one_or_none()
 
         return turma
 
@@ -235,7 +251,8 @@ def dbAlterarProfessorTurma(idTurma: int, idNovoProfessor: int):
 
 def dbListarMatriculaId(idAluno: int, idTurma: int):
     with SessionLocal() as session:
-        query = select(Matricula).where(Matricula.aluno_id == idAluno, Matricula.turma_id == idTurma)
+        from sqlalchemy.orm import joinedload
+        query = select(Matricula).options(joinedload(Matricula.disciplina)).where(Matricula.aluno_id == idAluno, Matricula.turma_id == idTurma)
         matricula = session.execute(query).scalar_one_or_none()
 
         return matricula
@@ -377,7 +394,8 @@ def dbListarProfessores():
     
 def dbListarProfessoresCampus(idCampus: int):
     with SessionLocal() as session:
-        query = select(Professor).where(Professor.campus_id == idCampus)
+        from sqlalchemy.orm import joinedload
+        query = select(Professor).options(joinedload(Professor.pessoa)).where(Professor.campus_id == idCampus)
         professores = session.execute(query).scalars().all()
 
         return professores
@@ -413,8 +431,14 @@ def dbListarProfessorCpf(cpfProfessor: str):
 
 def dbListarAlunos():
     with SessionLocal() as session:
-        query = select(Aluno)
-        alunos = session.execute(query).scalars().all()
+        from sqlalchemy.orm import joinedload
+        from database.entidades.Campus import Campus
+        query = select(Aluno).options(
+            joinedload(Aluno.pessoa),
+            joinedload(Aluno.curso),
+            joinedload(Aluno.campus).joinedload(Campus.caixa)
+        )
+        alunos = session.execute(query).unique().scalars().all()
 
         return alunos
 
@@ -434,8 +458,13 @@ def dbListarAlunosCurso(idCurso: int):
     
 def dbListarAlunoId(idAluno: int):
     with SessionLocal() as session:
-        query = select(Aluno).where(Aluno.pessoa_id == idAluno)
-        aluno = session.execute(query).scalar_one_or_none()
+        from sqlalchemy.orm import joinedload
+        query = select(Aluno).options(
+            joinedload(Aluno.pessoa),
+            joinedload(Aluno.matriculas).joinedload(Matricula.disciplina),
+            joinedload(Aluno.matriculas).joinedload(Matricula.turma)
+        ).where(Aluno.pessoa_id == idAluno)
+        aluno = session.execute(query).unique().scalar_one_or_none()
 
         return aluno
     
@@ -464,9 +493,17 @@ def dbListarBolsasAluno(idAluno: int):
 
         return bolsas
 
+def dbListarBolsasGeral():
+    with SessionLocal() as session:
+        from sqlalchemy.orm import joinedload
+        query = select(Bolsa).options(joinedload(Bolsa.aluno).joinedload(Aluno.pessoa))
+        bolsas = session.execute(query).scalars().all()
+        return bolsas
+
 def dbListarBolsasAtivas():
     with SessionLocal() as session:
-        query = select(Bolsa).where(Bolsa.status == StatusBolsa.ATIVA)
+        from sqlalchemy.orm import joinedload
+        query = select(Bolsa).options(joinedload(Bolsa.aluno).joinedload(Aluno.pessoa)).where(Bolsa.status == StatusBolsa.ATIVA)
         bolsas = session.execute(query).scalars().all()
 
         return bolsas    

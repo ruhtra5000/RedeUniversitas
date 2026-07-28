@@ -5,18 +5,24 @@ from database.Conexao import SessionLocal
 from database.entidades.Pessoa import Pessoa
 from database.entidades.Professor import Professor
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
+from modulos.academico.academico_service import listarCampus
 from modulos.cadastros.professor import criarProfessor
 
 import database.entidades
-
-from modulos.academico.academico_db import dbListarCampus
 
 def telaCadastroProfessor():
 
     if "form_key_prof" not in st.session_state:
         st.session_state.form_key_prof = 0
 
-    st.title("👨‍🏫 Cadastro de Professor")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Professor")
     st.caption("Preencha as informações abaixo para cadastrar um novo professor.")
     st.markdown(
         """
@@ -30,24 +36,17 @@ def telaCadastroProfessor():
     )
 
     if st.session_state.pop("cadastro_prof_realizado", False):
-        st.toast("Professor cadastrado com sucesso!", icon="🎉")
-
-    col1, col2 = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
+        st.toast("Professor cadastrado com sucesso!", icon=":material/check:")
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     lista_campus = st.session_state.cache_campus
 
     if not lista_campus:
         st.warning(
             """
-            ⚠️ Antes de cadastrar um professor é necessário possuir:
+            :material/warning: Antes de cadastrar um professor é necessário possuir:
 
             - Pelo menos **1 Campus**
             """
@@ -56,41 +55,36 @@ def telaCadastroProfessor():
     with st.form(key=f"cadastro_prof_{st.session_state.form_key_prof}", border=False):
 
         # Dados Pessoais
-        with st.container(border=True):
-            st.subheader("👤 Dados Pessoais")
+        with st.container():
+            st.subheader("Dados Pessoais")
             
-            c1, c2 = st.columns(2)
-            with c1:
+            with st.container(horizontal=True):
                 nome = st.text_input(
                     "Nome Completo *",
                     placeholder="Ex.: Carlos Mendes",
                     key=f"prof_nome_{st.session_state.form_key_prof}"
                 )
-                
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"prof_cpf_{st.session_state.form_key_prof}"
-                )
-                
-            with c2:
                 email = st.text_input(
                     "E-mail *",
                     placeholder="email@exemplo.com",
                     key=f"prof_email_{st.session_state.form_key_prof}"
                 )
-                
+
+            with st.container(horizontal=True):
+                cpf = st.text_input(
+                    "CPF *",
+                    placeholder="Somente números",
+                    key=f"prof_cpf_{st.session_state.form_key_prof}"
+                )
                 telefone = st.text_input(
                     "Telefone",
                     placeholder="Opcional",
                     key=f"prof_telefone_{st.session_state.form_key_prof}"
                 )
 
-        st.write("")
-
         # Vínculo Institucional
-        with st.container(border=True):
-            st.subheader("🔗 Vínculo Institucional")
+        with st.container():
+            st.subheader("Vínculo Institucional")
 
             campus = st.selectbox(
                 "Campus *",
@@ -108,9 +102,9 @@ def telaCadastroProfessor():
         
         with centro:
             cadastrar = st.form_submit_button(
-                "💾 Cadastrar Professor", 
+                "Cadastrar Professor", 
                 type="primary", 
-                use_container_width=True
+                width="stretch"
             )
 
     # Processamento
@@ -134,9 +128,8 @@ def telaCadastroProfessor():
                 criarProfessor(pessoa=nova_pessoa, idCampus=campus.id)
                 
                 st.session_state.form_key_prof += 1 
-                st.session_state.pop("cache_professores", None)
                 st.session_state["cadastro_prof_realizado"] = True
-                
+                st.session_state.pop("cache_professores", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

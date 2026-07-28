@@ -9,7 +9,7 @@ from database.entidades.Aluno import Aluno
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
-from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail, dbListarCampus, dbListarCursos
+from modulos.academico.academico_service import existeCpf, existeEmail, listarCampus, listarCursos
 from modulos.cadastros.aluno import criarAluno
 
 def telaCadastroAluno():
@@ -17,7 +17,14 @@ def telaCadastroAluno():
     if "form_key_aluno" not in st.session_state:
         st.session_state.form_key_aluno = 0
 
-    st.title("🎓 Cadastro de Aluno")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/person_add: Cadastro de Aluno")
     st.caption("Preencha as informações abaixo para cadastrar um novo aluno.")
 
     st.markdown(
@@ -32,20 +39,13 @@ def telaCadastroAluno():
     )
     
     if st.session_state.pop("cadastro_realizado", False):
-        st.toast("Aluno cadastrado com sucesso!", icon="🎉")
-
-    col1, col2 = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
+        st.toast("Aluno cadastrado com sucesso!", icon=":material/check:")
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     if "cache_cursos" not in st.session_state:
-        st.session_state.cache_cursos = dbListarCursos()
+        st.session_state.cache_cursos = listarCursos()
 
     lista_campus = st.session_state.cache_campus
     lista_cursos = st.session_state.cache_cursos
@@ -53,56 +53,46 @@ def telaCadastroAluno():
     if not lista_campus or not lista_cursos:
         st.warning(
             """
-            ⚠️ Antes de cadastrar um aluno é necessário possuir:
+            :material/warning: Antes de cadastrar um aluno é necessário possuir:
 
             - Pelo menos **1 Campus**
             - Pelo menos **1 Curso**
             """
         )
 
-    with st.form(f"cadastro_aluno_{st.session_state.form_key_aluno}", border=False):
+    with st.container():
 
         # Dados pessoais
 
-        with st.container(border=True):
-            st.subheader("👤 Dados Pessoais")
-            c1, c2 = st.columns(2)
-
-            with c1:
+        with st.container():
+            st.subheader("Dados Pessoais")
+            with st.container(horizontal=True):
                 nome = st.text_input(
                     "Nome Completo *",
                     placeholder="Ex.: João da Silva",
                     key=f"aluno_nome_{st.session_state.form_key_aluno}"
                 )
-
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"aluno_cpf_{st.session_state.form_key_aluno}"
-                )
-
-            with c2:
                 email = st.text_input(
                     "E-mail *",
                     placeholder="email@exemplo.com",
                     key=f"aluno_email_{st.session_state.form_key_aluno}"
                 )
 
+            with st.container(horizontal=True):
+                cpf = st.text_input(
+                    "CPF *",
+                    placeholder="Somente números",
+                    key=f"aluno_cpf_{st.session_state.form_key_aluno}"
+                )
                 telefone = st.text_input(
                     "Telefone",
                     placeholder="Opcional",
                     key=f"aluno_telefone_{st.session_state.form_key_aluno}"
                 )
 
-        st.write("")
-
-        # Dados acadêmicos
-
-        with st.container(border=True):
-            st.subheader("🎓 Dados Acadêmicos")
-            c1, c2 = st.columns(2)
-
-            with c1:
+            st.subheader("Dados Acadêmicos")
+            
+            with st.container(horizontal=True):
                 campus = st.selectbox(
                     "Campus *",
                     options=lista_campus if lista_campus else [],
@@ -112,15 +102,19 @@ def telaCadastroAluno():
                     disabled=not lista_campus,
                     key=f"aluno_campus_{st.session_state.form_key_aluno}"
                 )
+                
+                if campus:
+                    cursos_filtrados = [c for c in lista_cursos if c.campus_id == campus.id]
+                else:
+                    cursos_filtrados = []
 
-            with c2:
                 curso = st.selectbox(
                     "Curso *",
-                    options=lista_cursos if lista_cursos else [],
+                    options=cursos_filtrados,
                     format_func=lambda x: x.nome,
                     index=None,
-                    placeholder="Selecione um curso...",
-                    disabled=not lista_cursos,
+                    placeholder="Selecione um curso..." if campus else "Selecione o Campus primeiro",
+                    disabled=not campus,
                     key=f"aluno_curso_{st.session_state.form_key_aluno}"
                 )
 
@@ -129,10 +123,11 @@ def telaCadastroAluno():
         _, centro, _ = st.columns([2, 3, 2])
 
         with centro:
-            cadastrar = st.form_submit_button(
-                "💾 Cadastrar Aluno",
-                use_container_width=True,
-                type="primary"
+            cadastrar = st.button(
+                "Cadastrar Aluno",
+                width="stretch",
+                type="primary",
+                key=f"btn_cad_aluno_{st.session_state.form_key_aluno}"
             )
 
     # Processamento
@@ -144,6 +139,11 @@ def telaCadastroAluno():
         elif not nome.strip() or not cpf.strip() or not email.strip():
             st.error("Preencha todos os campos obrigatórios (Nome, CPF e E-mail).")
             
+        elif existeCpf(cpf):
+            st.error("Já existe um aluno cadastrado com este CPF.")
+        elif existeEmail(email.strip()):
+            st.error("Já existe um aluno cadastrado com este e-mail.")
+
         elif campus is None:
             st.error("Por favor, selecione um Campus.")
             
@@ -168,6 +168,7 @@ def telaCadastroAluno():
 
                 st.session_state.form_key_aluno += 1 
                 st.session_state["cadastro_realizado"] = True
+                st.session_state.pop("cache_alunos", None)
                 st.rerun()
 
             except SQLAlchemyError as e:

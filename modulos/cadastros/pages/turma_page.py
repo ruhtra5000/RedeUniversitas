@@ -3,7 +3,7 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Turma import Turma
 import database.entidades
-from modulos.academico.academico_db import (dbListarCursos, dbListarDisciplinasGeral, dbListarProfessores)
+from modulos.academico.academico_service import (listarCursos, listarDisciplinasGeral, listarProfessores)
 from modulos.cadastros.turma import criarTurma
 
 def telaCadastroTurma():
@@ -11,7 +11,14 @@ def telaCadastroTurma():
     if "form_key_turma" not in st.session_state:
         st.session_state.form_key_turma = 0
 
-    st.title("🏫 Cadastro de Turma")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/group_add: Cadastro de Turma")
     st.caption("Preencha as informações abaixo para cadastrar uma nova turma.")
 
     st.markdown(
@@ -26,23 +33,16 @@ def telaCadastroTurma():
     )
 
     if st.session_state.pop("cadastro_turma_realizado", False):
-        st.toast("Turma cadastrada com sucesso!", icon="🎉")
-
-    col1, col2 = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
+        st.toast("Turma cadastrada com sucesso!", icon=":material/check:")
 
     if "cache_cursos" not in st.session_state:
-        st.session_state.cache_cursos = dbListarCursos()
-
-    if "cache_disciplinas" not in st.session_state:
-        st.session_state.cache_disciplinas = dbListarDisciplinasGeral()
+        st.session_state.cache_cursos = listarCursos()
 
     if "cache_professores" not in st.session_state:
-        st.session_state.cache_professores = dbListarProfessores()
+        st.session_state.cache_professores = listarProfessores()
+        
+    if "cache_disciplinas" not in st.session_state:
+        st.session_state.cache_disciplinas = listarDisciplinasGeral()
 
     lista_cursos = st.session_state.cache_cursos
     lista_disciplinas = st.session_state.cache_disciplinas
@@ -51,7 +51,7 @@ def telaCadastroTurma():
     if not lista_cursos or not lista_disciplinas or not lista_professores:
         st.warning(
             """
-            ⚠️ Antes de cadastrar uma turma é necessário possuir pelo menos:
+            :material/warning: Antes de cadastrar uma turma é necessário possuir pelo menos:
 
             - **1 Curso**
             - **1 Disciplina**
@@ -59,20 +59,12 @@ def telaCadastroTurma():
             """
         )
 
-    with st.form(key=f"cadastro_turma_{st.session_state.form_key_turma}", border=False):
+    with st.container(border=False):
 
-        with st.container(border=True):
-            st.subheader("📚 Dados da Turma")
+        with st.container():
+            st.subheader("Dados da Turma")
             
-            c1, c2 = st.columns(2)
-            with c1:
-                semestre = st.text_input(
-                    "Semestre *",
-                    placeholder="Ex.: 2026.1",
-                    key=f"turma_semestre_{st.session_state.form_key_turma}"
-                )
-                
-            with c2:
+            with st.container(horizontal=True):
                 curso_selecionado = st.selectbox(
                     "Curso *",
                     options=lista_cursos if lista_cursos else [],
@@ -82,26 +74,23 @@ def telaCadastroTurma():
                     disabled=not lista_cursos,
                     key=f"turma_curso_{st.session_state.form_key_turma}"
                 )
+                
+                if curso_selecionado:
+                    disciplinas_filtradas = [d for d in lista_disciplinas if d.curso_id == curso_selecionado.id]
+                else:
+                    disciplinas_filtradas = []
 
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("🔗 Vínculos Acadêmicos")
-            
-            c3, c4 = st.columns(2)
-            with c3:
                 disciplina_selecionada = st.selectbox(
                     "Disciplina *",
-                    options=lista_disciplinas if lista_disciplinas else [],
+                    options=disciplinas_filtradas,
                     format_func=lambda d: d.nome,
                     index=None,
-                    placeholder="Selecione uma disciplina...",
-                    disabled=not lista_disciplinas,
-                    help="A disciplina deve pertencer ao curso selecionado acima.",
-                    key=f"turma_disciplina_{st.session_state.form_key_turma}"
+                    placeholder="Selecione uma disciplina..." if curso_selecionado else "Selecione o Curso primeiro",
+                    disabled=not curso_selecionado,
+                    key=f"turma_disc_{st.session_state.form_key_turma}"
                 )
-                
-            with c4:
+
+            with st.container(horizontal=True):
                 professor_selecionado = st.selectbox(
                     "Professor *",
                     options=lista_professores if lista_professores else [],
@@ -109,8 +98,12 @@ def telaCadastroTurma():
                     index=None,
                     placeholder="Selecione um professor...",
                     disabled=not lista_professores,
-                    help="O professor deve pertencer ao mesmo campus do curso.",
-                    key=f"turma_professor_{st.session_state.form_key_turma}"
+                    key=f"turma_prof_{st.session_state.form_key_turma}"
+                )
+                semestre = st.text_input(
+                    "Semestre *",
+                    placeholder="Ex.: 2026.1",
+                    key=f"turma_semestre_{st.session_state.form_key_turma}"
                 )
 
         st.write("")
@@ -118,10 +111,11 @@ def telaCadastroTurma():
         _, centro, _ = st.columns([2, 3, 2])
         
         with centro:
-            cadastrar = st.form_submit_button(
-                "💾 Cadastrar Turma", 
+            cadastrar = st.button(
+                "Cadastrar Turma", 
                 type="primary", 
-                use_container_width=True
+                width="stretch",
+                key=f"btn_cad_turma_{st.session_state.form_key_turma}"
             )
 
     # Processamento
@@ -155,7 +149,7 @@ def telaCadastroTurma():
                 
                 st.session_state.form_key_turma += 1 
                 st.session_state["cadastro_turma_realizado"] = True
-                
+                st.session_state.pop("cache_turmas", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

@@ -3,7 +3,7 @@ import streamlit as st
 from database.Conexao import SessionLocal
 from database.entidades.Curso import Curso
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
-from modulos.academico.academico_db import (dbListarCursos,dbListarProfessorId,dbListarCampus,dbListarProfessores)
+from modulos.academico.academico_service import (listarCursos,listarProfessorId,listarCampus,listarProfessores)
 import database.entidades
 from modulos.cadastros.curso import criarCurso
 
@@ -12,7 +12,14 @@ def telaCadastroCurso():
     if "form_key_curso" not in st.session_state:
         st.session_state.form_key_curso = 0
 
-    st.title("📚 Cadastro de Curso")
+    col1, _ = st.columns([1, 6])
+
+    with col1:
+        if st.button(":material/arrow_back: Voltar", width="stretch"):
+            from modulos.rotas import cadastros_page # evita import circular
+            st.switch_page(cadastros_page)
+
+    st.title(":material/library_add: Cadastro de Curso")
     st.caption("Preencha as informações abaixo para cadastrar um novo curso.")
 
     st.markdown(
@@ -27,45 +34,35 @@ def telaCadastroCurso():
     )
 
     if st.session_state.pop("cadastro_curso_realizado", False):
-        st.toast("Curso cadastrado com sucesso!", icon="🎉")
+        st.toast("Curso cadastrado com sucesso!", icon=":material/check:")
 
     if "cache_campus" not in st.session_state:
-        st.session_state.cache_campus = dbListarCampus()
+        st.session_state.cache_campus = listarCampus()
 
     if "cache_professores" not in st.session_state:
-        st.session_state.cache_professores = dbListarProfessores()
+        st.session_state.cache_professores = listarProfessores()
 
     lista_campus = st.session_state.cache_campus
     lista_professores = st.session_state.cache_professores
 
-    col1, col2 = st.columns([1, 6])
-
-    with col1:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
-
-    with st.form(key=f"cadastro_curso_{st.session_state.form_key_curso}", border=False):
+    with st.container(border=False):
 
         # Dados do Curso
-        with st.container(border=True):
-            st.subheader("📚 Dados Principais")
+        with st.container():
+            st.subheader("Dados Principais")
             
-            nome = st.text_input(
-                "Nome do Curso *",
-                placeholder="Ex.: Engenharia de Software",
-                key=f"curso_nome_{st.session_state.form_key_curso}"
-            )
-            
-            c1, c2, c3 = st.columns(3)
-            with c1:
+            with st.container(horizontal=True):
+                nome = st.text_input(
+                    "Nome do Curso *",
+                    placeholder="Ex.: Engenharia de Software",
+                    key=f"curso_nome_{st.session_state.form_key_curso}"
+                )
                 modalidade = st.selectbox(
                     "Modalidade *",
                     options=list(ModalidadeCurso), 
                     format_func=lambda x: x.name.replace("_", " ").title(),
                     key=f"curso_modalidade_{st.session_state.form_key_curso}"
                 )
-            with c2:
                 mensalidade_base = st.number_input(
                     "Mensalidade Base (R$) *",
                     min_value=1.0, 
@@ -73,23 +70,20 @@ def telaCadastroCurso():
                     format="%.2f",
                     key=f"curso_mensalidade_{st.session_state.form_key_curso}"
                 )
-            with c3:
+
+            with st.container(horizontal=True):
                 carga_horaria = st.number_input(
                     "Carga Horária Total (Horas) *",
                     min_value=1,
                     step=100,
                     key=f"curso_carga_{st.session_state.form_key_curso}"
                 )
-                
-            c4, c5 = st.columns(2)
-            with c4:
                 dur_min = st.number_input(
                     "Duração Mínima (Semestres) *",
                     min_value=1,
                     step=1,
                     key=f"curso_dur_min_{st.session_state.form_key_curso}"
                 )
-            with c5:
                 dur_max = st.number_input(
                     "Duração Máxima (Semestres) *",
                     min_value=1,
@@ -100,29 +94,32 @@ def telaCadastroCurso():
         st.write("")
 
         # Vínculos Institucionais
-        with st.container(border=True):
-            st.subheader("🔗 Vínculos Institucionais")
+        with st.container():
+            st.subheader("Vínculos Institucionais")
             
-            c1, c2 = st.columns(2)
-            with c1:
+            with st.container(horizontal=True):
                 campus_selecionado = st.selectbox(
-                    "Campus *", 
-                    options=lista_campus,
+                    "Campus do Curso *",
+                    options=lista_campus if lista_campus else [],
                     format_func=lambda c: c.nome,
                     index=None,
                     placeholder="Selecione um campus...",
+                    disabled=not lista_campus,
                     key=f"curso_campus_{st.session_state.form_key_curso}"
                 )
                 
-            with c2:
-                opcoes_professores = [None] + lista_professores
-                
+                if campus_selecionado:
+                    professores_filtrados = [p for p in lista_professores if p.campus_id == campus_selecionado.id]
+                else:
+                    professores_filtrados = []
+
                 coordenador_selecionado = st.selectbox(
-                    "Coordenador (Opcional)", 
-                    options=opcoes_professores,
-                    format_func=lambda p: "Nenhum" if p is None else p.pessoa.nome,
-                    index=0,
-                    help="Selecione o professor coordenador deste curso.",
+                    "Coordenador",
+                    options=professores_filtrados,
+                    format_func=lambda p: p.pessoa.nome,
+                    index=None,
+                    placeholder="Selecione um professor..." if campus_selecionado else "Selecione o Campus primeiro",
+                    disabled=not campus_selecionado,
                     key=f"curso_coord_{st.session_state.form_key_curso}"
                 )
 
@@ -131,10 +128,11 @@ def telaCadastroCurso():
         _, centro, _ = st.columns([2, 3, 2])
         
         with centro:
-            cadastrar = st.form_submit_button(
-                "💾 Cadastrar Curso", 
+            cadastrar = st.button(
+                "Cadastrar Curso", 
                 type="primary", 
-                use_container_width=True
+                width="stretch",
+                key=f"btn_cad_curso_{st.session_state.form_key_curso}"
             )
 
     # Processamento
@@ -164,8 +162,8 @@ def telaCadastroCurso():
                 criarCurso(curso=novo_curso)
                 
                 st.session_state.form_key_curso += 1 
-                st.session_state.pop("cache_cursos", None)
                 st.session_state["cadastro_curso_realizado"] = True
+                st.session_state.pop("cache_cursos", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:
