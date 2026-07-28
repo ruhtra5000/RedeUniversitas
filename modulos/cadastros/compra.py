@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from database.Conexao import SessionLocal
 from database.entidades.Compra import Compra
 from database.entidades.ContaPagar import ContaPagar
+from database.entidades.Financeiro import Financeiro
 from modulos.estoque.estoque_service import adicionarQtdeProduto
 import database.entidades
 
