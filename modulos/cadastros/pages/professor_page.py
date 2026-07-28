@@ -130,9 +130,8 @@ def telaCadastroProfessor():
                 criarProfessor(pessoa=nova_pessoa, idCampus=campus.id)
                 
                 st.session_state.form_key_prof += 1 
-                st.session_state.pop("cache_professores", None)
                 st.session_state["cadastro_prof_realizado"] = True
-                
+                st.session_state.pop("cache_professores", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

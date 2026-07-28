@@ -150,7 +150,7 @@ def telaCadastroTurma():
                 
                 st.session_state.form_key_turma += 1 
                 st.session_state["cadastro_turma_realizado"] = True
-                
+                st.session_state.pop("cache_turmas", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

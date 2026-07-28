@@ -118,7 +118,7 @@ def telaCadastroMatricula():
                 
                 st.session_state.form_key_matr += 1
                 st.session_state["cadastro_matr_realizado"] = True
-                
+                st.session_state.pop("cache_turmas", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

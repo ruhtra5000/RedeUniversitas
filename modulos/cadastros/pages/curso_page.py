@@ -162,8 +162,8 @@ def telaCadastroCurso():
                 criarCurso(curso=novo_curso)
                 
                 st.session_state.form_key_curso += 1 
-                st.session_state.pop("cache_cursos", None)
                 st.session_state["cadastro_curso_realizado"] = True
+                st.session_state.pop("cache_cursos", None)
                 st.rerun()
                 
             except SQLAlchemyError as e:

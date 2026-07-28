@@ -173,6 +173,7 @@ def telaCadastroAluno():
 
                 st.session_state.form_key_aluno += 1 
                 st.session_state["cadastro_realizado"] = True
+                st.session_state.pop("cache_alunos", None)
                 st.rerun()
 
             except SQLAlchemyError as e:

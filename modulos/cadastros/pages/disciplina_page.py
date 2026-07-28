@@ -145,8 +145,8 @@ def telaCadastroDisciplina():
                 criarDisciplina(disciplina=nova_disciplina, preRequisitos=lista_pre_req_ids)
                 
                 st.session_state.form_key_disc += 1 
-                st.session_state.pop("cache_disciplinas", None)
                 st.session_state["cadastro_disc_realizado"] = True
+                st.session_state.pop("cache_disciplinas", None)
                 st.rerun()
                 
             except Exception as e:
