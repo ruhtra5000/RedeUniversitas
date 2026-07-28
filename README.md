@@ -1,6 +1,6 @@
 # Rede Universitas
 
-Rede Universitas trata-se de um solução de software para o gerenciamento e acompanhamento de uma rede privada de universidades multi-campi, contando com: lançamento de notas, criação de bolsas, geração automática de mensalidades, visualização de dashboards, etc.
+Rede Universitas trata-se de uma solução de software para o gerenciamento e acompanhamento de uma rede privada de universidades multi-campi, contando com: lançamento de notas, criação de bolsas, gerenciamento de estoque e compras, geração automática de mensalidades, controle e visualização de fluxo de caixa, visualização de dashboards, etc.
 
 ---
 
@@ -59,15 +59,18 @@ Na pasta `.streamlit/secrets.toml` há os dados padrões para conexão com o ban
 Executar o comando:
 
 ```bash
-# Função built-in
+# Função built-in (c/ SQLAlchemy)
 python -m database.CriarTabelas
 ```
 
 ou 
 
 ```bash
-# Arquivo schema.sql
-# to do
+# Arquivo schema.sql (sem alterações no secrets.toml)
+psql -U user_universitas -d rede_universitas -f schema.sql
+
+# Arquivo schema.sql (caso tenha alterado o secrets.toml, substituir "nome_usuario" e "nome_banco")
+psql -U nome_usuario -d nome_banco -f schema.sql
 ```
 
 ### População do banco (recomendado)
