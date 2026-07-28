@@ -35,7 +35,9 @@ def criarMensalidades():
 
             bolsas: list[Bolsa] = listarBolsasAtivasAluno(aluno.pessoa_id)
             if bolsas != [] and bolsas[0].data_fim >= emissao:
-                mensalidade.valor *= bolsas[0].percentual_desconto
+                from decimal import Decimal
+                desconto_percentual = Decimal(str(1.0 - bolsas[0].percentual_desconto))
+                mensalidade.valor *= desconto_percentual
 
             # Montando ContaReceber referente a mensalidade
             contaReceber = ContaReceber(
