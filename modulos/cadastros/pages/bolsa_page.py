@@ -26,11 +26,20 @@ def telaCadastroBolsa():
     if st.session_state.pop("cadastro_bolsa_realizado", False):
         st.toast("Bolsa cadastrada com sucesso!", icon=":material/check:")
 
-    col1, _ = st.columns([1, 6])
-    with col1:
+    esq, _, dir = st.columns([1,4,1])
+    with esq:
         if st.button(":material/arrow_back: Voltar", width="stretch"):
             from modulos.rotas import cadastros_page
             st.switch_page(cadastros_page)
+
+    with dir:
+        if st.button(
+            ":material/edit: Edições", 
+            type="secondary", 
+            width="stretch"
+        ):
+            from modulos.rotas import gestao_bolsas
+            st.switch_page(gestao_bolsas)
 
     if "cache_alunos" not in st.session_state:
         st.session_state.cache_alunos = listarAlunos()
@@ -98,7 +107,7 @@ def telaCadastroBolsa():
 
         st.write("")
 
-        _, centro, direita = st.columns([2, 3, 2])
+        _, centro, _ = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
                 "Cadastrar Bolsa", 

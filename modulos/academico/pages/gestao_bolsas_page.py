@@ -68,7 +68,7 @@ def telaGestaoBolsas():
     st.write("---")
     
     with st.container():
-        st.subheader("Edição de Bolsa")
+        st.subheader(":material/edit: Edição de Bolsa")
 
         bolsa_selecionada = st.selectbox(
             "Selecione a Bolsa",
