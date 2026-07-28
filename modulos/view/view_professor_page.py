@@ -132,13 +132,13 @@ def telaViewProfessor():
         col1, col2 = st.columns([3.5, 2.5])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "Nome",
                 professor.pessoa.nome,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "CPF",
                 formatar_cpf(professor.pessoa.cpf),
             )
@@ -148,13 +148,13 @@ def telaViewProfessor():
         col1, col2 = st.columns([3.5, 2.5])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "E-mail",
                 professor.pessoa.email,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Telefone",
                 professor.pessoa.telefone or "Não informado",
             )
@@ -168,13 +168,13 @@ def telaViewProfessor():
         col1, col2 = st.columns([1.2, 4.8])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "ID",
                 professor.pessoa_id,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Campus",
                 professor.campus.nome,
             )

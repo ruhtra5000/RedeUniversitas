@@ -1,3 +1,6 @@
+import re
+import streamlit as st
+
 # Função para exibir um campo com título e valor
 def exibirCampo(titulo, valor):
     if valor is None or valor == "":

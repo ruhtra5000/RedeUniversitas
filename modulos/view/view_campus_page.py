@@ -1,7 +1,7 @@
 import re
 import streamlit as st
 from modulos.academico.academico_db import (dbListarCampusCnpj, dbListarCampusId)
-from modulos.utils.view_utils import formatar_cnpj
+from modulos.utils.view_utils import formatar_cnpj, exibirCampo
 
 # Função para limpar a consulta de campus
 def limpar_consulta_campus():
@@ -137,19 +137,19 @@ def telaViewCampus():
         col1, col2, col3 = st.columns([1, 3, 2])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "ID",
                 campus.id,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Nome",
                 campus.nome,
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "CNPJ",
                 formatar_cnpj(campus.cnpj),
             )
@@ -159,13 +159,13 @@ def telaViewCampus():
         col1, col2 = st.columns([3.5, 2.5])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "E-mail",
                 campus.email or "Não informado",
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Telefone",
                 campus.telefone or "Não informado",
             )

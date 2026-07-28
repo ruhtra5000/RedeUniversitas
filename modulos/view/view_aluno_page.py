@@ -3,6 +3,7 @@ import streamlit as st
 from modulos.academico.academico_db import (dbListarAlunoCpf, dbListarAlunoId)
 from modulos.utils.view_utils import exibirCampo
 
+
 # Função para limpar a consulta de aluno
 def limpar_consulta_aluno():
     st.session_state.pop("consulta_aluno_id", None)
@@ -129,20 +130,20 @@ def telaViewAluno():
         col1, col2 = st.columns([3.5, 2.5])
 
         with col1:
-            exibir_campo("Nome", aluno.pessoa.nome)
+            exibirCampo("Nome", aluno.pessoa.nome)
 
         with col2:
-            exibir_campo("CPF", aluno.pessoa.cpf)
+            exibirCampo("CPF", aluno.pessoa.cpf)
 
         st.write("")
 
         col1, col2 = st.columns([3.5, 2.5])
 
         with col1:
-            exibir_campo("E-mail", aluno.pessoa.email)
+            exibirCampo("E-mail", aluno.pessoa.email)
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Telefone",
                 aluno.pessoa.telefone or "Não informado",
             )
@@ -156,29 +157,29 @@ def telaViewAluno():
         col1, col2, col3 = st.columns([1, 2, 3])
 
         with col1:
-            exibir_campo("ID", aluno.pessoa_id)
+            exibirCampo("ID", aluno.pessoa_id)
 
         with col2:
-            exibir_campo("Matrícula", aluno.matricula)
+            exibirCampo("Matrícula", aluno.matricula)
 
         with col3:
-            exibir_campo("Campus", aluno.campus.nome)
+            exibirCampo("Campus", aluno.campus.nome)
 
         st.write("")
 
         col1, col2, col3 = st.columns([3, 1.5, 1.5])
 
         with col1:
-            exibir_campo("Curso", aluno.curso.nome)
+            exibirCampo("Curso", aluno.curso.nome)
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Média Geral",
                 f"{aluno.media_geral or 0:.2f}",
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Coef. Rendimento",
                 f"{aluno.coef_rend or 0:.2f}",
             )

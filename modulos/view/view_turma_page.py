@@ -129,19 +129,19 @@ def telaViewTurma():
         col1, col2, col3 = st.columns([1, 2.5, 2.5])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "ID",
                 turma.id,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Código",
                 turma.codigo or "Não informado",
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Semestre",
                 turma.semestre,
             )
@@ -155,20 +155,20 @@ def telaViewTurma():
         col1, col2 = st.columns(2)
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "Curso",
                 turma.curso.nome,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Disciplina",
                 turma.disciplina.nome,
             )
 
         st.write("")
 
-        exibir_campo(
+        exibirCampo(
             "Professor",
             turma.professor.pessoa.nome,
         )

@@ -28,7 +28,7 @@ def telaListagemDisciplinas():
         f"{'disciplina encontrada' if len(listaDisciplinas) == 1 else 'disciplinas encontradas'}"
     )
 
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+    proporcoes = [3, 2.2, 3.2, 2.5, 1.3, 1]
 
     with st.container(border=True):
 

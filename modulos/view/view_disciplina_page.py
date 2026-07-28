@@ -128,19 +128,19 @@ def telaViewDisciplina():
         col1, col2, col3 = st.columns([1, 1.8, 3.2])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "ID",
                 disciplina.id,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Código",
                 disciplina.codigo or "Não informado",
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Nome",
                 disciplina.nome,
             )
@@ -150,19 +150,19 @@ def telaViewDisciplina():
         col1, col2, col3 = st.columns([1.5, 1.5, 3])
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "Carga Horária",
                 f"{disciplina.carga_horaria} horas",
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Obrigatória",
                 "Sim" if disciplina.obrigatoria else "Não",
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Curso",
                 disciplina.curso.nome,
             )

@@ -99,13 +99,13 @@ def telaViewCurso():
         col1, col2, col3 = st.columns([1, 3.2, 1.8])
 
         with col1:
-            exibir_campo("ID", curso.id)
+            exibirCampo("ID", curso.id)
 
         with col2:
-            exibir_campo("Nome", curso.nome)
+            exibirCampo("Nome", curso.nome)
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Modalidade",
                 formatar_modalidade(curso.modalidade),
             )
@@ -115,19 +115,19 @@ def telaViewCurso():
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "Mensalidade Base",
                 formatar_mensalidade(curso.mensalidade_base),
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Carga Horária",
                 f"{curso.carga_horaria} horas",
             )
 
         with col3:
-            exibir_campo(
+            exibirCampo(
                 "Duração",
                 (
                     f"{curso.dur_min_semestre} a "
@@ -150,13 +150,13 @@ def telaViewCurso():
         col1, col2 = st.columns(2)
 
         with col1:
-            exibir_campo(
+            exibirCampo(
                 "Campus",
                 curso.campus.nome,
             )
 
         with col2:
-            exibir_campo(
+            exibirCampo(
                 "Coordenador",
                 nome_coordenador,
             )

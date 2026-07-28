@@ -2,6 +2,7 @@ import re
 import streamlit as st
 from modulos.academico.academico_db import dbListarCampus
 from modulos.utils.listagem_utils import separador
+from modulos.utils.view_utils import exibirCampo
 
 # Função para formatar o CNPJ
 def formatar_cnpj(cnpj):
