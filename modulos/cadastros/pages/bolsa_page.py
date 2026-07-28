@@ -12,9 +12,6 @@ def telaCadastroBolsa():
     if "form_key_bolsa" not in st.session_state:
         st.session_state.form_key_bolsa = 0
 
-    st.title("🏷️ Cadastro de Bolsa")
-    st.caption("Preencha as informações abaixo para conceder uma bolsa a um aluno.")
-
     st.markdown(
         """
         <style>
@@ -50,8 +47,9 @@ def telaCadastroBolsa():
 
     with st.form(key=f"cadastro_bolsa_{st.session_state.form_key_bolsa}", border=False):
         
-        with st.container(border=True):
-            st.subheader("👤 Vínculo e Tipo de Bolsa")
+        with st.container():
+            st.title("🏷️ Cadastro de Bolsa")
+            st.caption("Preencha as informações abaixo para conceder uma bolsa a um aluno.")
             
             with st.container(horizontal=True):
                 aluno_selecionado = st.selectbox(
@@ -71,12 +69,12 @@ def telaCadastroBolsa():
 
             with st.container(horizontal=True):
                 percentual_desconto = st.number_input(
-                    "Percentual de Desconto (0.0 a 1.0) *",
-                    min_value=0.01,
-                    max_value=1.00,
-                    step=0.05,
-                    format="%.2f",
-                    help="1.0 equivale a 100% de bolsa.",
+                    "Percentual de Desconto (%) *",
+                    min_value=1,
+                    max_value=100,
+                    step=1,
+                    format="%d",
+                    help="Digite um valor de 1 a 100.",
                     key=f"bolsa_perc_{st.session_state.form_key_bolsa}"
                 )
                 status_bolsa = st.selectbox(
@@ -85,11 +83,6 @@ def telaCadastroBolsa():
                     format_func=lambda s: s.name.title(),
                     key=f"bolsa_status_{st.session_state.form_key_bolsa}"
                 )
-
-        st.write("")
-
-        with st.container(border=True):
-            st.subheader("📅 Período de Vigência")
 
             with st.container(horizontal=True):
                 data_inicio = st.date_input(
@@ -105,7 +98,7 @@ def telaCadastroBolsa():
 
         st.write("")
 
-        _, centro, _ = st.columns([2, 3, 2])
+        _, centro, direita = st.columns([2, 3, 2])
         with centro:
             cadastrar = st.form_submit_button(
                 "💾 Cadastrar Bolsa", 
@@ -125,7 +118,7 @@ def telaCadastroBolsa():
                 nova_bolsa = Bolsa(
                     aluno_id=aluno_selecionado.pessoa_id,
                     tipo_bolsa=tipo_bolsa.strip(),
-                    percentual_desconto=percentual_desconto,
+                    percentual_desconto=float(percentual_desconto) / 100.0,
                     data_inicio=data_inicio,
                     data_fim=data_fim,
                     status=status_bolsa
