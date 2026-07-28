@@ -376,6 +376,10 @@ def listarBolsasCurso(idCurso: int):
 def listarBolsasAluno(idAluno: int):
     return dbListarBolsasAluno(idAluno)
 
+def listarBolsasGeral():
+    from modulos.academico.academico_db import dbListarBolsasGeral
+    return dbListarBolsasGeral()
+
 def listarBolsasAtivas():
     return dbListarBolsasAtivas()
 
@@ -396,10 +400,10 @@ def editarBolsa(idBolsa: int, tipo_bolsa: str, percentual_desconto: float, data_
     if status == StatusBolsa.ATIVA:
         bolsasAluno: list[Bolsa] = listarBolsasAtivasAluno(bolsa.aluno_id)
         
-        if bolsasAluno.count(bolsa) > 0:
-            bolsasAluno.remove(bolsa)
+        # Filtra removendo a bolsa que está sendo editada através do ID
+        bolsasAluno = [b for b in bolsasAluno if b.id != bolsa.id]
 
-        if bolsasAluno != []:
+        if bolsasAluno:
             raise Exception(f"O aluno em questão já tem uma bolsa ativa vinculada a si.")
     
     if data_fim < bolsa.data_inicio:

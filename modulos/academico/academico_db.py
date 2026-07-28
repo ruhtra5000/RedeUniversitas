@@ -487,9 +487,17 @@ def dbListarBolsasAluno(idAluno: int):
 
         return bolsas
 
+def dbListarBolsasGeral():
+    with SessionLocal() as session:
+        from sqlalchemy.orm import joinedload
+        query = select(Bolsa).options(joinedload(Bolsa.aluno).joinedload(Aluno.pessoa))
+        bolsas = session.execute(query).scalars().all()
+        return bolsas
+
 def dbListarBolsasAtivas():
     with SessionLocal() as session:
-        query = select(Bolsa).where(Bolsa.status == StatusBolsa.ATIVA)
+        from sqlalchemy.orm import joinedload
+        query = select(Bolsa).options(joinedload(Bolsa.aluno).joinedload(Aluno.pessoa)).where(Bolsa.status == StatusBolsa.ATIVA)
         bolsas = session.execute(query).scalars().all()
 
         return bolsas    
