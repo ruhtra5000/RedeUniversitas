@@ -15,13 +15,27 @@ import database.entidades
 # | |    | |   | (_) || (_| || |_| || |_ | (_) |\__ \
 # \_|    |_|    \___/  \__,_| \__,_| \__| \___/ |___/
 
+def dbCriarProduto(produto: Estoque):
+    with SessionLocal() as session:
+        try:
+            session.add(produto)
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+
 def dbListarProdutos(idCampus: int):
     with SessionLocal() as session:
         query = select(Estoque).where(Estoque.campus_id == idCampus)
         produtos = session.execute(query).scalars().all()
-
         return produtos
-    
+
+def dbListarProdutosGeral():
+    with SessionLocal() as session:
+        from sqlalchemy.orm import joinedload
+        query = select(Estoque).options(joinedload(Estoque.campus))
+        produtos = session.execute(query).scalars().all()
+        return produtos
 def dbListarProdutoId(idProduto: int):
     with SessionLocal() as session:
         query = select(Estoque).where(Estoque.id == idProduto)

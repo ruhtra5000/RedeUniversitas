@@ -196,6 +196,13 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
 #   | |  | |_| || |   | | | | | || (_| |
 #   \_/   \__,_||_|   |_| |_| |_| \__,_|
 
+def dbListarTurmasGeral():
+    with SessionLocal() as session:
+        from sqlalchemy.orm import joinedload
+        query = select(Turma).options(joinedload(Turma.disciplina))
+        turmas = session.execute(query).scalars().all()
+        return turmas
+
 def dbListarTurmasProfessor(idProfessor: int, semestre: str):
     with SessionLocal() as session:
         query = select(Turma).where(Turma.professor_id == idProfessor, Turma.semestre == semestre)
@@ -413,7 +420,8 @@ def dbListarProfessorCpf(cpfProfessor: str):
 
 def dbListarAlunos():
     with SessionLocal() as session:
-        query = select(Aluno)
+        from sqlalchemy.orm import joinedload
+        query = select(Aluno).options(joinedload(Aluno.pessoa))
         alunos = session.execute(query).scalars().all()
 
         return alunos

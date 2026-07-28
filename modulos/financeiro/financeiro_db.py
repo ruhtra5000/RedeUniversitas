@@ -74,8 +74,13 @@ def dbRemoverValorCaixa(idCaixa: int, valorDebito: Decimal):
 
 def dbListarFinanceiro():
     with SessionLocal() as session:
-        query = select(Financeiro)
-        financeiros = session.execute(query).scalars().all()
+        from sqlalchemy.orm import joinedload
+        from database.entidades.Campus import Campus
+        query = select(Financeiro).options(
+            joinedload(Financeiro.pessoa),
+            joinedload(Financeiro.campus).joinedload(Campus.caixa)
+        )
+        financeiros = session.execute(query).scalars().unique().all()
 
         return financeiros
     
