@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
@@ -271,15 +271,18 @@ def dbRemoverPreRequisito(preRequisito: PreRequisito):
 
 def dbListarTurmasGeral():
     with SessionLocal() as session:
-        return (
+        turmas = (
             session.query(Turma)
             .options(
-                joinedload(Turma.professor).joinedload(Professor.pessoa),
-                joinedload(Turma.disciplina),
-                joinedload(Turma.curso),
+                selectinload(Turma.disciplina),
+                selectinload(Turma.matriculas)
+                .selectinload(Matricula.aluno)
+                .selectinload(Aluno.pessoa)
             )
             .all()
         )
+
+        return turmas
 
 def dbListarTurmasProfessor(idProfessor: int, semestre: str):
     with SessionLocal() as session:
@@ -319,15 +322,22 @@ def dbListarTurmaId(idTurma: int):
             .options(
                 joinedload(Turma.disciplina),
                 joinedload(Turma.curso),
-                joinedload(Turma.professor).joinedload(Professor.pessoa),
-                joinedload(Turma.matriculas)
-                    .joinedload(Matricula.aluno)
-                    .joinedload(Aluno.pessoa),
+                joinedload(Turma.professor)
+                .joinedload(Professor.pessoa),
+
+                selectinload(Turma.matriculas)
+                .joinedload(Matricula.aluno)
+                .joinedload(Aluno.pessoa),
             )
             .where(Turma.id == idTurma)
         )
 
-        return session.execute(query).unique().scalar_one_or_none()
+        turma = session.execute(query).scalar_one_or_none()
+
+        if turma is not None:
+            _ = list(turma.matriculas)
+
+        return turma
 
 def dbAlterarProfessorTurma(idTurma: int, idNovoProfessor: int):
     with SessionLocal() as session:
