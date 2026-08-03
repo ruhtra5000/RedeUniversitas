@@ -25,7 +25,8 @@ class Bolsa(Base):
     # Ligações de ORM
     aluno: Mapped["Aluno"] = relationship(
         foreign_keys=[aluno_id],
-        back_populates="bolsas"
+        back_populates="bolsas",
+        lazy="joined"
     )
 
     # Constraints da tabela

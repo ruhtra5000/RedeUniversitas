@@ -23,12 +23,14 @@ class Disciplina(Base):
     # Ligações de ORM
     curso: Mapped["Curso"] = relationship(
         foreign_keys=[curso_id],
-        back_populates="disciplinas"
+        back_populates="disciplinas",
+        lazy="joined"
     )
 
     preRequisitos: Mapped[list["PreRequisito"]] = relationship(
         foreign_keys="PreRequisito.disciplina_id",
-        back_populates="disciplina"
+        back_populates="disciplina",
+        lazy="joined"
     )
 
     # Constraints da tabela

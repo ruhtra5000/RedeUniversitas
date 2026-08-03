@@ -22,11 +22,13 @@ class Financeiro(Base):
     # Ligações de ORM
     pessoa: Mapped["Pessoa"] = relationship(
         foreign_keys=[pessoa_id],
-        back_populates="financeiro"
+        back_populates="financeiro",
+        lazy="joined"
     )
 
     campus: Mapped["Campus"] = relationship(
-        foreign_keys=[campus_id]
+        foreign_keys=[campus_id],
+        lazy="joined"
     )
 
     compras: Mapped[list["Compra"]] = relationship(

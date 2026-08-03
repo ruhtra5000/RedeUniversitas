@@ -18,9 +18,11 @@ class PreRequisito(Base):
     # Ligações de ORM
     disciplina: Mapped["Disciplina"] = relationship(
         foreign_keys=[disciplina_id],
-        back_populates="preRequisitos"
+        back_populates="preRequisitos",
+        lazy="joined"
     )
 
     prerequisito: Mapped["Disciplina"] = relationship(
-        foreign_keys=[prerequisito_id]
+        foreign_keys=[prerequisito_id],
+        lazy="joined"
     )

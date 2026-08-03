@@ -24,16 +24,19 @@ class Turma(Base):
 
     # Ligações de ORM
     curso: Mapped["Curso"] = relationship(
-        foreign_keys=[curso_id]
+        foreign_keys=[curso_id],
+        lazy="joined"
     )
 
     disciplina: Mapped["Disciplina"] = relationship(
-        foreign_keys=[disciplina_id]
+        foreign_keys=[disciplina_id],
+        lazy="joined"
     )
 
     professor: Mapped["Professor"] = relationship(
         foreign_keys=[professor_id],
-        back_populates="turmas"
+        back_populates="turmas",
+        lazy="joined"
     )
 
     matriculas: Mapped[list["Matricula"]] = relationship(

@@ -20,11 +20,13 @@ class Almoxarife(Base):
     # Ligações de ORM
     pessoa: Mapped["Pessoa"] = relationship(
         foreign_keys=[pessoa_id],
-        back_populates="almoxarife"
+        back_populates="almoxarife",
+        lazy="joined"
     )
 
     campus: Mapped["Campus"] = relationship(
-        foreign_keys=[campus_id]
+        foreign_keys=[campus_id],
+        lazy="joined"
     )
 
     movimentacoes: Mapped[list["Movimentacao"]] = relationship(

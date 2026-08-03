@@ -25,7 +25,8 @@ class Campus(Base):
 
     # Ligações de ORM
     reitor: Mapped["Professor"] = relationship(
-        foreign_keys=[reitor_id]
+        foreign_keys=[reitor_id],
+        lazy="joined"
     )
 
     professores: Mapped[list["Professor"]] = relationship(
@@ -45,5 +46,6 @@ class Campus(Base):
 
     caixa: Mapped["Caixa"] = relationship(
         foreign_keys="Caixa.campus_id",
-        back_populates="campus"
+        back_populates="campus",
+        lazy="joined"
     )

@@ -27,12 +27,14 @@ class ContaReceber(Base):
     # Ligações de ORM
     mensalidade: Mapped["Mensalidade"] = relationship(
         foreign_keys=[mensalidade_id],
-        back_populates="contareceber"
+        back_populates="contareceber",
+        lazy="joined"
     )
 
     financeiro: Mapped["Financeiro"] = relationship(
         foreign_keys=[financeiro_id],
-        back_populates="contasreceber"
+        back_populates="contasreceber",
+        lazy="joined"
     )
 
     # Constraints da tabela

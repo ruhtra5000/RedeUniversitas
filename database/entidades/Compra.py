@@ -29,22 +29,26 @@ class Compra(Base):
     # Ligações de ORM
     produto: Mapped["Estoque"] = relationship(
         foreign_keys=[produto_id],
-        back_populates="compras"
+        back_populates="compras",
+        lazy="joined"
     )
 
     financeiro: Mapped["Financeiro"] = relationship(
         foreign_keys=[financeiro_id],
-        back_populates="compras"
+        back_populates="compras",
+        lazy="joined"
     )
 
     fornecedor: Mapped["Fornecedor"] = relationship(
         foreign_keys=[fornecedor_id],
-        back_populates="compras"
+        back_populates="compras",
+        lazy="joined"
     )
 
     contapagar: Mapped["ContaPagar"] = relationship(
         foreign_keys="ContaPagar.compra_id",
-        back_populates="compra"
+        back_populates="compra",
+        lazy="joined"
     )
     
     # Constraints da tabela

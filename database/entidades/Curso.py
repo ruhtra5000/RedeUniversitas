@@ -29,7 +29,8 @@ class Curso(Base):
 
     # Ligações de ORM
     coordenador: Mapped["Professor"] = relationship(
-        foreign_keys=[coordenador_id]
+        foreign_keys=[coordenador_id],
+        lazy="joined"
     )
 
     disciplinas: Mapped[list["Disciplina"]] = relationship(
@@ -39,7 +40,8 @@ class Curso(Base):
 
     campus: Mapped["Campus"] = relationship(
         foreign_keys=[campus_id],
-        back_populates="cursos"
+        back_populates="cursos",
+        lazy="joined"
     )
 
     # Constraints da tabela

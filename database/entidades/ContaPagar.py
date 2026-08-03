@@ -27,12 +27,14 @@ class ContaPagar(Base):
     # Ligações de ORM
     compra: Mapped["Compra"] = relationship(
         foreign_keys=[compra_id],
-        back_populates="contapagar"
+        back_populates="contapagar",
+        lazy="joined"
     )
 
     financeiro: Mapped["Financeiro"] = relationship(
         foreign_keys=[financeiro_id],
-        back_populates="contaspagar"
+        back_populates="contaspagar",
+        lazy="joined"
     )
 
     # Constraints da tabela

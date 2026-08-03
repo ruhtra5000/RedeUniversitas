@@ -27,15 +27,18 @@ class Aluno(Base):
     # Ligações de ORM
     pessoa: Mapped["Pessoa"] = relationship(
         back_populates="aluno",
-        uselist=False
+        uselist=False,
+        lazy="joined"
     )
 
     campus: Mapped["Campus"] = relationship(
-        foreign_keys=[campus_id]
+        foreign_keys=[campus_id],
+        lazy="joined"
     )
 
     curso: Mapped["Curso"] = relationship(
-        foreign_keys=[curso_id]
+        foreign_keys=[curso_id],
+        lazy="joined"
     )
 
     matriculas: Mapped[list["Matricula"]] = relationship(

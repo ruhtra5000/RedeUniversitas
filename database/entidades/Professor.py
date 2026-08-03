@@ -19,15 +19,17 @@ class Professor(Base):
 
     # Ligações de ORM
     pessoa: Mapped["Pessoa"] = relationship(
-        back_populates="professor"
+        back_populates="professor",
+        lazy="joined"
+    )
+
+    campus: Mapped["Campus"] = relationship(
+        foreign_keys=[campus_id],
+        back_populates="professores",
+        lazy="joined"
     )
 
     turmas: Mapped[list["Turma"]] = relationship(
         foreign_keys="Turma.professor_id",
         back_populates="professor"
-    )
-
-    campus: Mapped["Campus"] = relationship(
-        foreign_keys=[campus_id],
-        back_populates="professores"
     )

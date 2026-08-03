@@ -25,12 +25,14 @@ class Movimentacao(Base):
     # Ligações de ORM
     produto: Mapped["Estoque"] = relationship(
         foreign_keys=[produto_id],
-        back_populates="movimentacoes"
+        back_populates="movimentacoes",
+        lazy="joined"
     )
 
     almoxarife: Mapped["Almoxarife"] = relationship(
         foreign_keys=[pessoa_id],
-        back_populates="movimentacoes"
+        back_populates="movimentacoes",
+        lazy="joined"
     )
 
     # Constraints da tabela

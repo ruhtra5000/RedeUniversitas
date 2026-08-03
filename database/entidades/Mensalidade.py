@@ -25,7 +25,8 @@ class Mensalidade(Base):
     # Ligações de ORM
     aluno: Mapped["Aluno"] = relationship(
         foreign_keys=[aluno_id],
-        back_populates="mensalidades"
+        back_populates="mensalidades",
+        lazy="joined"
     )
 
     contareceber: Mapped["ContaReceber"] = relationship(

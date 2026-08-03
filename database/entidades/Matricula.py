@@ -30,12 +30,14 @@ class Matricula(Base):
     # Ligações de ORM
     aluno: Mapped["Aluno"] = relationship(
         foreign_keys=[aluno_id],
-        back_populates="matriculas"
+        back_populates="matriculas",
+        lazy="joined"
     )
 
     turma: Mapped["Turma"] = relationship(
         foreign_keys=[turma_id],
-        back_populates="matriculas"
+        back_populates="matriculas",
+        lazy="joined"
     )
 
     disciplina: Mapped["Disciplina"] = relationship(

@@ -22,7 +22,8 @@ class Caixa(Base):
     # Ligações de ORM
     campus: Mapped["Campus"] = relationship(
         foreign_keys=[campus_id],
-        back_populates="caixa"
+        back_populates="caixa",
+        lazy="joined"
     )
 
     contaspagar: Mapped[list["ContaPagar"]] = relationship(

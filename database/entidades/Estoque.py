@@ -24,7 +24,8 @@ class Estoque(Base):
     # Ligações de ORM
     campus: Mapped["Campus"] = relationship(
         foreign_keys=[campus_id],
-        back_populates="estoque"
+        back_populates="estoque",
+        lazy="joined"
     )
 
     compras: Mapped[list["Compra"]] = relationship(
