@@ -7,8 +7,8 @@ from database.Conexao import SessionLocal
 from database.entidades.Financeiro import Financeiro
 from database.entidades.Fornecedor import Fornecedor
 from database.entidades.Compra import Compra
-import database.entidades
 from modulos.estoque.estoque_db import dbAdicionarQtdeProduto 
+import database.entidades
 
 
 # ______                                            _              
@@ -72,6 +72,13 @@ def dbEditarFornecedor(idFornecedor: int, novoFornecedor: Fornecedor):
 #  \____/ \___/ |_| |_| |_|| .__/ |_|    \__,_||___/
 #                          | |                      
 #                          |_|                      
+
+def dbListarCompras():
+    with SessionLocal() as session:
+        query = select(Compra)
+        compras = session.execute(query).scalars().all()
+
+        return compras
 
 def dbListarComprasCampus(idCampus: int):
     with SessionLocal() as session:

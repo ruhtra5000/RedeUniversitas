@@ -58,6 +58,9 @@ def editarFornecedor(idFornecedor: int, nome: str, email: str, telefone: str):
 #                          | |                      
 #                          |_|                      
 
+def listarCompras():
+    return dbListarCompras()
+
 def listarComprasCampus(idCampus: int):
     return dbListarComprasCampus(idCampus)
 
