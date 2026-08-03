@@ -299,7 +299,12 @@ def listarProfessorNome(nomeProfessor: str):
     return dbListarProfessorNome(nomeProfessor)
     
 def listarProfessorCpf(cpfProfessor: str):
-    return dbListarProfessorCpf(cpfProfessor)
+    professor = dbListarProfessorCpf(cpfProfessor)
+
+    if professor == None:
+        raise Exception(f"Professor com CPF {cpfProfessor} não existente.")
+        
+    return professor
 
 
 #   ___   _                      
