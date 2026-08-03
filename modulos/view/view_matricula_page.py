@@ -1,5 +1,6 @@
 import streamlit as st
 from modulos.academico.academico_db import dbListarMatricula
+from modulos.academico.academico_service import listarMatriculaId
 from modulos.utils.view_utils import (exibirCampo, formatarAprovacao)
 
 # Função para limpar a consulta de matrícula
@@ -89,10 +90,10 @@ def telaViewMatricula():
             st.error("Todos os IDs devem conter somente números.")
 
         else:
-            matricula = dbListarMatricula(
+            matricula = listarMatriculaId( #função antiga: dbListarMatricula
                 int(idAluno),
                 int(idTurma),
-                int(idDisciplina),
+                #int(idDisciplina),
             )
 
             if matricula is None:
@@ -107,10 +108,10 @@ def telaViewMatricula():
     chave = st.session_state.get("consulta_matricula_chave")
 
     if matricula is None and chave:
-        matricula = dbListarMatricula(
+        matricula = listarMatriculaId( #função antiga: dbListarMatricula
             chave["aluno_id"],
             chave["turma_id"],
-            chave["disciplina_id"],
+            #chave["disciplina_id"],
         )
 
     if matricula is None:

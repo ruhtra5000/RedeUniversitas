@@ -7,7 +7,7 @@ from database.entidades.Compra import Compra
 from modulos.cadastros.compra import criarCompra
 from modulos.financeiro.financeiro_service import listarFinanceiro
 from modulos.compras.compras_service import listarFornecedores
-from modulos.estoque.estoque_service import listarProdutosGeral
+from modulos.estoque.estoque_service import listarProdutos
 import database.entidades
 
 def telaCadastroCompra():
@@ -44,7 +44,7 @@ def telaCadastroCompra():
         st.session_state.cache_fornecedores = listarFornecedores()
         
     if "cache_produtos" not in st.session_state:
-        st.session_state.cache_produtos = listarProdutosGeral()
+        st.session_state.cache_produtos = listarProdutos()
 
     lista_financeiros = st.session_state.cache_financeiros
     lista_fornecedores = st.session_state.cache_fornecedores
