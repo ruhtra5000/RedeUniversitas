@@ -55,7 +55,7 @@ def dbCriarCompraEContaPagar(compra: Compra, contaPagar: ContaPagar, financeiro:
             session.refresh(compra)
 
             contaPagar.compra_id = compra.id
-            contaPagar.caixa_id = financeiro.campus.caixa.id
+            contaPagar.caixa_id = financeiro.campus.id
             session.add(contaPagar)
             session.commit()
 

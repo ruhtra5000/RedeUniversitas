@@ -37,10 +37,6 @@ def criarDisciplina(disciplina: Disciplina, preRequisitos: list[int]):
         
         else:
             dbCriarDisciplina(disciplina)
-
-            
-    except SQLAlchemyError:    
-        raise
     
     except Exception:
         raise

@@ -1,6 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
+from database.entidades.Aluno import Aluno
+from database.entidades.Disciplina import Disciplina
 from database.entidades.Matricula import Matricula
 import database.entidades
 
@@ -14,7 +16,7 @@ import database.entidades
 #       disciplina: Disciplina
 
 # Service
-def criarMatricula(matricula: Matricula, aluno, disciplina):
+def criarMatricula(matricula: Matricula, aluno: Aluno, disciplina: Disciplina):
     try:
         if aluno.curso_id != disciplina.curso_id:
             raise Exception(f"O aluno deve pertencer ao mesmo curso da disciplina.")
@@ -27,11 +29,11 @@ def criarMatricula(matricula: Matricula, aluno, disciplina):
             
             preReqs = session.execute(
                 select(PreRequisito).where(PreRequisito.disciplina_id == disciplina.id)
-            ).scalars().all()
+            ).unique().scalars().all()
             
             matrAluno = session.execute(
                 select(MatrDB).where(MatrDB.aluno_id == aluno.pessoa_id)
-            ).scalars().all()
+            ).unique().scalars().all()
             
             flag = True
             for preReq in preReqs:
