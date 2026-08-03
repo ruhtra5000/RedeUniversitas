@@ -2,7 +2,6 @@
 
 Rede Universitas trata-se de uma solução de software para o gerenciamento e acompanhamento de uma rede privada de universidades multi-campi, contando com: lançamento de notas, criação de bolsas, gerenciamento de estoque e compras, geração automática de mensalidades, controle e visualização de fluxo de caixa, visualização de dashboards, etc.
 
----
 
 ## Equipe
 
@@ -10,7 +9,6 @@ Rede Universitas trata-se de uma solução de software para o gerenciamento e ac
 - Guilherme Paes Cavalcanti
 - Victor Cauã Tavares Inácio
 
----
 
 ## Requisitos de Software
 
@@ -22,7 +20,6 @@ Antes de executar o projeto, certifique-se de possuir instalado:
 | pip | **25.3** ou superior |
 | PostgreSQL | **17** ou superior |
 
----
 
 ## Como executar o projeto?
 
