@@ -10,6 +10,7 @@ from database.entidades.ContaPagar import ContaPagar
 from database.entidades.ContaReceber import ContaReceber
 from database.entidades.Financeiro import Financeiro
 import database.entidades
+from database.entidades.Pessoa import Pessoa
 
 #  _____         _              
 # /  __ \       (_)             
@@ -76,9 +77,13 @@ def dbListarFinanceiro():
     with SessionLocal() as session:
         from sqlalchemy.orm import joinedload
         from database.entidades.Campus import Campus
-        query = select(Financeiro).options(
-            joinedload(Financeiro.pessoa),
-            joinedload(Financeiro.campus).joinedload(Campus.caixa)
+
+        query = (
+            select(Financeiro)
+                .options(
+                    joinedload(Financeiro.campus).joinedload(Campus.caixa)
+                )
+                .order_by(Financeiro.pessoa_id)
         )
         financeiros = session.execute(query).scalars().unique().all()
 
@@ -88,13 +93,23 @@ def dbListarFinanceiroId(idFinanceiro: int):
     with SessionLocal() as session:
         from sqlalchemy.orm import joinedload
         from database.entidades.Campus import Campus
-        query = select(Financeiro).options(
-            joinedload(Financeiro.pessoa),
-            joinedload(Financeiro.campus).joinedload(Campus.caixa)
-        ).where(Financeiro.pessoa_id == idFinanceiro)
-        financeiros = session.execute(query).unique().scalar_one_or_none()
 
-        return financeiros
+        query = (
+            select(Financeiro)
+            .options(
+                joinedload(Financeiro.campus).joinedload(Campus.caixa)
+            )
+            .where(Financeiro.pessoa_id == idFinanceiro))
+        financeiro = session.execute(query).unique().scalar_one_or_none()
+
+        return financeiro
+
+def dbListarFinanceiroCpf(cpfFinanceiro: str):
+    with SessionLocal() as session:
+        query = select(Financeiro).join(Financeiro.pessoa).where(Pessoa.cpf == cpfFinanceiro)
+        financeiro = session.execute(query).unique().scalar_one_or_none()
+
+        return financeiro
     
 
 #  _____                _          ______                    _                 

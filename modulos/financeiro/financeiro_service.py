@@ -42,6 +42,14 @@ def listarFinanceiroId(idFinanceiro: int):
     
     return financeiro
 
+def listarFinanceiroCpf(cpfFinanceiro: str):
+    financeiro = dbListarFinanceiroCpf(cpfFinanceiro)
+    
+    if financeiro == None:
+        raise Exception(f"Financeiro com CPF {cpfFinanceiro} não existente.")
+        
+    return financeiro
+
 
 #  _____                _          ______                    _                 
 # /  __ \              | |         | ___ \                  | |                
