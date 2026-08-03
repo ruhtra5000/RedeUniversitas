@@ -7,11 +7,11 @@ from modulos.estoque.estoque_db import *
 # | |    | |   | (_) || (_| || |_| || |_ | (_) |\__ \
 # \_|    |_|    \___/  \__,_| \__,_| \__| \___/ |___/
 
-def listarProdutos(idCampus: int):
-    return dbListarProdutos(idCampus)
+def listarProdutos():
+    return dbListarProdutos()
 
-def listarProdutosGeral():
-    return dbListarProdutosGeral()
+def listarProdutosCampus(idCampus: int):
+    return dbListarProdutosCampus(idCampus)
 
 def listarProdutoId(idProduto: int):
     produto = dbListarProdutoId(idProduto)
@@ -47,8 +47,11 @@ def adicionarQtdeProduto(idProduto: int, qtde: int):
 # | |  | || (_) | \ V / | || | | | | ||  __/| | | || |_ | (_| || (__ | (_) ||  __/\__ \
 # \_|  |_/ \___/   \_/  |_||_| |_| |_| \___||_| |_| \__| \__,_| \___| \___/  \___||___/
 
-def listarMovimentacoes(idCampus: int):
-    return dbListarMovimentacoes(idCampus)
+def listarMovimentacoes():
+    return dbListarMovimentacoes()
+
+def listarMovimentacoesCampus(idCampus: int):
+    return dbListarMovimentacoesCampus(idCampus)
 
 def listarMovimentacaoId(idMovimentacao: int):
     movimentacao =  dbListarMovimentacaoId(idMovimentacao)
@@ -78,4 +81,12 @@ def listarAlmoxarifeId(idAlmoxarife: int):
     if almoxarife == None:
         raise Exception(f"Almoxarife com id {idAlmoxarife} não existente.")
     
+    return almoxarife
+
+def listarAlmoxarifeCpf(cpfAlmoxarife: str):
+    almoxarife = dbListarAlmoxarifeCpf(cpfAlmoxarife)
+    
+    if almoxarife == None:
+        raise Exception(f"Almoxarife com CPF {cpfAlmoxarife} não existente.")
+        
     return almoxarife

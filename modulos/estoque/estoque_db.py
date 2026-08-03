@@ -6,7 +6,9 @@ from database.Conexao import SessionLocal
 from database.entidades.Almoxarife import Almoxarife
 from database.entidades.Estoque import Estoque
 from database.entidades.Movimentacao import Movimentacao
-import database.entidades 
+from database.entidades.Pessoa import Pessoa 
+import database.entidades
+
 
 # ______                   _         _               
 # | ___ \                 | |       | |              
@@ -15,27 +17,20 @@ import database.entidades
 # | |    | |   | (_) || (_| || |_| || |_ | (_) |\__ \
 # \_|    |_|    \___/  \__,_| \__,_| \__| \___/ |___/
 
-def dbCriarProduto(produto: Estoque):
+def dbListarProdutos():
     with SessionLocal() as session:
-        try:
-            session.add(produto)
-            session.commit()
-        except SQLAlchemyError:
-            session.rollback()
-            raise
+        query = select(Estoque)
+        produtos = session.execute(query).scalars().all()
 
-def dbListarProdutos(idCampus: int):
+        return produtos
+
+def dbListarProdutosCampus(idCampus: int):
     with SessionLocal() as session:
         query = select(Estoque).where(Estoque.campus_id == idCampus)
         produtos = session.execute(query).scalars().all()
+
         return produtos
 
-def dbListarProdutosGeral():
-    with SessionLocal() as session:
-        from sqlalchemy.orm import joinedload
-        query = select(Estoque).options(joinedload(Estoque.campus))
-        produtos = session.execute(query).scalars().all()
-        return produtos
 def dbListarProdutoId(idProduto: int):
     with SessionLocal() as session:
         query = select(Estoque).where(Estoque.id == idProduto)
@@ -84,16 +79,18 @@ def dbAdicionarQtdeProduto(idProduto: int, qtdeAdd: int):
 # | |  | || (_) | \ V / | || | | | | ||  __/| | | || |_ | (_| || (__ | (_) ||  __/\__ \
 # \_|  |_/ \___/   \_/  |_||_| |_| |_| \___||_| |_| \__| \__,_| \___| \___/  \___||___/
 
-def dbListarMovimentacoes(idCampus: int):
+def dbListarMovimentacoes():
     with SessionLocal() as session:
-        query = select(Estoque).where(Estoque.campus_id == idCampus)
-        produtos = session.execute(query).scalars().all()
-        
-        movimentacoes = []
-        
-        for prod in produtos:
-            movimentacoes + prod.movimentacoes
+        query = select(Movimentacao)
+        movimentacoes = session.execute(query).scalars().all()
+    
+        return movimentacoes
 
+def dbListarMovimentacoesCampus(idCampus: int):
+    with SessionLocal() as session:
+        query = select(Movimentacao).join(Movimentacao.produto).where(Estoque.campus_id == idCampus)
+        movimentacoes = session.execute(query).scalars().all()
+    
         return movimentacoes
 
 def dbListarMovimentacaoId(idMovimentacao: int):
@@ -113,7 +110,7 @@ def dbListarMovimentacaoId(idMovimentacao: int):
 
 def dbListarAlmoxarifes():
     with SessionLocal() as session:
-        query = select(Almoxarife)
+        query = select(Almoxarife).order_by(Almoxarife.pessoa_id)
         almoxarifes = session.execute(query).scalars().all()
 
         return almoxarifes
@@ -128,6 +125,13 @@ def dbListarAlmoxarifesCampus(idCampus: int):
 def dbListarAlmoxarifeId(idAlmoxarife: int):
     with SessionLocal() as session:
         query = select(Almoxarife).where(Almoxarife.pessoa_id == idAlmoxarife)
+        almoxarife = session.execute(query).scalar_one_or_none()
+
+        return almoxarife
+
+def dbListarAlmoxarifeCpf(cpfAlmoxarife: str):
+    with SessionLocal() as session:
+        query = select(Almoxarife).join(Almoxarife.pessoa).where(Pessoa.cpf == cpfAlmoxarife)
         almoxarife = session.execute(query).scalar_one_or_none()
 
         return almoxarife
