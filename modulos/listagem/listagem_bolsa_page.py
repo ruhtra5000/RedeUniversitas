@@ -1,30 +1,6 @@
 import streamlit as st
-
-from modulos.academico.academico_db import dbListarBolsasGeral
-from modulos.utils.listagem_utils import separador
-
-# Função para formatar o percentual de desconto da bolsa
-def formatarPercentual(valor):
-    if valor is None:
-        return "Não informado"
-
-    return f"{float(valor) * 100:.0f}%"
-
-# Função para formatar a data de início da bolsa
-def formatarData(data):
-    if data is None:
-        return "Não informada"
-
-    return data.strftime("%d/%m/%Y")
-
-# Função para formatar o status da bolsa
-def formatarStatus(status):
-    if status is None:
-        return "Não informado"
-
-    valor = status.value if hasattr(status, "value") else str(status)
-
-    return str(valor).replace("_", " ").title()
+from modulos.academico.academico_service import listarBolsasGeral
+from modulos.utils.listagem_utils import separador, formatar_percentual, formatar_data, formatar_status
 
 # Tela de listagem de bolsas
 def telaListagemBolsas():
@@ -39,7 +15,7 @@ def telaListagemBolsas():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaBolsas = dbListarBolsasGeral()
+    listaBolsas = listarBolsasGeral()
 
     if not listaBolsas:
         st.info("🎓 Nenhuma bolsa cadastrada.")
@@ -52,7 +28,7 @@ def telaListagemBolsas():
         f"{'bolsa encontrada' if len(listaBolsas) == 1 else 'bolsas encontradas'}"
     )
 
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+    proporcoes = [3, 2.2, 2, 2, 2.5, 1.3]
 
     with st.container(border=True):
 
@@ -85,16 +61,16 @@ def telaListagemBolsas():
 
             with c3:
                 st.write(
-                    formatarPercentual(
+                    formatar_percentual(
                         bolsa.percentual_desconto
                     )
                 )
 
             with c4:
-                st.write(formatarData(bolsa.data_inicio))
+                st.write(formatar_data(bolsa.data_inicio))
 
             with c5:
-                st.write(formatarStatus(bolsa.status))
+                st.write(formatar_status(bolsa.status))
 
             with c6:
                 visualizar = st.button(

@@ -1,6 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarProfessores
-from modulos.utils.listagem_utils import (formatar_cpf, separador)
+from modulos.academico.academico_service import listarProfessores
+from modulos.utils.listagem_utils import formatar_cpf, separador
 
 # Tela de listagem para Professores
 def telaListagemProfessores():
@@ -15,7 +15,7 @@ def telaListagemProfessores():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaProfessores = dbListarProfessores()
+    listaProfessores = listarProfessores()
 
     if not listaProfessores:
         st.info("👨‍🏫 Nenhum professor cadastrado.")

@@ -1,6 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarCursos
-from modulos.utils.listagem_utils import (formatar_modalidade,separador)
+from modulos.academico.academico_service import listarCursos
+from modulos.utils.listagem_utils import formatar_modalidade, separador
 
 # Tela de listagem para Cursos
 def telaListagemCursos():
@@ -15,7 +15,7 @@ def telaListagemCursos():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaCursos = dbListarCursos()
+    listaCursos = listarCursos()
 
     if not listaCursos:
         st.info("📚 Nenhum curso cadastrado.")

@@ -1,21 +1,8 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import dbListarCampus
-from modulos.utils.listagem_utils import separador
+from modulos.academico.academico_service import listarCampus
+from modulos.utils.listagem_utils import separador, formatar_cnpj
 from modulos.utils.view_utils import exibirCampo
-
-# Função para formatar o CNPJ
-def formatar_cnpj(cnpj):
-    numeros = re.sub(r"\D", "", cnpj or "")
-
-    if len(numeros) != 14:
-        return cnpj or "Não informado"
-
-    return (
-        f"{numeros[:2]}.{numeros[2:5]}."
-        f"{numeros[5:8]}/{numeros[8:12]}-"
-        f"{numeros[12:]}"
-    )
 
 # Tela de listagem para Campus
 def telaListagemCampus():
@@ -30,7 +17,7 @@ def telaListagemCampus():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaCampus = dbListarCampus()
+    listaCampus = listarCampus()
 
     if not listaCampus:
         st.info("🏛️ Nenhum campus cadastrado.")

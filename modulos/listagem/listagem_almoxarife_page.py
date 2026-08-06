@@ -1,6 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarAlmoxarifes
-from modulos.utils.listagem_utils import (formatar_cpf, separador)
+from modulos.estoque.estoque_service import listarAlmoxarifes
+from modulos.utils.listagem_utils import formatar_cpf, separador
 
 # Tela de listagem para Almoxarifes
 def telaListagemAlmoxarifes():
@@ -15,7 +15,7 @@ def telaListagemAlmoxarifes():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaAlmoxarifes = dbListarAlmoxarifes()
+    listaAlmoxarifes = listarAlmoxarifes()
 
     if not listaAlmoxarifes:
         st.info("📦 Nenhum almoxarife cadastrado.")

@@ -1,5 +1,5 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarAlunos
+from modulos.academico.academico_service import listarAlunos
 from modulos.utils.listagem_utils import separador
 
 # Tela de listagem para Alunos
@@ -15,7 +15,7 @@ def telaListagemAlunos():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaAlunos = dbListarAlunos()
+    listaAlunos = listarAlunos()
 
     if not listaAlunos:
         st.info("👥 Nenhum aluno cadastrado.")
