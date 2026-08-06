@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
