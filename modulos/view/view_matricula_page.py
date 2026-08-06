@@ -1,25 +1,17 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarMatricula
-from modulos.academico.academico_service import listarMatriculaId
-from modulos.utils.view_utils import (exibirCampo, formatarAprovacao)
-
-# Função para limpar a consulta de matrícula
-def limparConsultaMatricula():
-    st.session_state.pop("consulta_matricula_chave", None)
-    st.session_state.pop("consulta_matricula_aluno", None)
-    st.session_state.pop("consulta_matricula_turma", None)
-    st.session_state.pop("consulta_matricula_disciplina", None)
+from modulos.academico.academico_service import listarMatriculaId, listarMatricula
+from modulos.utils.view_utils import exibirCampo, formatar_aprovacao, limpar_consulta_matricula
 
 # Tela de visualização de matrícula
 def telaViewMatricula():
 
     st.title("🔎 Consulta de Matrícula")
     st.caption(
-        "Pesquise utilizando os IDs do aluno, da turma e da disciplina."
+        "Pesquise utilizando os IDs do aluno e da turma."
     )
 
     selecionada = st.session_state.pop(
-        "matricula_selecionada",
+        "matricula_selecionada",    
         None,
     )
 
@@ -39,7 +31,7 @@ def telaViewMatricula():
 
         st.markdown("#### 🔍 Buscar matrícula")
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
 
         with col1:
             alunoDigitado = st.text_input(
@@ -53,13 +45,6 @@ def telaViewMatricula():
                 "ID da turma",
                 placeholder="Ex.: 1",
                 key="consulta_matricula_turma",
-            )
-
-        with col3:
-            disciplinaDigitada = st.text_input(
-                "ID da disciplina",
-                placeholder="Ex.: 1",
-                key="consulta_matricula_disciplina",
             )
 
         colunaBotao, _ = st.columns([1.3, 4.7])
@@ -76,24 +61,22 @@ def telaViewMatricula():
 
         idAluno = alunoDigitado.strip()
         idTurma = turmaDigitada.strip()
-        idDisciplina = disciplinaDigitada.strip()
 
-        if not idAluno or not idTurma or not idDisciplina:
+        if not idAluno or not idTurma:
             st.warning(
-                "Informe os IDs do aluno, da turma e da disciplina."
+                "Informe os IDs do aluno e da turma."
             )
 
         elif not all(
             valor.isdigit()
-            for valor in [idAluno, idTurma, idDisciplina]
+            for valor in [idAluno, idTurma]
         ):
             st.error("Todos os IDs devem conter somente números.")
 
         else:
-            matricula = listarMatriculaId( #função antiga: dbListarMatricula
+            matricula = listarMatriculaId(
                 int(idAluno),
                 int(idTurma),
-                #int(idDisciplina),
             )
 
             if matricula is None:
@@ -102,16 +85,14 @@ def telaViewMatricula():
                 st.session_state["consulta_matricula_chave"] = {
                     "aluno_id": matricula.aluno_id,
                     "turma_id": matricula.turma_id,
-                    "disciplina_id": matricula.disciplina_id,
                 }
 
     chave = st.session_state.get("consulta_matricula_chave")
 
     if matricula is None and chave:
-        matricula = listarMatriculaId( #função antiga: dbListarMatricula
+        matricula = listarMatriculaId(
             chave["aluno_id"],
             chave["turma_id"],
-            #chave["disciplina_id"],
         )
 
     if matricula is None:
@@ -137,7 +118,7 @@ def telaViewMatricula():
             "Limpar",
             icon=":material/close:",
             use_container_width=True,
-            on_click=limparConsultaMatricula,
+            on_click=limpar_consulta_matricula,
         )
 
     with st.container(border=True):
@@ -185,7 +166,7 @@ def telaViewMatricula():
         with col3:
             exibirCampo(
                 "Situação",
-                formatarAprovacao(matricula.aprovacao),
+                formatar_aprovacao(matricula.aprovacao),
             )
 
         st.write("")
@@ -197,9 +178,3 @@ def telaViewMatricula():
 
         with col2:
             exibirCampo("ID da turma", matricula.turma_id)
-
-        with col3:
-            exibirCampo(
-                "ID da disciplina",
-                matricula.disciplina_id,
-            )

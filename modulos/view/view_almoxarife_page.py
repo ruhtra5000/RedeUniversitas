@@ -1,13 +1,7 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import (dbListarAlmoxarifeCpf, dbListarAlmoxarifeId)
-from modulos.utils.view_utils import (exibirCampo, formatar_cpf)
-
-# Função para limpar a consulta de almoxarife
-def limparConsultaAlmoxarife():
-    st.session_state.pop("consulta_almoxarife_id", None)
-    st.session_state.pop("consulta_almoxarife_cpf", None)
-    st.session_state.pop("consulta_almoxarife_id_digitado", None)
+from modulos.estoque.estoque_service import listarAlmoxarifeCpf, listarAlmoxarifeId
+from modulos.utils.view_utils import exibirCampo, formatar_cpf, limpar_consulta_almoxarife
 
 # Tela de visualização de almoxarife
 def telaViewAlmoxarife():
@@ -74,7 +68,7 @@ def telaViewAlmoxarife():
             if len(cpf) != 11:
                 st.error("O CPF deve possuir 11 números.")
             else:
-                almoxarife = dbListarAlmoxarifeCpf(cpf)
+                almoxarife = listarAlmoxarifeCpf(cpf)
 
                 if almoxarife is None:
                     st.error("Almoxarife não encontrado.")
@@ -87,7 +81,7 @@ def telaViewAlmoxarife():
             st.error("O ID deve conter somente números.")
 
         else:
-            almoxarife = dbListarAlmoxarifeId(int(idPessoa))
+            almoxarife = listarAlmoxarifeId(int(idPessoa))
 
             if almoxarife is None:
                 st.error("Almoxarife não encontrado.")
@@ -99,7 +93,7 @@ def telaViewAlmoxarife():
     idPessoa = st.session_state.get("consulta_almoxarife_id")
 
     if almoxarife is None and idPessoa is not None:
-        almoxarife = dbListarAlmoxarifeId(idPessoa)
+        almoxarife = listarAlmoxarifeId(idPessoa)
 
     if almoxarife is None:
         if not buscar:
@@ -122,7 +116,7 @@ def telaViewAlmoxarife():
             "Limpar",
             icon=":material/close:",
             use_container_width=True,
-            on_click=limparConsultaAlmoxarife,
+            on_click=limpar_consulta_almoxarife,
         )
 
     with st.container(border=True):

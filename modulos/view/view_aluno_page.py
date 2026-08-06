@@ -1,14 +1,7 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import (dbListarAlunoCpf, dbListarAlunoId)
-from modulos.utils.view_utils import exibirCampo
-
-
-# Função para limpar a consulta de aluno
-def limpar_consulta_aluno():
-    st.session_state.pop("consulta_aluno_id", None)
-    st.session_state.pop("consulta_cpf", None)
-    st.session_state.pop("consulta_id", None)
+from modulos.academico.academico_service import listarAlunoCpf, listarAlunoId
+from modulos.utils.view_utils import exibirCampo, limpar_consulta_aluno, formatar_cpf
         
 # Tela de visualização de aluno
 def telaViewAluno():
@@ -77,7 +70,7 @@ def telaViewAluno():
             if len(cpf) != 11:
                 st.error("O CPF deve possuir 11 números.")
             else:
-                aluno = dbListarAlunoCpf(cpf)
+                aluno = listarAlunoCpf(cpf)
 
                 if aluno is None:
                     st.error("Aluno não encontrado.")
@@ -88,7 +81,7 @@ def telaViewAluno():
             if not id_aluno.isdigit():
                 st.error("O ID deve conter somente números.")
             else:
-                aluno = dbListarAlunoId(int(id_aluno))
+                aluno = listarAlunoId(int(id_aluno))
 
                 if aluno is None:
                     st.error("Aluno não encontrado.")
@@ -98,7 +91,7 @@ def telaViewAluno():
     aluno_id = st.session_state.get("consulta_aluno_id")
 
     if aluno is None and aluno_id is not None:
-        aluno = dbListarAlunoId(aluno_id)
+        aluno = listarAlunoId(aluno_id)
 
     if aluno is None:
         if not buscar:
@@ -134,6 +127,7 @@ def telaViewAluno():
 
         with col2:
             exibirCampo("CPF", aluno.pessoa.cpf)
+            formatar_cpf(aluno.pessoa.cpf)
 
         st.write("")
 
