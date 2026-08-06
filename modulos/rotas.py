@@ -26,6 +26,9 @@ from modulos.listagem.listagem_almoxarife_page import telaListagemAlmoxarifes
 from modulos.listagem.listagem_financeiro_page import telaListagemFinanceiros
 from modulos.listagem.listagem_bolsa_page import telaListagemBolsas
 from modulos.listagem.listagem_matricula_page import telaListagemMatriculas
+from modulos.listagem.listagem_compra_page import telaListagemCompras
+from modulos.listagem.listagem_fornecedor_page import telaListagemFornecedores
+from modulos.listagem.listagem_produto_page import telaListagemProdutos
 from modulos.view.view_aluno_page import telaViewAluno
 from modulos.view.view_curso_page import telaViewCurso
 from modulos.view.view_professor_page import telaViewProfessor
@@ -36,6 +39,9 @@ from modulos.view.view_almoxarife_page import telaViewAlmoxarife
 from modulos.view.view_financeiro_page import telaViewFinanceiro
 from modulos.view.view_bolsa_page import telaViewBolsa
 from modulos.view.view_matricula_page import telaViewMatricula
+from modulos.view.view_compra_page import telaViewCompra
+from modulos.view.view_fornecedor_page import telaViewFornecedor
+from modulos.view.view_produto_page import telaViewProduto
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -58,28 +64,34 @@ cadastro_matricula = st.Page(telaCadastroMatricula, title="Matrícula", icon=":m
 cadastro_estoque = st.Page(telaCadastroEstoque, title="Produto", icon=":material/inventory_2:", url_path="cadastro_estoque")
 
 # Listagens
-listagem_aluno_page = st.Page(telaListagemAlunos, title="Aluno", icon=":material/list:",url_path="listagem_alunos")
-listagem_curso_page = st.Page(telaListagemCursos, title="Curso", icon=":material/list:",url_path="listagem_cursos")
-listagem_professor_page = st.Page(telaListagemProfessores, title="Professor", icon=":material/list:", url_path="listagem_professores")
-listagem_disciplina_page = st.Page(telaListagemDisciplinas, title="Disciplina", icon=":material/list:", url_path="listagem_disciplinas")
-listagem_turma_page = st.Page(telaListagemTurmas, title="Turma", icon=":material/list:", url_path="listagem_turmas")
-listagem_campus_page = st.Page(telaListagemCampus, title="Campus", icon=":material/list:", url_path="listagem_campus")
+listagem_aluno_page = st.Page(telaListagemAlunos, title="Aluno", icon=":material/contacts:",url_path="listagem_alunos")
+listagem_curso_page = st.Page(telaListagemCursos, title="Curso", icon=":material/library_books:",url_path="listagem_cursos")
+listagem_professor_page = st.Page(telaListagemProfessores, title="Professor", icon=":material/groups:", url_path="listagem_professores")
+listagem_disciplina_page = st.Page(telaListagemDisciplinas, title="Disciplina", icon=":material/list_alt:", url_path="listagem_disciplinas")
+listagem_turma_page = st.Page(telaListagemTurmas, title="Turma", icon=":material/groups:", url_path="listagem_turmas")
+listagem_campus_page = st.Page(telaListagemCampus, title="Campus", icon=":material/domain:", url_path="listagem_campus")
 listagem_almoxarife_page = st.Page(telaListagemAlmoxarifes, title="Almoxarifes", icon=":material/inventory_2:", url_path="listagem_almoxarifes")
 listagem_financeiro_page = st.Page(telaListagemFinanceiros, title="Financeiro", icon=":material/payments:", url_path="listagem_financeiro")
-listagem_bolsa_page = st.Page(telaListagemBolsas, title="Bolsas", icon=":material/school:", url_path="listagem_bolsas")
+listagem_bolsa_page = st.Page(telaListagemBolsas, title="Bolsas", icon=":material/sell:", url_path="listagem_bolsas")
 listagem_matricula_page = st.Page(telaListagemMatriculas, title="Matrículas", icon=":material/assignment:", url_path="listagem_matriculas")
+listagem_compra_page = st.Page(telaListagemCompras, title="Compra", icon=":material/shopping_cart:", url_path="listagem_compras")
+listagem_fornecedor_page = st.Page(telaListagemFornecedores, title="Fornecedor", icon=":material/local_shipping:", url_path="listagem_fornecedores")
+listagem_produto_page = st.Page(telaListagemProdutos, title="Produto", icon=":material/inventory:", url_path="listagem_produtos")
 
 #visualizações
-view_aluno_page = st.Page(telaViewAluno, title="Aluno", icon=":material/visibility:", url_path="view_aluno")
-view_curso_page = st.Page(telaViewCurso, title="Curso", icon=":material/visibility:", url_path="view_curso")
-view_professor_page = st.Page(telaViewProfessor, title="Professor", icon=":material/visibility:", url_path="view_professor")
-view_disciplina_page = st.Page(telaViewDisciplina, title="Disciplina", icon=":material/visibility:", url_path="view_disciplina")
-view_turma_page = st.Page(telaViewTurma, title="Turma", icon=":material/visibility:", url_path="view_turma")
-view_campus_page = st.Page(telaViewCampus, title="Campus", icon=":material/visibility:", url_path="view_campus")
-view_almoxarife_page = st.Page(telaViewAlmoxarife, title="Almoxarife", icon=":material/visibility:", url_path="view_almoxarife")
-view_financeiro_page = st.Page(telaViewFinanceiro, title="Financeiro", icon=":material/visibility:", url_path="view_financeiro")
-view_bolsa_page = st.Page(telaViewBolsa, title="Bolsa", icon=":material/visibility:", url_path="view_bolsa")
-view_matricula_page = st.Page(telaViewMatricula, title="Matrícula", icon=":material/visibility:", url_path="view_matricula")
+view_aluno_page = st.Page(telaViewAluno, title="Aluno", icon=":material/person_search:", url_path="view_aluno")
+view_curso_page = st.Page(telaViewCurso, title="Curso", icon=":material/auto_stories:", url_path="view_curso")
+view_professor_page = st.Page(telaViewProfessor, title="Professor", icon=":material/person_search:", url_path="view_professor")
+view_disciplina_page = st.Page(telaViewDisciplina, title="Disciplina", icon=":material/preview:", url_path="view_disciplina")
+view_turma_page = st.Page(telaViewTurma, title="Turma", icon=":material/group_search:", url_path="view_turma")
+view_campus_page = st.Page(telaViewCampus, title="Campus", icon=":material/domain_verification:", url_path="view_campus")
+view_almoxarife_page = st.Page(telaViewAlmoxarife, title="Almoxarifes", icon=":material/person_search:", url_path="view_almoxarife")
+view_financeiro_page = st.Page(telaViewFinanceiro, title="Financeiro", icon=":material/person_search:", url_path="view_financeiro")
+view_bolsa_page = st.Page(telaViewBolsa, title="Bolsa", icon=":material/sell:", url_path="view_bolsa")
+view_matricula_page = st.Page(telaViewMatricula, title="Matrículas", icon=":material/assignment_ind:", url_path="view_matricula")
+view_compra_page = st.Page(telaViewCompra, title="Compra", icon=":material/receipt_long:", url_path="view_compra")
+view_fornecedor_page = st.Page(telaViewFornecedor, title="Fornecedor", icon=":material/storefront:", url_path="view_fornecedor")
+view_produto_page = st.Page(telaViewProduto, title="Produto", icon=":material/category:", url_path="view_produto")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -141,7 +153,10 @@ def get_navigation():
             listagem_disciplina_page,
             listagem_turma_page,
             listagem_matricula_page,
-            listagem_bolsa_page
+            listagem_bolsa_page,
+            listagem_compra_page,
+            listagem_fornecedor_page,
+            listagem_produto_page
         ]
         
     if "ADMIN" in roles:
@@ -154,7 +169,10 @@ def get_navigation():
             view_disciplina_page,
             view_turma_page,
             view_matricula_page,
-             view_bolsa_page
+            view_bolsa_page,
+            view_compra_page,
+            view_fornecedor_page,
+            view_produto_page
         ]
 
     # Reitor tem acesso executivo (C-Level)
