@@ -1,12 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import (dbListarDisciplinaCodigo, dbListarDisciplinaId, dbListarPreRequisitosDisciplina)
-from modulos.utils.view_utils import exibirCampo
-
-# Função para limpar a consulta de disciplina
-def limpar_consulta_disciplina():
-    st.session_state.pop("consulta_disciplina_id", None)
-    st.session_state.pop("consulta_disciplina_codigo", None)
-    st.session_state.pop("consulta_disciplina_id_digitado", None)
+from modulos.academico.academico_service import listarDisciplinaCodigo, listarDisciplinaId, listarPreRequisitosDisciplina
+from modulos.utils.view_utils import exibirCampo, limpar_consulta_disciplina
 
 # Tela de visualização de disciplina
 def telaViewDisciplina():
@@ -71,7 +65,7 @@ def telaViewDisciplina():
             st.warning("Informe somente o código ou somente o ID.")
 
         elif codigo:
-            disciplina = dbListarDisciplinaCodigo(codigo)
+            disciplina = listarDisciplinaCodigo(codigo)
 
             if disciplina is None:
                 st.error("Disciplina não encontrada.")
@@ -82,7 +76,7 @@ def telaViewDisciplina():
             if not id_disciplina.isdigit():
                 st.error("O ID deve conter somente números.")
             else:
-                disciplina = dbListarDisciplinaId(int(id_disciplina))
+                disciplina = listarDisciplinaId(int(id_disciplina))
 
                 if disciplina is None:
                     st.error("Disciplina não encontrada.")
@@ -94,14 +88,14 @@ def telaViewDisciplina():
     disciplina_id = st.session_state.get("consulta_disciplina_id")
 
     if disciplina is None and disciplina_id is not None:
-        disciplina = dbListarDisciplinaId(disciplina_id)
+        disciplina = listarDisciplinaId(disciplina_id)
 
     if disciplina is None:
         if not buscar:
             st.info("Informe um código ou ID para consultar uma disciplina.")
         return
 
-    pre_requisitos = dbListarPreRequisitosDisciplina(disciplina.id)
+    pre_requisitos = listarPreRequisitosDisciplina(disciplina.id)
 
     st.write("")
 

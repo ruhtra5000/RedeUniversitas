@@ -1,12 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import (dbListarTurmaCodigo, dbListarTurmaId)
-from modulos.utils.view_utils import exibirCampo
-
-# Função para limpar a consulta de turma
-def limpar_consulta_turma():
-    st.session_state.pop("consulta_turma_id", None)
-    st.session_state.pop("consulta_turma_codigo", None)
-    st.session_state.pop("consulta_turma_id_digitado", None)
+from modulos.academico.academico_service import listarTurmaCodigo, listarTurmaId
+from modulos.utils.view_utils import exibirCampo, limpar_consulta_turma
 
 # Tela de visualização de turma
 def telaViewTurma():
@@ -72,7 +66,7 @@ def telaViewTurma():
             )
 
         elif codigo:
-            turma = dbListarTurmaCodigo(codigo)
+            turma = listarTurmaCodigo(codigo)
 
             if turma is None:
                 st.error("Turma não encontrada.")
@@ -83,7 +77,7 @@ def telaViewTurma():
             if not id_turma.isdigit():
                 st.error("O ID deve conter somente números.")
             else:
-                turma = dbListarTurmaId(int(id_turma))
+                turma = listarTurmaId(int(id_turma))
 
                 if turma is None:
                     st.error("Turma não encontrada.")
@@ -93,7 +87,7 @@ def telaViewTurma():
     turma_id = st.session_state.get("consulta_turma_id")
 
     if turma is None and turma_id is not None:
-        turma = dbListarTurmaId(turma_id)
+        turma = listarTurmaId(turma_id)
 
     if turma is None:
         if not buscar:

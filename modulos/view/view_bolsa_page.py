@@ -1,11 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarBolsaId
-from modulos.utils.view_utils import (formatarPercentual, formatarData, formatarStatus, exibirCampo)
-
-# Função para limpar a consulta de bolsa
-def limparConsultaBolsa():
-    st.session_state.pop("consulta_bolsa_id", None)
-    st.session_state.pop("consulta_bolsa_id_digitado", None)
+from modulos.academico.academico_service import listarBolsaId
+from modulos.utils.view_utils import formatar_percentual, formatar_data, formatar_status, exibirCampo, limpar_consulta_bolsa
 
 # Tela de visualização de bolsa
 def telaViewBolsa():
@@ -58,7 +53,7 @@ def telaViewBolsa():
             st.error("O ID deve conter somente números.")
 
         else:
-            bolsa = dbListarBolsaId(int(idBolsa))
+            bolsa = listarBolsaId(int(idBolsa))
 
             if bolsa is None:
                 st.error("Bolsa não encontrada.")
@@ -68,7 +63,7 @@ def telaViewBolsa():
     idBolsa = st.session_state.get("consulta_bolsa_id")
 
     if bolsa is None and idBolsa is not None:
-        bolsa = dbListarBolsaId(idBolsa)
+        bolsa = listarBolsaId(idBolsa)
 
     if bolsa is None:
         if not buscar:
@@ -91,7 +86,7 @@ def telaViewBolsa():
             "Limpar",
             icon=":material/close:",
             use_container_width=True,
-            on_click=limparConsultaBolsa,
+            on_click=limpar_consulta_bolsa,
         )
 
     with st.container(border=True):
@@ -123,7 +118,7 @@ def telaViewBolsa():
         with col2:
             exibirCampo(
                 "Desconto",
-                formatarPercentual(
+                formatar_percentual(
                     bolsa.percentual_desconto
                 ),
             )
@@ -131,7 +126,7 @@ def telaViewBolsa():
         with col3:
             exibirCampo(
                 "Status",
-                formatarStatus(bolsa.status),
+                formatar_status(bolsa.status),
             )
 
         st.write("")
@@ -141,11 +136,11 @@ def telaViewBolsa():
         with col1:
             exibirCampo(
                 "Data de início",
-                formatarData(bolsa.data_inicio),
+                formatar_data(bolsa.data_inicio),
             )
 
         with col2:
             exibirCampo(
                 "Data de término",
-                formatarData(bolsa.data_fim),
+                formatar_data(bolsa.data_fim),
             )

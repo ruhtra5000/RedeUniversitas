@@ -1,13 +1,7 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import (dbListarFinanceiroCpf, dbListarFinanceiroId)
-from modulos.utils.view_utils import (exibirCampo, formatar_cpf)
-
-# Função para limpar a consulta de financeiro
-def limparConsultaFinanceiro():
-    st.session_state.pop("consulta_financeiro_id", None)
-    st.session_state.pop("consulta_financeiro_cpf", None)
-    st.session_state.pop("consulta_financeiro_id_digitado", None)
+from modulos.financeiro.financeiro_service import listarFinanceiroCpf, listarFinanceiroId
+from modulos.utils.view_utils import exibirCampo, formatar_cpf, limpar_consulta_financeiro
 
 # Tela de visualização de financeiro
 def telaViewFinanceiro():
@@ -74,7 +68,7 @@ def telaViewFinanceiro():
             if len(cpf) != 11:
                 st.error("O CPF deve possuir 11 números.")
             else:
-                financeiro = dbListarFinanceiroCpf(cpf)
+                financeiro = listarFinanceiroCpf(cpf)
 
                 if financeiro is None:
                     st.error("Funcionário não encontrado.")
@@ -87,7 +81,7 @@ def telaViewFinanceiro():
             st.error("O ID deve conter somente números.")
 
         else:
-            financeiro = dbListarFinanceiroId(int(idPessoa))
+            financeiro = listarFinanceiroId(int(idPessoa))
 
             if financeiro is None:
                 st.error("Funcionário não encontrado.")
@@ -99,7 +93,7 @@ def telaViewFinanceiro():
     idPessoa = st.session_state.get("consulta_financeiro_id")
 
     if financeiro is None and idPessoa is not None:
-        financeiro = dbListarFinanceiroId(idPessoa)
+        financeiro = listarFinanceiroId(idPessoa)
 
     if financeiro is None:
         if not buscar:
@@ -122,7 +116,7 @@ def telaViewFinanceiro():
             "Limpar",
             icon=":material/close:",
             use_container_width=True,
-            on_click=limparConsultaFinanceiro,
+            on_click=limpar_consulta_financeiro,
         )
 
     with st.container(border=True):

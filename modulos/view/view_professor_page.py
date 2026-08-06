@@ -1,13 +1,7 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import (dbListarProfessorCpf, dbListarProfessorId)
-from modulos.utils.view_utils import (formatar_cpf, exibirCampo)
-
-# Função para limpar a consulta de professor
-def limpar_consulta_professor():
-    st.session_state.pop("consulta_professor_id", None)
-    st.session_state.pop("consulta_professor_cpf", None)
-    st.session_state.pop("consulta_professor_id_digitado", None)
+from modulos.academico.academico_service import listarProfessorCpf, listarProfessorId
+from modulos.utils.view_utils import formatar_cpf, exibirCampo, limpar_consulta_professor
 
 # Tela de visualização de professor
 def telaViewProfessor():
@@ -75,7 +69,7 @@ def telaViewProfessor():
             if len(cpf) != 11:
                 st.error("O CPF deve possuir 11 números.")
             else:
-                professor = dbListarProfessorCpf(cpf)
+                professor = listarProfessorCpf(cpf)
 
                 if professor is None:
                     st.error("Professor não encontrado.")
@@ -88,7 +82,7 @@ def telaViewProfessor():
             if not id_professor.isdigit():
                 st.error("O ID deve conter somente números.")
             else:
-                professor = dbListarProfessorId(int(id_professor))
+                professor = listarProfessorId(int(id_professor))
 
                 if professor is None:
                     st.error("Professor não encontrado.")
@@ -100,7 +94,7 @@ def telaViewProfessor():
     professor_id = st.session_state.get("consulta_professor_id")
 
     if professor is None and professor_id is not None:
-        professor = dbListarProfessorId(professor_id)
+        professor = listarProfessorId(professor_id)
 
     if professor is None:
         if not buscar:

@@ -1,11 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarCursoId
-from modulos.utils.view_utils import (exibirCampo, formatar_modalidade, formatar_mensalidade)
-
-# Função para limpar a consulta de curso
-def limpar_consulta_curso():
-    st.session_state.pop("consulta_curso_id", None)
-    st.session_state.pop("consulta_curso_busca", None)
+from modulos.academico.academico_service import listarCursoId
+from modulos.utils.view_utils import exibirCampo, formatar_modalidade, formatar_mensalidade, limpar_consulta_curso
 
 # Tela de visualização de curso
 def telaViewCurso():
@@ -57,7 +52,7 @@ def telaViewCurso():
             st.error("O ID deve conter somente números.")
 
         else:
-            curso = dbListarCursoId(int(id_curso))
+            curso = listarCursoId(int(id_curso))
 
             if curso is None:
                 st.error("Curso não encontrado.")
@@ -67,7 +62,7 @@ def telaViewCurso():
     curso_id = st.session_state.get("consulta_curso_id")
 
     if curso is None and curso_id is not None:
-        curso = dbListarCursoId(curso_id)
+        curso = listarCursoId(curso_id)
 
     if curso is None:
         if not buscar:

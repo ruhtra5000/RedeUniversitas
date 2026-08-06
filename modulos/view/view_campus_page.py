@@ -1,13 +1,7 @@
 import re
 import streamlit as st
-from modulos.academico.academico_db import (dbListarCampusCnpj, dbListarCampusId)
-from modulos.utils.view_utils import formatar_cnpj, exibirCampo
-
-# Função para limpar a consulta de campus
-def limpar_consulta_campus():
-    st.session_state.pop("consulta_campus_id", None)
-    st.session_state.pop("consulta_campus_cnpj", None)
-    st.session_state.pop("consulta_campus_id_digitado", None)
+from modulos.academico.academico_service import listarCampusCnpj, listarCampusId
+from modulos.utils.view_utils import formatar_cnpj, exibirCampo, limpar_consulta_campus
 
 # Tela de visualização de campus
 def telaViewCampus():
@@ -77,7 +71,7 @@ def telaViewCampus():
             if len(cnpj) != 14:
                 st.error("O CNPJ deve possuir 14 números.")
             else:
-                campus = dbListarCampusCnpj(cnpj)
+                campus = listarCampusCnpj(cnpj)
 
                 if campus is None:
                     st.error("Campus não encontrado.")
@@ -90,7 +84,7 @@ def telaViewCampus():
             if not idCampus.isdigit():
                 st.error("O ID deve conter somente números.")
             else:
-                campus = dbListarCampusId(int(idCampus))
+                campus = listarCampusId(int(idCampus))
 
                 if campus is None:
                     st.error("Campus não encontrado.")
@@ -102,7 +96,7 @@ def telaViewCampus():
     idCampus = st.session_state.get("consulta_campus_id")
 
     if campus is None and idCampus is not None:
-        campus = dbListarCampusId(idCampus)
+        campus = listarCampusId(idCampus)
 
     if campus is None:
         if not buscar:
