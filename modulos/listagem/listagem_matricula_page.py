@@ -1,16 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import (dbListarMatriculasGeral)
-from modulos.utils.listagem_utils import separador
-
-# Função para formatar a situação da matrícula
-def formatarAprovacao(aprovacao):
-    if aprovacao is True:
-        return "Aprovado"
-
-    if aprovacao is False:
-        return "Reprovado"
-
-    return "Em andamento"
+from modulos.academico.academico_service import listarMatriculasGeral
+from modulos.utils.listagem_utils import separador, formatar_aprovacao
 
 # Tela de listagem de matrículas
 def telaListagemMatriculas():
@@ -25,7 +15,7 @@ def telaListagemMatriculas():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaMatriculas = dbListarMatriculasGeral()
+    listaMatriculas = listarMatriculasGeral()
 
     if not listaMatriculas:
         st.info("📝 Nenhuma matrícula cadastrada.")
@@ -78,7 +68,7 @@ def telaListagemMatriculas():
 
             with c4:
                 st.write(
-                    formatarAprovacao(matricula.aprovacao)
+                    formatar_aprovacao(matricula.aprovacao)
                 )
 
             with c5:
@@ -87,8 +77,7 @@ def telaListagemMatriculas():
                     key=(
                         f"view_matricula_"
                         f"{matricula.aluno_id}_"
-                        f"{matricula.turma_id}_"
-                        f"{matricula.disciplina_id}"
+                        f"{matricula.turma_id}"
                     ),
                     help="Visualizar matrícula",
                     use_container_width=True,
@@ -98,7 +87,6 @@ def telaListagemMatriculas():
                 st.session_state["matricula_selecionada"] = {
                     "aluno_id": matricula.aluno_id,
                     "turma_id": matricula.turma_id,
-                    "disciplina_id": matricula.disciplina_id,
                 }
 
                 from modulos.rotas import view_matricula_page

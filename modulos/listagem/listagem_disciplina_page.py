@@ -1,5 +1,5 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarDisciplinasGeral
+from modulos.academico.academico_service import listarDisciplinasGeral
 from modulos.utils.listagem_utils import separador
 
 # Tela de listagem para Disciplinas
@@ -15,7 +15,7 @@ def telaListagemDisciplinas():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaDisciplinas = dbListarDisciplinasGeral()
+    listaDisciplinas = listarDisciplinasGeral()
 
     if not listaDisciplinas:
         st.info("📖 Nenhuma disciplina cadastrada.")

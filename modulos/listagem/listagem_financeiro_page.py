@@ -1,6 +1,6 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarFinanceiros
-from modulos.utils.listagem_utils import (formatar_cpf, separador)
+from modulos.financeiro.financeiro_service import listarFinanceiro
+from modulos.utils.listagem_utils import formatar_cpf, separador
 
 # Tela de listagem para Financeiros
 def telaListagemFinanceiros():
@@ -15,7 +15,7 @@ def telaListagemFinanceiros():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaFinanceiros = dbListarFinanceiros()
+    listaFinanceiros = listarFinanceiro()
 
     if not listaFinanceiros:
         st.info("💰 Nenhum funcionário financeiro cadastrado.")

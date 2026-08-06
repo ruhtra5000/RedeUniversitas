@@ -1,5 +1,5 @@
 import streamlit as st
-from modulos.academico.academico_db import dbListarTurmasGeral
+from modulos.academico.academico_service import listarTurmasGeral
 from modulos.utils.listagem_utils import separador
 
 # Tela de listagem para Turmas
@@ -15,7 +15,7 @@ def telaListagemTurmas():
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
-    listaTurmas = dbListarTurmasGeral()
+    listaTurmas = listarTurmasGeral()
 
     if not listaTurmas:
         st.info("🏫 Nenhuma turma cadastrada.")
