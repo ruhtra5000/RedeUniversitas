@@ -27,6 +27,14 @@ def listarCampusId(idCampus: int):
 def listarCampusNome(nomeCampus: str):
     return dbListarCampusNome(nomeCampus)
 
+def listarCampusCnpj(cnpjCampus: str):
+    campus = dbListarCampusCnpj(cnpjCampus)
+
+    if campus == None:
+        raise Exception(f"Campus com CNPJ {cnpjCampus} não existente.")
+
+    return campus
+
 def editarCampus(idCampus: int, nome: str, email: str, telefone: str):
     if nome == "" or nome == None:
         raise Exception("O campo 'nome' é obrigatório.")
@@ -142,6 +150,19 @@ def listarDisciplinaId(idDisciplina: int):
         raise Exception(f"Disciplina com id {idDisciplina} não existente.")
     
     return disciplina
+
+def listarDisciplinaCodigo(codigoDisciplina: str):
+    disciplina = dbListarDisciplinaCodigo(codigoDisciplina)
+
+    if disciplina == None:
+        raise Exception(f"Disciplina com código {codigoDisciplina} não existente.")
+
+    return disciplina
+
+
+def listarPreRequisitosDisciplina(idDisciplina: int):
+    listarDisciplinaId(idDisciplina)
+    return dbListarPreRequisitosDisciplina(idDisciplina)
     
 def editarDisciplina(idDisciplina: int, nome: str, carga_horaria: int, obrigatoria: bool):
     if nome == "" or nome == None:
@@ -195,6 +216,14 @@ def listarTurmaId(idTurma: int):
     if turma == None:
         raise Exception(f"Turma com id {idTurma} não existente.")
     
+    return turma
+
+def listarTurmaCodigo(codigoTurma: str):
+    turma = dbListarTurmaCodigo(codigoTurma)
+
+    if turma == None:
+        raise Exception(f"Turma com código {codigoTurma} não existente.")
+
     return turma
 
 def alterarProfessorTurma(idTurma: int, idNovoProfessor: int):
@@ -272,6 +301,21 @@ def calcularFrequenciaRelativa(idAluno: int, idTurma: int):
 
     if freqRelativa < 0.75: # Freq. Minima: 75%
         dbDefinirAprovacao(idAluno, idTurma, False)
+
+def definirAprovacao(idAluno: int, idTurma: int, aprovacao: bool):
+    listarMatriculaId(idAluno, idTurma)
+    dbDefinirAprovacao(idAluno, idTurma, aprovacao)
+
+def listarMatriculasGeral():
+    return dbListarMatriculasGeral()
+
+def listarMatricula(idAluno: int, idTurma: int, idDisciplina: int):
+    matricula = dbListarMatricula(idAluno, idTurma, idDisciplina)
+
+    if matricula == None:
+        raise Exception("Matrícula não encontrada para o aluno, ""turma e disciplina informados.")
+
+    return matricula
     
 
 # ______                __                                         
@@ -329,6 +373,14 @@ def listarAlunoId(idAluno: int):
     if aluno == None:
         raise Exception(f"Aluno com id {idAluno} não existente.")
     
+    return aluno
+
+def listarAlunoCpf(cpfAluno: str):
+    aluno = dbListarAlunoCpf(cpfAluno)
+
+    if aluno == None:
+        raise Exception(f"Aluno com CPF {cpfAluno} não existente.")
+
     return aluno
     
 def atualizarCoefRendMediaGeral(idAluno: int):
