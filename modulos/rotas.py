@@ -51,6 +51,7 @@ from modulos.cadastros.pages.edicao.editar_campus_page import telaEdicaoCampus
 from modulos.cadastros.pages.edicao.editar_curso_page import telaEdicaoCurso
 from modulos.cadastros.pages.edicao.editar_disciplina_page import telaEdicaoDisciplina
 from modulos.cadastros.pages.edicao.editar_turma_page import telaEdicaoTurma
+from modulos.cadastros.pages.edicao.editar_fornecedor_page import telaEdicaoFornecedor
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -113,6 +114,7 @@ editar_campus_page = st.Page(telaEdicaoCampus, title="Campus", icon=":material/e
 editar_curso_page = st.Page(telaEdicaoCurso, title="Curso", icon=":material/edit:", url_path="editar_curso")
 editar_disciplina_page = st.Page(telaEdicaoDisciplina, title="Disciplina", icon=":material/edit:", url_path="editar_disciplina")
 editar_turma_page = st.Page(telaEdicaoTurma, title="Turma", icon=":material/edit:", url_path="editar_turma")
+editar_fornecedor_page = st.Page(telaEdicaoFornecedor, title="Fornecedor", icon=":material/edit:", url_path="editar_fornecedor")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -205,7 +207,8 @@ def get_navigation():
             editar_campus_page,
             editar_curso_page,
             editar_disciplina_page,
-            editar_turma_page
+            editar_turma_page,
+            editar_fornecedor_page
         ]
 
     # Reitor tem acesso executivo (C-Level)
