@@ -48,6 +48,7 @@ from modulos.cadastros.pages.edicao.editar_professor_page import telaEdicaoProfe
 from modulos.cadastros.pages.edicao.editar_almoxarife_page import telaEdicaoAlmoxarife
 from modulos.cadastros.pages.edicao.editar_financeiro_page import telaEdicaoFinanceiro
 from modulos.cadastros.pages.edicao.editar_campus_page import telaEdicaoCampus
+from modulos.cadastros.pages.edicao.editar_curso_page import telaEdicaoCurso
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -107,6 +108,7 @@ editar_financeiro_page = st.Page(telaEdicaoFinanceiro, title="Financeiro", icon=
 
 # Edições (Outros)
 editar_campus_page = st.Page(telaEdicaoCampus, title="Campus", icon=":material/edit:", url_path="editar_campus")
+editar_curso_page = st.Page(telaEdicaoCurso, title="Curso", icon=":material/edit:", url_path="editar_curso")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -196,7 +198,8 @@ def get_navigation():
             editar_professor_page,
             editar_almoxarife_page,
             editar_financeiro_page,
-            editar_campus_page
+            editar_campus_page,
+            editar_curso_page
         ]
 
     # Reitor tem acesso executivo (C-Level)
