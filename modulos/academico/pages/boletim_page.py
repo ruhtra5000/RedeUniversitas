@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from modulos.academico.academico_service import listarAlunoId
+from modulos.academico.academico_service import listarAlunoId, listarMatriculasAluno
 
 def telaBoletim():
     st.title(":material/school: Meu Boletim")
@@ -32,7 +32,7 @@ def telaBoletim():
     
     st.write("---")
 
-    matriculas = aluno.matriculas
+    matriculas = listarMatriculasAluno(pessoa_id)
 
     if not matriculas:
         st.info("Você ainda não está matriculado em nenhuma disciplina.", icon=":material/info:")

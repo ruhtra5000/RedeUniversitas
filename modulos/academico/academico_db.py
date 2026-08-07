@@ -453,6 +453,17 @@ def dbListarMatriculasGeral():
 
         return session.execute(query).unique().scalars().all()
 
+def dbListarMatriculasAluno(idAluno: int):
+    with SessionLocal() as session:
+        query = (
+            select(Matricula)
+            .options(
+                joinedload(Matricula.disciplina),
+            )
+            .where(Matricula.aluno_id == idAluno)
+        )
+        return session.execute(query).unique().scalars().all()
+
 def dbListarMatricula(
     idAluno: int,
     idTurma: int,

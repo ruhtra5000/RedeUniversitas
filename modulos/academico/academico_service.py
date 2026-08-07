@@ -209,6 +209,34 @@ def listarTurmasGeral():
     
 def listarTurmasCurso(idCurso: int, semestre: str):
     return dbListarTurmasCurso(idCurso, semestre)
+
+def listarTurmasDisponiveisAluno(idAluno: int):
+    aluno = listarAlunoId(idAluno)
+    turmas_gerais = dbListarTurmasGeral()
+    turmas_do_curso = [t for t in turmas_gerais if t.curso_id == aluno.curso_id]
+    
+    matriculas_aluno = dbListarMatriculasAluno(idAluno)
+    aprovadas = {m.disciplina_id for m in matriculas_aluno if m.aprovacao == True}
+    cursando = {m.disciplina_id for m in matriculas_aluno if m.aprovacao == None}
+    
+    turmas_validas = []
+    for t in turmas_do_curso:
+        if t.disciplina_id in aprovadas:
+            continue
+        if t.disciplina_id in cursando:
+            continue
+            
+        pre_requisitos = t.disciplina.preRequisitos
+        atende_prereq = True
+        for pr in pre_requisitos:
+            if pr.prerequisito_id not in aprovadas:
+                atende_prereq = False
+                break
+                
+        if atende_prereq:
+            turmas_validas.append(t)
+            
+    return turmas_validas
     
 def listarTurmaId(idTurma: int):
     turma = dbListarTurmaId(idTurma)
@@ -494,6 +522,9 @@ def listarMensalidadesCurso(idCurso: int):
 
 def listarMensalidadesAluno(idAluno: int):
     return dbListarMensalidadesAluno(idAluno)
+
+def listarMatriculasAluno(idAluno: int):
+    return dbListarMatriculasAluno(idAluno)
     
 def listarMensalidadeId(idMensalidade: int):
     mensalidade = dbListarMensalidadeId(idMensalidade)
