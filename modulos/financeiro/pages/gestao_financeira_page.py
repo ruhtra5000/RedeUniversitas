@@ -10,6 +10,7 @@ from modulos.financeiro.financeiro_service import (
     definirDataPagamentoContaPagar,
     definirFinanceiroContaReceber,
 )
+from modulos.cadastros.mensalidade import criarMensalidades
 
 def telaGestaoFinanceira():
     st.title(":material/account_balance: Gestão Financeira")
@@ -217,6 +218,23 @@ def telaGestaoFinanceira():
                     "Fornecedor": c.compra.fornecedor.nome if hasattr(c, 'compra') and c.compra else "-",
                     "Vencimento": c.data_vencimento.strftime("%d/%m/%Y"),
                     "Data Pagamento": c.data_pagamento.strftime("%d/%m/%Y"),
-                    "Valor Pago": f"R$ {float(c.valor):.2f}"
                 } for c in pagar_pagas])
                 st.dataframe(df_pag_pagas, use_container_width=True, hide_index=True)
+
+    # ====== ABA AJUSTES MANUAIS ======
+    with tab_ajustes:
+        st.subheader("Ações Manuais")
+        
+        st.write("**Gerar Mensalidades**")
+        st.caption("Esta ação gera as mensalidades para todos os alunos. (Isso já ocorre automaticamente no dia 1 de cada mês)")
+        
+        if st.button("Gerar Mensalidades Agora", type="primary", icon=":material/autorenew:"):
+            with st.spinner("Gerando mensalidades..."):
+                try:
+                    criarMensalidades()
+                    st.success("Mensalidades geradas com sucesso!")
+                    import time
+                    time.sleep(1.5)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Erro ao gerar mensalidades: {e}")
