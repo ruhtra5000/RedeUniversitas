@@ -9,8 +9,6 @@ from modulos.financeiro.financeiro_service import (
     definirDataPagamentoContaReceber,
     definirDataPagamentoContaPagar,
     definirFinanceiroContaReceber,
-    adicionarValorCaixa,
-    removerValorCaixa
 )
 
 def telaGestaoFinanceira():
