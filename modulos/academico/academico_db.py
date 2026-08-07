@@ -719,12 +719,13 @@ def dbListarPessoaGoogleId(googleId: str):
         return pessoa
 
 def dbEditarPessoa(idPessoa: int, novaPessoa: Pessoa):
-    # São editaveis: email, telefone
+    # São editaveis: nome, email, telefone
     with SessionLocal() as session:
         try: 
             query = select(Pessoa).where(Pessoa.id == idPessoa)
             pessoa = session.execute(query).scalar_one()
         
+            pessoa.nome = novaPessoa.nome
             pessoa.email = novaPessoa.email
             pessoa.telefone = novaPessoa.telefone
 

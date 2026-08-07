@@ -43,6 +43,11 @@ from modulos.view.view_compra_page import telaViewCompra
 from modulos.view.view_fornecedor_page import telaViewFornecedor
 from modulos.view.view_produto_page import telaViewProduto
 
+from modulos.cadastros.pages.edicao.editar_aluno_page import telaEdicaoAluno
+from modulos.cadastros.pages.edicao.editar_professor_page import telaEdicaoProfessor
+from modulos.cadastros.pages.edicao.editar_almoxarife_page import telaEdicaoAlmoxarife
+from modulos.cadastros.pages.edicao.editar_financeiro_page import telaEdicaoFinanceiro
+
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
 
@@ -92,6 +97,12 @@ view_matricula_page = st.Page(telaViewMatricula, title="Matrículas", icon=":mat
 view_compra_page = st.Page(telaViewCompra, title="Compra", icon=":material/receipt_long:", url_path="view_compra")
 view_fornecedor_page = st.Page(telaViewFornecedor, title="Fornecedor", icon=":material/storefront:", url_path="view_fornecedor")
 view_produto_page = st.Page(telaViewProduto, title="Produto", icon=":material/category:", url_path="view_produto")
+
+# Edições (Pessoas)
+editar_aluno_page = st.Page(telaEdicaoAluno, title="Aluno", icon=":material/edit:", url_path="editar_aluno")
+editar_professor_page = st.Page(telaEdicaoProfessor, title="Professor", icon=":material/edit:", url_path="editar_professor")
+editar_almoxarife_page = st.Page(telaEdicaoAlmoxarife, title="Almoxarife", icon=":material/edit:", url_path="editar_almoxarife")
+editar_financeiro_page = st.Page(telaEdicaoFinanceiro, title="Financeiro", icon=":material/edit:", url_path="editar_financeiro")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -161,7 +172,6 @@ def get_navigation():
             listagem_produto_page
         ]
         
-    if "ADMIN" in roles:
         pages["Visualizações"] = [view_aluno_page,
             view_professor_page,
             view_financeiro_page,
@@ -175,6 +185,13 @@ def get_navigation():
             view_compra_page,
             view_fornecedor_page,
             view_produto_page
+        ]
+        
+        pages["Edições (Oculto)"] = [
+            editar_aluno_page,
+            editar_professor_page,
+            editar_almoxarife_page,
+            editar_financeiro_page
         ]
 
     # Reitor tem acesso executivo (C-Level)

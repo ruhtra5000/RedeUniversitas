@@ -562,20 +562,27 @@ def listarPessoaGoogleId(googleId: str):
     
     return pessoa
 
-def editarPessoa(idPessoa: int, email: str, telefone: str = None):
+def editarPessoa(idPessoa: int, nome: str, email: str, telefone: str = None):
+    if not nome or not nome.strip():
+        raise Exception("O nome não pode estar vazio.")
+
     if not validarEmail(email):
         raise Exception("O E-mail disponibilizado não é válido.")
             
-    if dbExisteEmail(email):
-        raise Exception("Já existe um aluno cadastrado com este e-mail.")
+    # Remove a checagem de existeEmail se o e-mail não mudou (ou melhor, verificar se o e-mail pertence a outra pessoa, mas dbEditarPessoa cuidará disso se formos cuidadosos. Na verdade, como a função original simplesmente chamava dbExisteEmail, ela impedia o próprio usuário de manter o email atual se estivesse salvando sem alterar o email. Vou arrumar essa lógica: precisamos garantir que o email não pertence a OUTRA pessoa. A forma mais fácil no momento, mantendo a regra existente, é verificar se mudou, mas vou apenas deixar como era para manter compatibilidade: )
+    # Na verdade, a regra original era: `if dbExisteEmail(email): raise ...`. Se eu não alterar, o usuário não consegue salvar com o mesmo email.
+    pessoa_atual = listarPessoaId(idPessoa)
+    if pessoa_atual.email != email and dbExisteEmail(email):
+        raise Exception("Já existe uma pessoa cadastrada com este e-mail.")
                 
     if telefone is not None and telefone != "":
         if not validarTelefone(telefone):
             raise Exception("O telefone disponibilizado não é válido.")
 
     novaPessoa = Pessoa(
-        email=email, 
-        telefone=telefone
+        nome=nome.strip(),
+        email=email.strip(), 
+        telefone=telefone.strip() if telefone else None
     )
 
     dbEditarPessoa(idPessoa, novaPessoa)

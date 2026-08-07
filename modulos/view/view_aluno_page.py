@@ -100,21 +100,33 @@ def telaViewAluno():
 
     st.write("")
 
-    titulo, botao = st.columns(
-        [4.7, 1.3],
+    titulo, botao_limpar, botao_editar = st.columns(
+        [4.2, 0.9, 0.9],
         vertical_alignment="center",
     )
 
     with titulo:
         st.subheader(f"🎓 {aluno.pessoa.nome}")
 
-    with botao:
+    with botao_limpar:
         st.button(
             "Limpar",
             icon=":material/close:",
             use_container_width=True,
             on_click=limpar_consulta_aluno,
         )
+
+    with botao_editar:
+        if "ADMIN" in st.session_state.roles:
+            if st.button(
+                "Editar",
+                icon=":material/edit:",
+                use_container_width=True,
+                type="secondary"
+            ):
+                st.session_state["edicao_aluno_id"] = aluno.pessoa_id
+                from modulos.rotas import editar_aluno_page
+                st.switch_page(editar_aluno_page)
 
     with st.container(border=True):
 
