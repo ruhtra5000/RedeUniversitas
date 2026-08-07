@@ -96,6 +96,7 @@ view_produto_page = st.Page(telaViewProduto, title="Produto", icon=":material/ca
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
 from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
+from modulos.academico.pages.renovar_matricula_page import telaRenovarMatricula
 
 from modulos.financeiro.pages.gestao_financeira_page import telaGestaoFinanceira
 
@@ -110,6 +111,7 @@ gestao_bolsas = st.Page(telaGestaoBolsas, title="Gestão de Bolsas", icon=":mate
 # Portal do Aluno
 meu_boletim = st.Page(telaBoletim, title="Meu Boletim", icon=":material/school:", url_path="meu_boletim")
 meu_financeiro = st.Page(telaFinanceiroAluno, title="Meu Financeiro", icon=":material/payments:", url_path="meu_financeiro")
+renovar_matricula = st.Page(telaRenovarMatricula, title="Renovar Matrícula", icon=":material/school:", url_path="renovar_matricula")
 
 def get_navigation():
     roles = st.session_state.get("roles", [])
@@ -123,7 +125,7 @@ def get_navigation():
 
     # Aluno
     if "ALUNO" in roles:
-        pages["Portal do Aluno"] = [meu_boletim, meu_financeiro]
+        pages["Portal do Aluno"] = [meu_boletim, meu_financeiro, renovar_matricula]
 
     # Professor
     if "PROFESSOR" in roles:
