@@ -47,6 +47,7 @@ from modulos.cadastros.pages.edicao.editar_aluno_page import telaEdicaoAluno
 from modulos.cadastros.pages.edicao.editar_professor_page import telaEdicaoProfessor
 from modulos.cadastros.pages.edicao.editar_almoxarife_page import telaEdicaoAlmoxarife
 from modulos.cadastros.pages.edicao.editar_financeiro_page import telaEdicaoFinanceiro
+from modulos.cadastros.pages.edicao.editar_campus_page import telaEdicaoCampus
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -103,6 +104,9 @@ editar_aluno_page = st.Page(telaEdicaoAluno, title="Aluno", icon=":material/edit
 editar_professor_page = st.Page(telaEdicaoProfessor, title="Professor", icon=":material/edit:", url_path="editar_professor")
 editar_almoxarife_page = st.Page(telaEdicaoAlmoxarife, title="Almoxarife", icon=":material/edit:", url_path="editar_almoxarife")
 editar_financeiro_page = st.Page(telaEdicaoFinanceiro, title="Financeiro", icon=":material/edit:", url_path="editar_financeiro")
+
+# Edições (Outros)
+editar_campus_page = st.Page(telaEdicaoCampus, title="Campus", icon=":material/edit:", url_path="editar_campus")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
@@ -191,7 +195,8 @@ def get_navigation():
             editar_aluno_page,
             editar_professor_page,
             editar_almoxarife_page,
-            editar_financeiro_page
+            editar_financeiro_page,
+            editar_campus_page
         ]
 
     # Reitor tem acesso executivo (C-Level)
