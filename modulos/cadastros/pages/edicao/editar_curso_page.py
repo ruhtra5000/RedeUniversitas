@@ -58,6 +58,15 @@ def telaEdicaoCurso():
 
             st.subheader("Configurações Acadêmicas")
             with st.container(horizontal=True):
+                mensalidade_base = st.number_input(
+                    "Mensalidade Base (R$) *",
+                    min_value=0.0,
+                    value=float(curso.mensalidade_base),
+                    step=100.0,
+                    key=f"edit_curso_mensalidade_{st.session_state.form_key_edit_curso}"
+                )
+                
+            with st.container(horizontal=True):
                 carga_horaria = st.number_input(
                     "Carga Horária Total (h) *",
                     min_value=1,
@@ -109,6 +118,7 @@ def telaEdicaoCurso():
                     idCurso=curso.id,
                     nome=nome.strip(),
                     modalidade=mod_enum,
+                    mensalidade_base=mensalidade_base,
                     carga_horaria=carga_horaria,
                     dur_min_semestre=duracao_min,
                     dur_max_semestre=duracao_max

@@ -85,7 +85,7 @@ def listarCursoId(idCurso: int):
     
     return curso
     
-def editarCurso(idCurso: int, nome: str, modalidade: ModalidadeCurso, carga_horaria: int,
+def editarCurso(idCurso: int, nome: str, modalidade: ModalidadeCurso, mensalidade_base: float, carga_horaria: int,
                 dur_min_semestre: int, dur_max_semestre: int):
     
     if nome == "" or nome == None:
@@ -93,6 +93,9 @@ def editarCurso(idCurso: int, nome: str, modalidade: ModalidadeCurso, carga_hora
     
     if carga_horaria <= 0:
         raise Exception("O valor da carga horária deve ser maior que 0.")
+        
+    if mensalidade_base < 0:
+        raise Exception("O valor da mensalidade base não pode ser negativo.")
     
     if dur_min_semestre > dur_max_semestre:
         raise Exception("A duração mínima de semestres não pode ser maior do que a duração máxima.")
@@ -100,6 +103,7 @@ def editarCurso(idCurso: int, nome: str, modalidade: ModalidadeCurso, carga_hora
     curso = Curso(
         nome=nome,
         modalidade=modalidade,
+        mensalidade_base=mensalidade_base,
         carga_horaria=carga_horaria,
         dur_min_semestre=dur_min_semestre,
         dur_max_semestre=dur_max_semestre
