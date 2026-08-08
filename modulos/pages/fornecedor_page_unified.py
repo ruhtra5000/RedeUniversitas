@@ -5,7 +5,7 @@ from modulos.view.view_fornecedor_page import telaViewFornecedor
 
 def tela_fornecedor_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_fornecedor_id")
+    consulta_id = st.session_state.get("consulta_fornecedor_id") or st.session_state.get("fornecedor_id")
     
     if consulta_id:
         telaViewFornecedor()

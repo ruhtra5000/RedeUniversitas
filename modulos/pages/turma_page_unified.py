@@ -5,7 +5,7 @@ from modulos.view.view_turma_page import telaViewTurma
 
 def tela_turma_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_turma_id")
+    consulta_id = st.session_state.get("consulta_turma_id") or st.session_state.get("turma_id")
     
     if consulta_id:
         telaViewTurma()

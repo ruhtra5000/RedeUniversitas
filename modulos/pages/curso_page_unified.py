@@ -5,7 +5,7 @@ from modulos.view.view_curso_page import telaViewCurso
 
 def tela_curso_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_curso_id")
+    consulta_id = st.session_state.get("consulta_curso_id") or st.session_state.get("curso_id")
     
     if consulta_id:
         telaViewCurso()

@@ -5,7 +5,7 @@ from modulos.view.view_professor_page import telaViewProfessor
 
 def tela_professor_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_professor_id")
+    consulta_id = st.session_state.get("consulta_professor_id") or st.session_state.get("professor_id")
     
     if consulta_id:
         telaViewProfessor()

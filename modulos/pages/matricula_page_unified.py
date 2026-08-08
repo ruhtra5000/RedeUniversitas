@@ -5,7 +5,7 @@ from modulos.view.view_matricula_page import telaViewMatricula
 
 def tela_matricula_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_matricula_id")
+    consulta_id = st.session_state.get("consulta_matricula_id") or st.session_state.get("matricula_id")
     
     if consulta_id:
         telaViewMatricula()

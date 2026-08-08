@@ -5,7 +5,7 @@ from modulos.view.view_produto_page import telaViewProduto
 
 def tela_estoque_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_produto_id")
+    consulta_id = st.session_state.get("consulta_produto_id") or st.session_state.get("produto_id")
     
     if consulta_id:
         telaViewProduto()

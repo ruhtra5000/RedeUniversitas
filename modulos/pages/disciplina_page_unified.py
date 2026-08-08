@@ -5,7 +5,7 @@ from modulos.view.view_disciplina_page import telaViewDisciplina
 
 def tela_disciplina_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_disciplina_id")
+    consulta_id = st.session_state.get("consulta_disciplina_id") or st.session_state.get("disciplina_id")
     
     if consulta_id:
         telaViewDisciplina()

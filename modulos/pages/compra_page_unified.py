@@ -5,7 +5,7 @@ from modulos.view.view_compra_page import telaViewCompra
 
 def tela_compra_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_compra_id")
+    consulta_id = st.session_state.get("consulta_compra_id") or st.session_state.get("compra_id")
     
     if consulta_id:
         telaViewCompra()

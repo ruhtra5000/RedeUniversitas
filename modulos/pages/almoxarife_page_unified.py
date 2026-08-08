@@ -5,7 +5,7 @@ from modulos.view.view_almoxarife_page import telaViewAlmoxarife
 
 def tela_almoxarife_unificada():
     # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_almoxarife_id")
+    consulta_id = st.session_state.get("consulta_almoxarife_id") or st.session_state.get("almoxarife_id")
     
     if consulta_id:
         telaViewAlmoxarife()
