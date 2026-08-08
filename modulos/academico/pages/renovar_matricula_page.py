@@ -64,8 +64,9 @@ def telaRenovarMatricula():
     st.write("---")
 
     # Input disabled do Aluno
-    st.text_input("Aluno", value=aluno.pessoa.nome, disabled=True)
-    st.text_input("Curso", value=aluno.curso.nome, disabled=True)
+    with st.container(horizontal=True):
+        st.text_input("Aluno", value=aluno.pessoa.nome, disabled=True)
+        st.text_input("Curso", value=aluno.curso.nome, disabled=True)
     
     # 1 e 2. Listar e filtrar turmas válidas diretamente via backend
     turmas_validas = listarTurmasDisponiveisAluno(pessoa_id)
