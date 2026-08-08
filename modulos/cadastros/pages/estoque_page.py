@@ -9,11 +9,6 @@ def telaCadastroEstoque():
     if "form_key_estoque" not in st.session_state:
         st.session_state.form_key_estoque = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
 
     st.title(":material/inventory_2: Cadastro de Produto")
     st.caption("Preencha as informações abaixo para cadastrar um novo produto no estoque do campus.")

@@ -15,12 +15,6 @@ def telaCadastroProfessor():
     if "form_key_prof" not in st.session_state:
         st.session_state.form_key_prof = 0
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
 
     st.title(":material/person_add: Cadastro de Professor")
     st.caption("Preencha as informações abaixo para cadastrar um novo professor.")

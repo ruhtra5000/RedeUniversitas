@@ -8,12 +8,6 @@ def telaListagemProfessores():
     st.title(":material/assignment: Listagem de Professores")
     st.caption("Consulte os professores cadastrados no sistema.")
 
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button(":material/arrow_back: Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
 
     listaProfessores = listarProfessores()
 

@@ -10,12 +10,6 @@ def telaListagemCampus():
     st.title(":material/assignment: Listagem de Campus")
     st.caption("Consulte os campus cadastrados no sistema.")
 
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button(":material/arrow_back: Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
 
     listaCampus = listarCampus()
 

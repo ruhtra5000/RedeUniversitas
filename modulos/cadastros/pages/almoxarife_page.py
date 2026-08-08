@@ -11,11 +11,6 @@ def telaCadastroAlmoxarife():
     if "form_key_alm" not in st.session_state:
         st.session_state.form_key_alm = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
 
     st.title(":material/person_add: Cadastro de Almoxarife")
     st.caption("Preencha as informações abaixo para cadastrar um novo almoxarife no sistema.")

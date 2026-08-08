@@ -15,12 +15,6 @@ def telaCadastroTurma():
     if "form_key_turma" not in st.session_state:
         st.session_state.form_key_turma = 0
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page  # evita import circular
-            st.switch_page(cadastros_page)
 
     st.title(":material/group_add: Cadastro de Turma")
     st.caption(

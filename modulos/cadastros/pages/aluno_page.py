@@ -17,12 +17,6 @@ def telaCadastroAluno():
     if "form_key_aluno" not in st.session_state:
         st.session_state.form_key_aluno = 0
 
-    col1, _ = st.columns([1, 6])
-
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
 
     st.title(":material/person_add: Cadastro de Aluno")
     st.caption("Preencha as informações abaixo para cadastrar um novo aluno.")

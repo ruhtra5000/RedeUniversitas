@@ -14,11 +14,6 @@ def telaCadastroCompra():
     if "form_key_compra" not in st.session_state:
         st.session_state.form_key_compra = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
 
     st.title(":material/add_shopping_cart: Registro de Compra")
     st.caption("Preencha as informações abaixo para registrar uma compra de produtos.")
