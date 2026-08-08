@@ -94,10 +94,23 @@ else:
     # fica gerando mensagem de login toda hora 
     # (acho que dá pra juntar na parte de logica de paginas)
 
-# Renderização do Perfil na Sidebar
+# Configuração das Rotas (ocultando a sidebar nativa)
+nav_dict = get_navigation()
+pg = st.navigation(nav_dict, position="hidden")
+
+# Renderização do Perfil e Menu na Sidebar
 with st.sidebar:
     renderizar_perfil_usuario()
+    
+    st.divider()
+    
+    # Renderiza manualmente as seções, pulando "Edições (Oculto)"
+    for section, pages in nav_dict.items():
+        if section != "Edições (Oculto)":
+            st.markdown(f"**{section}**")
+            for page in pages:
+                st.page_link(page, label=page.title, icon=page.icon)
+            st.write("") # Espaço extra entre seções
 
-# Configuração e Execução das Rotas
-pg = st.navigation(get_navigation())
+# Execução da página atual
 pg.run()
