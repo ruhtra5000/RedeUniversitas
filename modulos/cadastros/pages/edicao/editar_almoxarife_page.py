@@ -2,7 +2,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
 import re
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
-from modulos.academico.academico_service import listarAlmoxarifeId, editarPessoa
+from modulos.academico.academico_service import editarPessoa
+from modulos.estoque.estoque_service import listarAlmoxarifeId
 
 def telaEdicaoAlmoxarife():
     if "ADMIN" not in st.session_state.roles:
