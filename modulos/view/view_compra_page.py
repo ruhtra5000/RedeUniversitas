@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_data, formatar_moeda,
 # Tela de visualização de compra
 def telaViewCompra():
 
-    st.title("🔎 Consulta de Compra")
+    st.title(":material/search: Consulta de Compra")
     st.caption("Pesquise uma compra pelo ID.")
 
     selecionada = st.session_state.pop("compra_selecionada", None)
@@ -23,14 +23,14 @@ def telaViewCompra():
 
     with col_voltar:
         if st.button(
-            "⬅ Voltar",
+            ":material/arrow_back: Voltar",
             use_container_width=True,
         ):
             pass
 
     with st.form("buscar_compra", border=True):
 
-        st.markdown("#### 🔍 Buscar compra")
+        st.markdown("#### :material/search: Buscar compra")
 
         id_digitado = st.text_input(
             "ID",
@@ -42,7 +42,7 @@ def telaViewCompra():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -119,7 +119,7 @@ def telaViewCompra():
 
     with titulo:
         st.subheader(
-            f"🛒 Compra de {obter_nome_produto(compra)}"
+            f":material/shopping_cart: Compra de {obter_nome_produto(compra)}"
         )
 
     with botao:
@@ -132,7 +132,7 @@ def telaViewCompra():
 
     with st.container(border=True):
 
-        st.markdown("#### 🛒 Dados da Compra")
+        st.markdown("#### :material/shopping_cart: Dados da Compra")
 
         col1, col2, col3 = st.columns(
             [1, 3, 2]
@@ -167,7 +167,7 @@ def telaViewCompra():
 
     with st.container(border=True):
 
-        st.markdown("#### 💰 Valores")
+        st.markdown("#### :material/payments: Valores")
 
         col1, col2, col3 = st.columns(3)
 
@@ -198,7 +198,7 @@ def telaViewCompra():
 
     with st.container(border=True):
 
-        st.markdown("#### 📅 Compra e Recebimento")
+        st.markdown("#### :material/calendar_month: Compra e Recebimento")
 
         col1, col2, col3 = st.columns(3)
 

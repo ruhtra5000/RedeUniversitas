@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import formatar_modalidade, separador
 # Tela de listagem para Cursos
 def telaListagemCursos():
 
-    st.title("📋 Listagem de Cursos")
+    st.title(":material/assignment: Listagem de Cursos")
     st.caption("Consulte os cursos cadastrados no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaCursos = listarCursos()
 
     if not listaCursos:
-        st.info("📚 Nenhum curso cadastrado.")
+        st.info(":material/local_library: Nenhum curso cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"📚 {len(listaCursos)} "
+        f":material/local_library: {len(listaCursos)} "
         f"{'curso encontrado' if len(listaCursos) == 1 else 'cursos encontrados'}"
     )
 
@@ -68,7 +68,7 @@ def telaListagemCursos():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_curso_{curso.id}",
                     help="Visualizar curso",
                     use_container_width=True,

@@ -10,7 +10,7 @@ from modulos.sidebar import renderizar_perfil_usuario
 
 st.set_page_config(
     page_title="RedeUniversitas",
-    page_icon="🎓",
+    page_icon=":material/school:",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
@@ -23,7 +23,7 @@ def telaLogin():
     st.markdown("<br><br>", unsafe_allow_html=True)
     with st.container():
         # TODO: colocar logo depois
-        st.title("🎓 RedeUniversitas", text_alignment="center")
+        st.title(":material/school: RedeUniversitas", text_alignment="center")
         st.divider()
 
         if st.button(
@@ -100,10 +100,6 @@ pg = st.navigation(nav_dict, position="hidden")
 
 # Renderização do Perfil e Menu na Sidebar
 with st.sidebar:
-    renderizar_perfil_usuario()
-    
-    st.divider()
-    
     # Renderiza manualmente as seções, pulando "Edições (Oculto)"
     for section, pages in nav_dict.items():
         if section != "Edições (Oculto)":
@@ -112,5 +108,8 @@ with st.sidebar:
                 st.page_link(page, label=page.title, icon=page.icon)
             st.write("") # Espaço extra entre seções
 
+    st.divider()
+
+    renderizar_perfil_usuario()
 # Execução da página atual
 pg.run()

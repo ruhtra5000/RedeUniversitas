@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import formatar_cpf, separador
 # Tela de listagem para Almoxarifes
 def telaListagemAlmoxarifes():
 
-    st.title("📋 Listagem de Almoxarifes")
+    st.title(":material/assignment: Listagem de Almoxarifes")
     st.caption("Consulte os almoxarifes cadastrados no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaAlmoxarifes = listarAlmoxarifes()
 
     if not listaAlmoxarifes:
-        st.info("📦 Nenhum almoxarife cadastrado.")
+        st.info(":material/inventory_2: Nenhum almoxarife cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"📦 {len(listaAlmoxarifes)} "
+        f":material/inventory_2: {len(listaAlmoxarifes)} "
         f"{'almoxarife encontrado' if len(listaAlmoxarifes) == 1 else 'almoxarifes encontrados'}"
     )
 
@@ -72,7 +72,7 @@ def telaListagemAlmoxarifes():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_almoxarife_{almoxarife.pessoa_id}",
                     help="Visualizar almoxarife",
                     use_container_width=True,

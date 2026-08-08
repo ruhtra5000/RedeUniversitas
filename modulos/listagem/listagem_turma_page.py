@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import separador
 # Tela de listagem para Turmas
 def telaListagemTurmas():
 
-    st.title("📋 Listagem de Turmas")
+    st.title(":material/assignment: Listagem de Turmas")
     st.caption("Consulte as turmas cadastradas no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaTurmas = listarTurmasGeral()
 
     if not listaTurmas:
-        st.info("🏫 Nenhuma turma cadastrada.")
+        st.info(":material/account_balance: Nenhuma turma cadastrada.")
         return
 
     st.write("")
 
     st.caption(
-        f"🏫 {len(listaTurmas)} "
+        f":material/account_balance: {len(listaTurmas)} "
         f"{'turma encontrada' if len(listaTurmas) == 1 else 'turmas encontradas'}"
     )
 
@@ -66,7 +66,7 @@ def telaListagemTurmas():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_turma_{turma.id}",
                     help="Visualizar turma",
                     use_container_width=True,

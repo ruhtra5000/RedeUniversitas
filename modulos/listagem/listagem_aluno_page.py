@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import separador
 # Tela de listagem para Alunos
 def telaListagemAlunos():
 
-    st.title("📋 Listagem de Alunos")
+    st.title(":material/assignment: Listagem de Alunos")
     st.caption("Consulte os alunos cadastrados no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaAlunos = listarAlunos()
 
     if not listaAlunos:
-        st.info("👥 Nenhum aluno cadastrado.")
+        st.info(":material/groups: Nenhum aluno cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"👥 {len(listaAlunos)} "
+        f":material/groups: {len(listaAlunos)} "
         f"{'aluno encontrado' if len(listaAlunos) == 1 else 'alunos encontrados'}"
     )
 
@@ -76,7 +76,7 @@ def telaListagemAlunos():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_aluno_{aluno.pessoa_id}",
                     help="Visualizar aluno",
                     use_container_width=True,

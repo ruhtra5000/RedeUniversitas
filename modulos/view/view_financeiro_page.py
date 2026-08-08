@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_cpf, limpar_consulta_
 # Tela de visualização de financeiro
 def telaViewFinanceiro():
 
-    st.title("🔎 Consulta do Financeiro")
+    st.title(":material/search: Consulta do Financeiro")
     st.caption("Pesquise um funcionário pelo CPF ou pelo ID.")
 
     if "financeiro_id" in st.session_state:
@@ -19,12 +19,12 @@ def telaViewFinanceiro():
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_financeiro", border=True):
 
-        st.markdown("#### 🔍 Buscar funcionário")
+        st.markdown("#### :material/search: Buscar funcionário")
 
         col1, col2 = st.columns(2)
 
@@ -46,7 +46,7 @@ def telaViewFinanceiro():
 
         with colunaBotao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -108,7 +108,7 @@ def telaViewFinanceiro():
     )
 
     with titulo:
-        st.subheader(f"💰 {financeiro.pessoa.nome}")
+        st.subheader(f":material/payments: {financeiro.pessoa.nome}")
 
     with botao_limpar:
         st.button(
@@ -132,7 +132,7 @@ def telaViewFinanceiro():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Dados Pessoais")
+        st.markdown("#### :material/person: Dados Pessoais")
 
         col1, col2, col3 = st.columns([1, 3, 2])
 
@@ -161,7 +161,7 @@ def telaViewFinanceiro():
     st.write("")
 
     with st.container(border=True):
-        st.markdown("#### 🏛️ Vínculo")
+        st.markdown("#### :material/account_balance: Vínculo")
 
         exibirCampo(
             "Campus",

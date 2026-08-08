@@ -6,7 +6,7 @@ from modulos.utils.view_utils import formatar_cpf, exibirCampo, limpar_consulta_
 # Tela de visualização de professor
 def telaViewProfessor():
 
-    st.title("🔎 Consulta de Professor")
+    st.title(":material/search: Consulta de Professor")
     st.caption("Pesquise um professor pelo CPF ou pelo ID.")
 
     if "professor_id" in st.session_state:
@@ -19,12 +19,12 @@ def telaViewProfessor():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_professor", border=True):
 
-        st.markdown("#### 🔍 Buscar professor")
+        st.markdown("#### :material/search: Buscar professor")
 
         col1, col2 = st.columns(2)
 
@@ -46,7 +46,7 @@ def telaViewProfessor():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -108,7 +108,7 @@ def telaViewProfessor():
     )
 
     with titulo:
-        st.subheader(f"👨‍🏫 {professor.pessoa.nome}")
+        st.subheader(f":material/person: {professor.pessoa.nome}")
 
     with botao_limpar:
         st.button(
@@ -132,7 +132,7 @@ def telaViewProfessor():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Dados Pessoais")
+        st.markdown("#### :material/person: Dados Pessoais")
 
         col1, col2 = st.columns([3.5, 2.5])
 
@@ -168,7 +168,7 @@ def telaViewProfessor():
 
     with st.container(border=True):
 
-        st.markdown("#### 🔗 Vínculo Institucional")
+        st.markdown("#### :material/link: Vínculo Institucional")
 
         col1, col2 = st.columns([1.2, 4.8])
 

@@ -5,7 +5,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_modalidade, formatar_
 # Tela de visualização de curso
 def telaViewCurso():
 
-    st.title("🔎 Consulta de Curso")
+    st.title(":material/search: Consulta de Curso")
     st.caption("Pesquise um curso pelo ID.")
 
     if "curso_id" in st.session_state:
@@ -16,13 +16,13 @@ def telaViewCurso():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import listagem_cursos_page
             st.switch_page(listagem_cursos_page)
 
     with st.form("buscar_curso", border=True):
 
-        st.markdown("#### 🔍 Buscar curso")
+        st.markdown("#### :material/search: Buscar curso")
 
         id_digitado = st.text_input(
             "ID do Curso",
@@ -34,7 +34,7 @@ def telaViewCurso():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -77,7 +77,7 @@ def telaViewCurso():
     )
 
     with titulo:
-        st.subheader(f"📚 {curso.nome}")
+        st.subheader(f":material/local_library: {curso.nome}")
 
     with botao_limpar:
         st.button(
@@ -101,7 +101,7 @@ def telaViewCurso():
 
     with st.container(border=True):
 
-        st.markdown("#### 📚 Dados Principais")
+        st.markdown("#### :material/local_library: Dados Principais")
 
         col1, col2, col3 = st.columns([1, 3.2, 1.8])
 
@@ -146,7 +146,7 @@ def telaViewCurso():
 
     with st.container(border=True):
 
-        st.markdown("#### 🔗 Vínculos Institucionais")
+        st.markdown("#### :material/link: Vínculos Institucionais")
 
         nome_coordenador = (
             curso.coordenador.pessoa.nome

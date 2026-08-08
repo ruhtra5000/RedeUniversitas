@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import formatar_cpf, separador
 # Tela de listagem para Financeiros
 def telaListagemFinanceiros():
 
-    st.title("📋 Listagem do Financeiro")
+    st.title(":material/assignment: Listagem do Financeiro")
     st.caption("Consulte os funcionários do financeiro.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaFinanceiros = listarFinanceiro()
 
     if not listaFinanceiros:
-        st.info("💰 Nenhum funcionário financeiro cadastrado.")
+        st.info(":material/payments: Nenhum funcionário financeiro cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"💰 {len(listaFinanceiros)} "
+        f":material/payments: {len(listaFinanceiros)} "
         f"{'funcionário encontrado' if len(listaFinanceiros) == 1 else 'funcionários encontrados'}"
     )
 
@@ -70,7 +70,7 @@ def telaListagemFinanceiros():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_financeiro_{financeiro.pessoa_id}",
                     help="Visualizar funcionário",
                     use_container_width=True,

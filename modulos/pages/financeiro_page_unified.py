@@ -10,7 +10,7 @@ def tela_financeiro_unificada():
     if consulta_id:
         telaViewFinanceiro()
     else:
-        aba_listagem, aba_cadastro = st.tabs(["📋 Listagem", "➕ Novo Cadastro"])
+        aba_listagem, aba_cadastro = st.tabs([":material/assignment: Listagem", ":material/add: Novo Cadastro"])
         
         with aba_listagem:
             telaListagemFinanceiros()

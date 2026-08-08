@@ -5,7 +5,7 @@ from modulos.utils.view_utils import formatar_percentual, formatar_data, formata
 # Tela de visualização de bolsa
 def telaViewBolsa():
 
-    st.title("🔎 Consulta de Bolsa")
+    st.title(":material/search: Consulta de Bolsa")
     st.caption("Pesquise uma bolsa pelo ID.")
 
     if "bolsa_id" in st.session_state:
@@ -18,12 +18,12 @@ def telaViewBolsa():
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_bolsa", border=True):
 
-        st.markdown("#### 🔍 Buscar bolsa")
+        st.markdown("#### :material/search: Buscar bolsa")
 
         idDigitado = st.text_input(
             "ID da bolsa",
@@ -35,7 +35,7 @@ def telaViewBolsa():
 
         with colunaBotao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -78,7 +78,7 @@ def telaViewBolsa():
     )
 
     with titulo:
-        st.subheader(f"🎓 Bolsa #{bolsa.id}")
+        st.subheader(f":material/school: Bolsa #{bolsa.id}")
 
     with botao:
         st.button(
@@ -90,7 +90,7 @@ def telaViewBolsa():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Aluno")
+        st.markdown("#### :material/person: Aluno")
 
         col1, col2, col3 = st.columns([1, 3, 2])
 
@@ -107,7 +107,7 @@ def telaViewBolsa():
 
     with st.container(border=True):
 
-        st.markdown("#### 🎓 Dados da Bolsa")
+        st.markdown("#### :material/school: Dados da Bolsa")
 
         col1, col2, col3 = st.columns(3)
 

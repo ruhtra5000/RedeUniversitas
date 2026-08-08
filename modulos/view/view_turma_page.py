@@ -5,7 +5,7 @@ from modulos.utils.view_utils import exibirCampo, limpar_consulta_turma
 # Tela de visualização de turma
 def telaViewTurma():
 
-    st.title("🔎 Consulta de Turma")
+    st.title(":material/search: Consulta de Turma")
     st.caption("Pesquise uma turma pelo código ou pelo ID.")
     if "turma_id" in st.session_state:
         st.session_state["consulta_turma_id"] = (
@@ -17,12 +17,12 @@ def telaViewTurma():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_turma", border=True):
 
-        st.markdown("#### 🔍 Buscar turma")
+        st.markdown("#### :material/search: Buscar turma")
 
         col1, col2 = st.columns(2)
 
@@ -44,7 +44,7 @@ def telaViewTurma():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -105,7 +105,7 @@ def telaViewTurma():
 
     with titulo:
         titulo_turma = turma.codigo or f"Turma {turma.id}"
-        st.subheader(f"🏫 {titulo_turma}")
+        st.subheader(f":material/account_balance: {titulo_turma}")
 
     with botao_limpar:
         st.button(
@@ -129,7 +129,7 @@ def telaViewTurma():
 
     with st.container(border=True):
 
-        st.markdown("#### 🏫 Dados da Turma")
+        st.markdown("#### :material/account_balance: Dados da Turma")
 
         col1, col2, col3 = st.columns([1, 2.5, 2.5])
 
@@ -155,7 +155,7 @@ def telaViewTurma():
 
     with st.container(border=True):
 
-        st.markdown("#### 🔗 Vínculos Acadêmicos")
+        st.markdown("#### :material/link: Vínculos Acadêmicos")
 
         col1, col2 = st.columns(2)
 

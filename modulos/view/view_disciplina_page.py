@@ -5,7 +5,7 @@ from modulos.utils.view_utils import exibirCampo, limpar_consulta_disciplina
 # Tela de visualização de disciplina
 def telaViewDisciplina():
 
-    st.title("🔎 Consulta de Disciplina")
+    st.title(":material/search: Consulta de Disciplina")
     st.caption("Pesquise uma disciplina pelo código ou pelo ID.")
 
     if "disciplina_id" in st.session_state:
@@ -18,12 +18,12 @@ def telaViewDisciplina():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_disciplina", border=True):
 
-        st.markdown("#### 🔍 Buscar disciplina")
+        st.markdown("#### :material/search: Buscar disciplina")
 
         col1, col2 = st.columns(2)
 
@@ -45,7 +45,7 @@ def telaViewDisciplina():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -104,7 +104,7 @@ def telaViewDisciplina():
     )
 
     with titulo:
-        st.subheader(f"📘 {disciplina.nome}")
+        st.subheader(f":material/menu_book: {disciplina.nome}")
 
     with botao_limpar:
         st.button(
@@ -128,7 +128,7 @@ def telaViewDisciplina():
 
     with st.container(border=True):
 
-        st.markdown("#### 📚 Dados da Disciplina")
+        st.markdown("#### :material/local_library: Dados da Disciplina")
 
         col1, col2, col3 = st.columns([1, 1.8, 3.2])
 
@@ -176,7 +176,7 @@ def telaViewDisciplina():
 
     with st.container(border=True):
 
-        st.markdown("#### 🔗 Pré-requisitos")
+        st.markdown("#### :material/link: Pré-requisitos")
 
         if not pre_requisitos:
             st.info("Esta disciplina não possui pré-requisitos.")

@@ -7,26 +7,26 @@ from modulos.utils.view_utils import exibirCampo
 # Tela de listagem para Campus
 def telaListagemCampus():
 
-    st.title("📋 Listagem de Campus")
+    st.title(":material/assignment: Listagem de Campus")
     st.caption("Consulte os campus cadastrados no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaCampus = listarCampus()
 
     if not listaCampus:
-        st.info("🏛️ Nenhum campus cadastrado.")
+        st.info(":material/account_balance: Nenhum campus cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"🏛️ {len(listaCampus)} "
+        f":material/account_balance: {len(listaCampus)} "
         f"{'campus encontrado' if len(listaCampus) == 1 else 'campus encontrados'}"
     )
 
@@ -68,7 +68,7 @@ def telaListagemCampus():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_campus_{campus.id}",
                     help="Visualizar campus",
                     use_container_width=True,

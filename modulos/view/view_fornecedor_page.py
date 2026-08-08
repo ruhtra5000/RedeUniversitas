@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_cnpj, limpar_consulta
 # Tela de visualização de fornecedor
 def telaViewFornecedor():
 
-    st.title("🔎 Consulta de Fornecedor")
+    st.title(":material/search: Consulta de Fornecedor")
     st.caption("Pesquise um fornecedor pelo ID.")
 
     selecionado = st.session_state.pop("fornecedor_selecionado", None)
@@ -23,14 +23,14 @@ def telaViewFornecedor():
 
     with col_voltar:
         if st.button(
-            "⬅ Voltar",
+            ":material/arrow_back: Voltar",
             use_container_width=True,
         ):
             pass
 
     with st.form("buscar_fornecedor", border=True):
 
-        st.markdown("#### 🔍 Buscar fornecedor")
+        st.markdown("#### :material/search: Buscar fornecedor")
 
         id_digitado = st.text_input(
             "ID",
@@ -42,7 +42,7 @@ def telaViewFornecedor():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -118,7 +118,7 @@ def telaViewFornecedor():
     )
 
     with titulo:
-        st.subheader(f"🏭 {fornecedor.nome}")
+        st.subheader(f":material/factory: {fornecedor.nome}")
 
     with botao_limpar:
         st.button(
@@ -142,7 +142,7 @@ def telaViewFornecedor():
 
     with st.container(border=True):
 
-        st.markdown("#### 🏭 Dados do Fornecedor")
+        st.markdown("#### :material/factory: Dados do Fornecedor")
 
         col1, col2, col3 = st.columns(
             [1, 3, 2]
@@ -175,7 +175,7 @@ def telaViewFornecedor():
 
     with st.container(border=True):
 
-        st.markdown("#### 📞 Informações de Contato")
+        st.markdown("#### :material/call: Informações de Contato")
 
         col1, col2 = st.columns(2)
 

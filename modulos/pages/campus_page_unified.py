@@ -10,7 +10,7 @@ def tela_campus_unificada():
     if consulta_id:
         telaViewCampus()
     else:
-        aba_listagem, aba_cadastro = st.tabs(["📋 Listagem", "➕ Novo Cadastro"])
+        aba_listagem, aba_cadastro = st.tabs([":material/assignment: Listagem", ":material/add: Novo Cadastro"])
         
         with aba_listagem:
             telaListagemCampus()

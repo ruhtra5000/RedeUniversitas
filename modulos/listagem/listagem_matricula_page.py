@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import separador, formatar_aprovacao
 # Tela de listagem de matrículas
 def telaListagemMatriculas():
 
-    st.title("📋 Listagem de Matrículas")
+    st.title(":material/assignment: Listagem de Matrículas")
     st.caption("Consulte as matrículas acadêmicas.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaMatriculas = listarMatriculasGeral()
 
     if not listaMatriculas:
-        st.info("📝 Nenhuma matrícula cadastrada.")
+        st.info(":material/edit_document: Nenhuma matrícula cadastrada.")
         return
 
     st.write("")
 
     st.caption(
-        f"📝 {len(listaMatriculas)} "
+        f":material/edit_document: {len(listaMatriculas)} "
         f"{'matrícula encontrada' if len(listaMatriculas) == 1 else 'matrículas encontradas'}"
     )
 
@@ -73,7 +73,7 @@ def telaListagemMatriculas():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=(
                         f"view_matricula_"
                         f"{matricula.aluno_id}_"

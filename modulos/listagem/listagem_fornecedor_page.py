@@ -6,7 +6,7 @@ from modulos.utils.listagem_utils import separador, formatar_cnpj
 # Tela de listagem para Fornecedores
 def telaListagemFornecedores():
 
-    st.title("📋 Listagem de Fornecedores")
+    st.title(":material/assignment: Listagem de Fornecedores")
     st.caption(
         "Consulte os fornecedores cadastrados no sistema."
     )
@@ -14,20 +14,20 @@ def telaListagemFornecedores():
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaFornecedores = listarFornecedores()
 
     if not listaFornecedores:
-        st.info("🏭 Nenhum fornecedor cadastrado.")
+        st.info(":material/factory: Nenhum fornecedor cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"🏭 {len(listaFornecedores)} "
+        f":material/factory: {len(listaFornecedores)} "
         f"{'fornecedor encontrado' if len(listaFornecedores) == 1 else 'fornecedores encontrados'}"
     )
 
@@ -73,7 +73,7 @@ def telaListagemFornecedores():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_fornecedor_{fornecedor.id}",
                     help="Visualizar fornecedor",
                     use_container_width=True,

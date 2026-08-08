@@ -6,7 +6,7 @@ from modulos.utils.view_utils import formatar_cnpj, exibirCampo, limpar_consulta
 # Tela de visualização de campus
 def telaViewCampus():
 
-    st.title("🔎 Consulta de Campus")
+    st.title(":material/search: Consulta de Campus")
     st.caption("Pesquise um campus pelo CNPJ ou pelo ID.")
 
     if "campus_id" in st.session_state:
@@ -19,12 +19,12 @@ def telaViewCampus():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_campus", border=True):
 
-        st.markdown("#### 🔍 Buscar campus")
+        st.markdown("#### :material/search: Buscar campus")
 
         col1, col2 = st.columns(2)
 
@@ -46,7 +46,7 @@ def telaViewCampus():
 
         with colunaBotao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -113,7 +113,7 @@ def telaViewCampus():
     )
 
     with titulo:
-        st.subheader(f"🏛️ {campus.nome}")
+        st.subheader(f":material/account_balance: {campus.nome}")
 
     with botao_limpar:
         st.button(
@@ -137,7 +137,7 @@ def telaViewCampus():
 
     with st.container(border=True):
 
-        st.markdown("#### 🏛️ Dados do Campus")
+        st.markdown("#### :material/account_balance: Dados do Campus")
 
         col1, col2, col3 = st.columns([1, 3, 2])
 

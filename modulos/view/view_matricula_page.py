@@ -5,7 +5,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_aprovacao, limpar_con
 # Tela de visualização de matrícula
 def telaViewMatricula():
 
-    st.title("🔎 Consulta de Matrícula")
+    st.title(":material/search: Consulta de Matrícula")
     st.caption(
         "Pesquise utilizando os IDs do aluno e da turma."
     )
@@ -23,12 +23,12 @@ def telaViewMatricula():
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_matricula", border=True):
 
-        st.markdown("#### 🔍 Buscar matrícula")
+        st.markdown("#### :material/search: Buscar matrícula")
 
         col1, col2 = st.columns(2)
 
@@ -50,7 +50,7 @@ def telaViewMatricula():
 
         with colunaBotao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -109,7 +109,7 @@ def telaViewMatricula():
 
     with titulo:
         st.subheader(
-            f"📝 Matrícula de {matricula.aluno.pessoa.nome}"
+            f":material/edit_document: Matrícula de {matricula.aluno.pessoa.nome}"
         )
 
     with botao:
@@ -122,7 +122,7 @@ def telaViewMatricula():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Dados do Aluno")
+        st.markdown("#### :material/person: Dados do Aluno")
 
         col1, col2, col3 = st.columns([1, 3, 2])
 
@@ -145,7 +145,7 @@ def telaViewMatricula():
 
     with st.container(border=True):
 
-        st.markdown("#### 📚 Vínculo Acadêmico")
+        st.markdown("#### :material/local_library: Vínculo Acadêmico")
 
         col1, col2, col3 = st.columns(3)
 

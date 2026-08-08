@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_situacao_estoque, lim
 # Tela de visualização de produto
 def telaViewProduto():
 
-    st.title("🔎 Consulta de Produto")
+    st.title(":material/search: Consulta de Produto")
     st.caption("Pesquise um produto pelo ID.")
 
     selecionado = st.session_state.pop("produto_selecionado", None)
@@ -23,7 +23,7 @@ def telaViewProduto():
 
     with col_voltar:
         if st.button(
-            "⬅ Voltar",
+            ":material/arrow_back: Voltar",
             use_container_width=True,
         ):
             from modulos.rotas import listagem_produto_page
@@ -31,7 +31,7 @@ def telaViewProduto():
 
     with st.form("buscar_produto", border=True):
 
-        st.markdown("#### 🔍 Buscar produto")
+        st.markdown("#### :material/search: Buscar produto")
 
         id_digitado = st.text_input(
             "ID",
@@ -43,7 +43,7 @@ def telaViewProduto():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -118,7 +118,7 @@ def telaViewProduto():
     )
 
     with titulo:
-        st.subheader(f"📦 {produto.nome}")
+        st.subheader(f":material/inventory_2: {produto.nome}")
 
     with botao:
         st.button(
@@ -130,7 +130,7 @@ def telaViewProduto():
 
     with st.container(border=True):
 
-        st.markdown("#### 📦 Dados do Produto")
+        st.markdown("#### :material/inventory_2: Dados do Produto")
 
         col1, col2, col3 = st.columns(
             [1, 3, 2]
@@ -163,7 +163,7 @@ def telaViewProduto():
 
     with st.container(border=True):
 
-        st.markdown("#### 🏫 Controle de Estoque")
+        st.markdown("#### :material/account_balance: Controle de Estoque")
 
         col1, col2, col3 = st.columns(3)
 

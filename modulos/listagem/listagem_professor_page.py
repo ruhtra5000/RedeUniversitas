@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import formatar_cpf, separador
 # Tela de listagem para Professores
 def telaListagemProfessores():
 
-    st.title("📋 Listagem de Professores")
+    st.title(":material/assignment: Listagem de Professores")
     st.caption("Consulte os professores cadastrados no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaProfessores = listarProfessores()
 
     if not listaProfessores:
-        st.info("👨‍🏫 Nenhum professor cadastrado.")
+        st.info(":material/person: Nenhum professor cadastrado.")
         return
 
     st.write("")
 
     st.caption(
-        f"👨‍🏫 {len(listaProfessores)} "
+        f":material/person: {len(listaProfessores)} "
         f"{'professor encontrado' if len(listaProfessores) == 1 else 'professores encontrados'}"
     )
 
@@ -72,7 +72,7 @@ def telaListagemProfessores():
 
             with c5:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_professor_{professor.pessoa_id}",
                     help="Visualizar professor",
                     use_container_width=True,

@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import separador, formatar_moeda, formatar_dat
 # Tela de listagem para Compras
 def telaListagemCompras():
 
-    st.title("📋 Listagem de Compras")
+    st.title(":material/assignment: Listagem de Compras")
     st.caption("Consulte as compras cadastradas no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaCompras = listarCompras()
 
     if not listaCompras:
-        st.info("🛒 Nenhuma compra cadastrada.")
+        st.info(":material/shopping_cart: Nenhuma compra cadastrada.")
         return
 
     st.write("")
 
     st.caption(
-        f"🛒 {len(listaCompras)} "
+        f":material/shopping_cart: {len(listaCompras)} "
         f"{'compra encontrada' if len(listaCompras) == 1 else 'compras encontradas'}"
     )
 
@@ -78,7 +78,7 @@ def telaListagemCompras():
 
             with c6:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_compra_{compra.id}",
                     help="Visualizar compra",
                     use_container_width=True,

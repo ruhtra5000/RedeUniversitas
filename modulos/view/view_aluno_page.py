@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, limpar_consulta_aluno, formata
 # Tela de visualização de aluno
 def telaViewAluno():
 
-    st.title("🔎 Consulta de Aluno")
+    st.title(":material/search: Consulta de Aluno")
     st.caption("Pesquise um aluno pelo CPF ou pelo ID.")
 
     # Recebe o aluno selecionado pela listagem
@@ -19,13 +19,13 @@ def telaViewAluno():
     col_voltar, _ = st.columns([1, 5])
 
     with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     # Pesquisa
     with st.form("buscar_aluno", border=True):
 
-        st.markdown("#### 🔍 Buscar aluno")
+        st.markdown("#### :material/search: Buscar aluno")
 
         col1, col2 = st.columns(2)
 
@@ -47,7 +47,7 @@ def telaViewAluno():
 
         with coluna_botao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -105,7 +105,7 @@ def telaViewAluno():
     )
 
     with titulo:
-        st.subheader(f"🎓 {aluno.pessoa.nome}")
+        st.subheader(f":material/school: {aluno.pessoa.nome}")
 
     with botao_limpar:
         st.button(
@@ -129,7 +129,7 @@ def telaViewAluno():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Dados Pessoais")
+        st.markdown("#### :material/person: Dados Pessoais")
 
         col1, col2 = st.columns([3.5, 2.5])
 
@@ -157,7 +157,7 @@ def telaViewAluno():
 
     with st.container(border=True):
 
-        st.markdown("#### 🎓 Dados Acadêmicos")
+        st.markdown("#### :material/school: Dados Acadêmicos")
 
         col1, col2, col3 = st.columns([1, 2, 3])
 

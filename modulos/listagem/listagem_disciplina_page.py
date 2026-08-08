@@ -5,26 +5,26 @@ from modulos.utils.listagem_utils import separador
 # Tela de listagem para Disciplinas
 def telaListagemDisciplinas():
 
-    st.title("📋 Listagem de Disciplinas")
+    st.title(":material/assignment: Listagem de Disciplinas")
     st.caption("Consulte as disciplinas cadastradas no sistema.")
 
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             from modulos.rotas import home_page
             st.switch_page(home_page)
 
     listaDisciplinas = listarDisciplinasGeral()
 
     if not listaDisciplinas:
-        st.info("📖 Nenhuma disciplina cadastrada.")
+        st.info(":material/auto_stories: Nenhuma disciplina cadastrada.")
         return
 
     st.write("")
 
     st.caption(
-        f"📖 {len(listaDisciplinas)} "
+        f":material/auto_stories: {len(listaDisciplinas)} "
         f"{'disciplina encontrada' if len(listaDisciplinas) == 1 else 'disciplinas encontradas'}"
     )
 
@@ -80,7 +80,7 @@ def telaListagemDisciplinas():
 
             with c6:
                 visualizar = st.button(
-                    "👁️",
+                    ":material/visibility:",
                     key=f"view_disciplina_{disciplina.id}",
                     help="Visualizar disciplina",
                     use_container_width=True,

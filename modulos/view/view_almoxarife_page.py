@@ -6,7 +6,7 @@ from modulos.utils.view_utils import exibirCampo, formatar_cpf, limpar_consulta_
 # Tela de visualização de almoxarife
 def telaViewAlmoxarife():
 
-    st.title("🔎 Consulta de Almoxarife")
+    st.title(":material/search: Consulta de Almoxarife")
     st.caption("Pesquise um almoxarife pelo CPF ou pelo ID.")
 
     if "almoxarife_id" in st.session_state:
@@ -19,12 +19,12 @@ def telaViewAlmoxarife():
     colVoltar, _ = st.columns([1, 5])
 
     with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
+        if st.button(":material/arrow_back: Voltar", use_container_width=True):
             pass
 
     with st.form("buscar_almoxarife", border=True):
 
-        st.markdown("#### 🔍 Buscar almoxarife")
+        st.markdown("#### :material/search: Buscar almoxarife")
 
         col1, col2 = st.columns(2)
 
@@ -46,7 +46,7 @@ def telaViewAlmoxarife():
 
         with colunaBotao:
             buscar = st.form_submit_button(
-                "🔍 Buscar",
+                ":material/search: Buscar",
                 type="primary",
                 use_container_width=True,
             )
@@ -108,7 +108,7 @@ def telaViewAlmoxarife():
     )
 
     with titulo:
-        st.subheader(f"📦 {almoxarife.pessoa.nome}")
+        st.subheader(f":material/inventory_2: {almoxarife.pessoa.nome}")
 
     with botao_limpar:
         st.button(
@@ -132,7 +132,7 @@ def telaViewAlmoxarife():
 
     with st.container(border=True):
 
-        st.markdown("#### 👤 Dados Pessoais")
+        st.markdown("#### :material/person: Dados Pessoais")
 
         col1, col2, col3 = st.columns([1, 3, 2])
 
@@ -161,7 +161,7 @@ def telaViewAlmoxarife():
     st.write("")
 
     with st.container(border=True):
-        st.markdown("#### 🏛️ Vínculo")
+        st.markdown("#### :material/account_balance: Vínculo")
 
         exibirCampo(
             "Campus",
