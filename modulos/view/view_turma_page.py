@@ -18,7 +18,8 @@ def telaViewTurma():
 
     with col_voltar:
         if st.button(":material/arrow_back: Voltar", use_container_width=True):
-            pass
+            from modulos.rotas import turma_page
+            st.switch_page(turma_page)
 
     with st.form("buscar_turma", border=True):
 

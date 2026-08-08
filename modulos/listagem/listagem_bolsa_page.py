@@ -76,8 +76,8 @@ def telaListagemBolsas():
 
             if visualizar:
                 st.session_state["bolsa_id"] = bolsa.id
-
-                st.rerun()
+                from modulos.rotas import view_bolsa_page
+                st.switch_page(view_bolsa_page)
 
             if indice < len(listaBolsas) - 1:
                 separador()

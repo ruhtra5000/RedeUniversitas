@@ -68,8 +68,8 @@ def telaListagemTurmas():
 
             if visualizar:
                 st.session_state["turma_id"] = turma.id
-
-                st.rerun()
+                from modulos.rotas import view_turma_page
+                st.switch_page(view_turma_page)
 
             if indice < len(listaTurmas) - 1:
                 separador()

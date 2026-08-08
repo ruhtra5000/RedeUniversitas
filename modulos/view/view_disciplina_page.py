@@ -19,7 +19,8 @@ def telaViewDisciplina():
 
     with col_voltar:
         if st.button(":material/arrow_back: Voltar", use_container_width=True):
-            pass
+            from modulos.rotas import disciplina_page
+            st.switch_page(disciplina_page)
 
     with st.form("buscar_disciplina", border=True):
 

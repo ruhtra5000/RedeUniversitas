@@ -1,19 +1,12 @@
 import streamlit as st
 from modulos.listagem.listagem_matricula_page import telaListagemMatriculas
 from modulos.cadastros.pages.matricula_page import telaCadastroMatricula
-from modulos.view.view_matricula_page import telaViewMatricula
 
 def tela_matricula_unificada():
-    # Verifica se há um ID na sessão solicitando a view
-    consulta_id = st.session_state.get("consulta_matricula_id") or st.session_state.get("matricula_id")
+    aba_listagem, aba_cadastro = st.tabs([":material/assignment: Listagem", ":material/add: Novo Cadastro"])
     
-    if consulta_id:
-        telaViewMatricula()
-    else:
-        aba_listagem, aba_cadastro = st.tabs([":material/assignment: Listagem", ":material/add: Novo Cadastro"])
+    with aba_listagem:
+        telaListagemMatriculas()
         
-        with aba_listagem:
-            telaListagemMatriculas()
-            
-        with aba_cadastro:
-            telaCadastroMatricula()
+    with aba_cadastro:
+        telaCadastroMatricula()

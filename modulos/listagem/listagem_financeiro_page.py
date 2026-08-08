@@ -74,8 +74,8 @@ def telaListagemFinanceiros():
                 st.session_state["financeiro_id"] = (
                     financeiro.pessoa_id
                 )
-
-                st.rerun()
+                from modulos.rotas import view_financeiro_page
+                st.switch_page(view_financeiro_page)
 
             if indice < len(listaFinanceiros) - 1:
                 separador()

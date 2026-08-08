@@ -76,8 +76,8 @@ def telaListagemAlmoxarifes():
                 st.session_state["almoxarife_id"] = (
                     almoxarife.pessoa_id
                 )
-
-                st.rerun()
+                from modulos.rotas import view_almoxarife_page
+                st.switch_page(view_almoxarife_page)
 
             if indice < len(listaAlmoxarifes) - 1:
                 separador()

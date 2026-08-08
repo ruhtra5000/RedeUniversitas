@@ -70,8 +70,8 @@ def telaListagemCursos():
 
             if visualizar:
                 st.session_state["curso_id"] = curso.id
-
-                st.rerun()
+                from modulos.rotas import view_curso_page
+                st.switch_page(view_curso_page)
 
             if indice < len(listaCursos) - 1:
                 separador()

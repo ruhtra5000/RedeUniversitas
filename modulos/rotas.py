@@ -37,6 +37,22 @@ from modulos.financeiro.pages.gestao_financeira_page import telaGestaoFinanceira
 from modulos.academico.pages.boletim_page import telaBoletim
 from modulos.academico.pages.financeiro_aluno_page import telaFinanceiroAluno
 
+
+# Visualizações
+from modulos.view.view_aluno_page import telaViewAluno
+from modulos.view.view_professor_page import telaViewProfessor
+from modulos.view.view_almoxarife_page import telaViewAlmoxarife
+from modulos.view.view_financeiro_page import telaViewFinanceiro
+from modulos.view.view_campus_page import telaViewCampus
+from modulos.view.view_curso_page import telaViewCurso
+from modulos.view.view_disciplina_page import telaViewDisciplina
+from modulos.view.view_turma_page import telaViewTurma
+from modulos.view.view_fornecedor_page import telaViewFornecedor
+from modulos.view.view_compra_page import telaViewCompra
+from modulos.view.view_bolsa_page import telaViewBolsa
+from modulos.view.view_produto_page import telaViewProduto
+from modulos.view.view_matricula_page import telaViewMatricula
+
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
 
@@ -65,6 +81,22 @@ editar_curso_page = st.Page(telaEdicaoCurso, title="Curso", icon=":material/edit
 editar_disciplina_page = st.Page(telaEdicaoDisciplina, title="Disciplina", icon=":material/edit:", url_path="editar_disciplina")
 editar_turma_page = st.Page(telaEdicaoTurma, title="Turma", icon=":material/edit:", url_path="editar_turma")
 editar_fornecedor_page = st.Page(telaEdicaoFornecedor, title="Fornecedor", icon=":material/edit:", url_path="editar_fornecedor")
+
+
+# Visualizações (Oculto)
+view_aluno_page = st.Page(telaViewAluno, title="Visualizar Aluno", icon=":material/visibility:", url_path="view_aluno")
+view_professor_page = st.Page(telaViewProfessor, title="Visualizar Professor", icon=":material/visibility:", url_path="view_professor")
+view_almoxarife_page = st.Page(telaViewAlmoxarife, title="Visualizar Almoxarife", icon=":material/visibility:", url_path="view_almoxarife")
+view_financeiro_page = st.Page(telaViewFinanceiro, title="Visualizar Financeiro", icon=":material/visibility:", url_path="view_financeiro")
+view_campus_page = st.Page(telaViewCampus, title="Visualizar Campus", icon=":material/visibility:", url_path="view_campus")
+view_curso_page = st.Page(telaViewCurso, title="Visualizar Curso", icon=":material/visibility:", url_path="view_curso")
+view_disciplina_page = st.Page(telaViewDisciplina, title="Visualizar Disciplina", icon=":material/visibility:", url_path="view_disciplina")
+view_turma_page = st.Page(telaViewTurma, title="Visualizar Turma", icon=":material/visibility:", url_path="view_turma")
+view_fornecedor_page = st.Page(telaViewFornecedor, title="Visualizar Fornecedor", icon=":material/visibility:", url_path="view_fornecedor")
+view_compra_page = st.Page(telaViewCompra, title="Visualizar Compra", icon=":material/visibility:", url_path="view_compra")
+view_bolsa_page = st.Page(telaViewBolsa, title="Visualizar Bolsa", icon=":material/visibility:", url_path="view_bolsa")
+view_produto_page = st.Page(telaViewProduto, title="Visualizar Estoque", icon=":material/visibility:", url_path="view_estoque")
+view_matricula_page = st.Page(telaViewMatricula, title="Visualizar Matrícula", icon=":material/visibility:", url_path="view_matricula")
 
 # Operações
 operacao_diario = st.Page(telaDiarioClasse, title="Diário de Classe", icon=":material/edit_document:", url_path="diario_classe")
@@ -108,6 +140,13 @@ def get_navigation():
             editar_aluno_page, editar_professor_page, editar_almoxarife_page, editar_financeiro_page,
             editar_campus_page, editar_curso_page, editar_disciplina_page, editar_turma_page, editar_fornecedor_page
         ]
+
+        pages["Visualizações (Oculto)"] = [
+            view_aluno_page, view_professor_page, view_almoxarife_page, view_financeiro_page,
+            view_campus_page, view_curso_page, view_disciplina_page, view_turma_page, view_fornecedor_page,
+            view_compra_page, view_bolsa_page, view_produto_page, view_matricula_page
+        ]
+
 
     elif "REITOR" in roles:
         pages["Gestão Acadêmica"] = [gestao_bolsas]

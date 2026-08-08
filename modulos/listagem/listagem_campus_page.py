@@ -70,8 +70,8 @@ def telaListagemCampus():
 
             if visualizar:
                 st.session_state["campus_id"] = campus.id
-
-                st.rerun()
+                from modulos.rotas import view_campus_page
+                st.switch_page(view_campus_page)
 
             if indice < len(listaCampus) - 1:
                 separador()
