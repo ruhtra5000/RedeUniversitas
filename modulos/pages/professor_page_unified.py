@@ -1,14 +1,14 @@
 import streamlit as st
 from modulos.listagem.listagem_professor_page import telaListagemProfessores
 from modulos.cadastros.pages.professor_page import telaCadastroProfessor
-from modulos.view.view_professor_page import view_professor
+from modulos.view.view_professor_page import telaViewProfessor
 
 def tela_professor_unificada():
     # Verifica se há um ID na sessão solicitando a view
     consulta_id = st.session_state.get("consulta_professor_id")
     
     if consulta_id:
-        view_professor()
+        telaViewProfessor()
     else:
         aba_listagem, aba_cadastro = st.tabs(["📋 Listagem", "➕ Novo Cadastro"])
         

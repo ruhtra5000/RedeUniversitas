@@ -1,14 +1,14 @@
 import streamlit as st
 from modulos.listagem.listagem_turma_page import telaListagemTurmas
 from modulos.cadastros.pages.turma_page import telaCadastroTurma
-from modulos.view.view_turma_page import view_turma
+from modulos.view.view_turma_page import telaViewTurma
 
 def tela_turma_unificada():
     # Verifica se há um ID na sessão solicitando a view
     consulta_id = st.session_state.get("consulta_turma_id")
     
     if consulta_id:
-        view_turma()
+        telaViewTurma()
     else:
         aba_listagem, aba_cadastro = st.tabs(["📋 Listagem", "➕ Novo Cadastro"])
         
