@@ -1,5 +1,5 @@
 import streamlit as st
-from modulos.listagem.listagem_estoque_page import telaListagemProdutos
+from modulos.listagem.listagem_produto_page import telaListagemProdutos
 from modulos.cadastros.pages.estoque_page import telaCadastroEstoque
 from modulos.view.view_produto_page import telaViewProduto
 
