@@ -219,7 +219,7 @@ def dbEditarDisciplina(idDisciplina: int, novaDisciplina: Disciplina):
     # São editaveis: nome, carga_horaria, obrigatoria
     with SessionLocal() as session:
         query = select(Disciplina).where(Disciplina.id == idDisciplina)
-        disciplina = session.execute(query).scalar_one()
+        disciplina = session.execute(query).unique().scalar_one()
 
         disciplina.nome = novaDisciplina.nome
         disciplina.carga_horaria = novaDisciplina.carga_horaria
