@@ -1,6 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
-from modulos.academico.academico_service import listarTurmaId, alterarProfessorTurma, listarProfessoresAtivos
+from modulos.academico.academico_service import listarTurmaId, alterarProfessorTurma, listarProfessoresCampus
 
 def telaEdicaoTurma():
     if "ADMIN" not in st.session_state.roles:
@@ -42,7 +42,7 @@ def telaEdicaoTurma():
             st.subheader("Vínculo de Ensino")
             
             # Professores do mesmo campus
-            professores = listarProfessoresAtivos(turma.curso.campus_id)
+            professores = listarProfessoresCampus(turma.curso.campus_id)
             opcoes_professores = {
                 prof.pessoa_id: f"{prof.pessoa.nome} - ID: {prof.pessoa_id}"
                 for prof in professores
