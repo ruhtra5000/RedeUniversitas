@@ -96,7 +96,7 @@ def get_navigation():
     operacoes_list = []
 
     if "ADMIN" in roles:
-        pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
+        pages["Gestão Acadêmica"] = [gestao_cargos]
         
         gestao_cadastros.extend([
             aluno_page, professor_page, financeiro_page, almoxarife_page,
