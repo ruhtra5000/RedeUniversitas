@@ -83,8 +83,7 @@ def telaListagemAlmoxarifes():
                     almoxarife.pessoa_id
                 )
 
-                from modulos.rotas import view_almoxarife_page
-                st.switch_page(view_almoxarife_page)
+                st.rerun()
 
             if indice < len(listaAlmoxarifes) - 1:
                 separador()

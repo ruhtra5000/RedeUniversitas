@@ -84,8 +84,7 @@ def telaListagemFornecedores():
                     fornecedor.id
                 )
 
-                from modulos.rotas import view_fornecedor_page
-                st.switch_page(view_fornecedor_page)
+                st.rerun()
 
             if indice < len(listaFornecedores) - 1:
                 separador()

@@ -81,8 +81,7 @@ def telaListagemFinanceiros():
                     financeiro.pessoa_id
                 )
 
-                from modulos.rotas import view_financeiro_page
-                st.switch_page(view_financeiro_page)
+                st.rerun()
 
             if indice < len(listaFinanceiros) - 1:
                 separador()

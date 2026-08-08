@@ -83,8 +83,7 @@ def telaListagemProfessores():
                     professor.pessoa_id
                 )
 
-                from modulos.rotas import view_professor_page
-                st.switch_page(view_professor_page)
+                st.rerun()
 
             if indice < len(listaProfessores) - 1:
                 separador()

@@ -24,8 +24,7 @@ def telaViewMatricula():
 
     with colVoltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_matricula_page
-            st.switch_page(listagem_matricula_page)
+            pass
 
     with st.form("buscar_matricula", border=True):
 

@@ -26,8 +26,7 @@ def telaViewFornecedor():
             "⬅ Voltar",
             use_container_width=True,
         ):
-            from modulos.rotas import listagem_fornecedor_page
-            st.switch_page(listagem_fornecedor_page)
+            pass
 
     with st.form("buscar_fornecedor", border=True):
 

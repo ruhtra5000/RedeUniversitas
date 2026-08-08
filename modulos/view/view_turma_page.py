@@ -18,8 +18,7 @@ def telaViewTurma():
 
     with col_voltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_turma_page
-            st.switch_page(listagem_turma_page)
+            pass
 
     with st.form("buscar_turma", border=True):
 

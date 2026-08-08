@@ -20,8 +20,7 @@ def telaViewProfessor():
 
     with col_voltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_professor_page
-            st.switch_page(listagem_professor_page)
+            pass
 
     with st.form("buscar_professor", border=True):
 

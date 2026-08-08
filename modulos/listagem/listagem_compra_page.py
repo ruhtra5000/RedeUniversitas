@@ -87,8 +87,7 @@ def telaListagemCompras():
             if visualizar:
                 st.session_state["compra_selecionada"] = compra.id
 
-                from modulos.rotas import view_compra_page
-                st.switch_page(view_compra_page)
+                st.rerun()
 
             if indice < len(listaCompras) - 1:
                 separador()

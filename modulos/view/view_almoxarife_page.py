@@ -20,8 +20,7 @@ def telaViewAlmoxarife():
 
     with colVoltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_almoxarife_page
-            st.switch_page(listagem_almoxarife_page)
+            pass
 
     with st.form("buscar_almoxarife", border=True):
 

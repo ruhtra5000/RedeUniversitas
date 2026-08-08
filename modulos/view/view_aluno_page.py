@@ -20,8 +20,7 @@ def telaViewAluno():
 
     with col_voltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_aluno_page
-            st.switch_page(listagem_aluno_page)
+            pass
 
     # Pesquisa
     with st.form("buscar_aluno", border=True):

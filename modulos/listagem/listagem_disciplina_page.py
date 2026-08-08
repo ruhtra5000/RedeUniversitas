@@ -89,8 +89,7 @@ def telaListagemDisciplinas():
             if visualizar:
                 st.session_state["disciplina_id"] = disciplina.id
 
-                from modulos.rotas import view_disciplina_page
-                st.switch_page(view_disciplina_page)
+                st.rerun()
 
             if indice < len(listaDisciplinas) - 1:
                 separador()

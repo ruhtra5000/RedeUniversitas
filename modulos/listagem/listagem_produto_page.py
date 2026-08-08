@@ -82,8 +82,7 @@ def telaListagemProdutos():
             if visualizar:
                 st.session_state["produto_selecionado"] = produto.id
 
-                from modulos.rotas import view_produto_page
-                st.switch_page(view_produto_page)
+                st.rerun()
 
             if indice < len(listaProdutos) - 1:
                 separador()

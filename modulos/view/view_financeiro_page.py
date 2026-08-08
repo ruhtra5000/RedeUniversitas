@@ -20,8 +20,7 @@ def telaViewFinanceiro():
 
     with colVoltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_financeiro_page
-            st.switch_page(listagem_financeiro_page)
+            pass
 
     with st.form("buscar_financeiro", border=True):
 

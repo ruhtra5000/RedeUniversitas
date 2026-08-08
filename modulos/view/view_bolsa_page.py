@@ -19,8 +19,7 @@ def telaViewBolsa():
 
     with colVoltar:
         if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_bolsa_page
-            st.switch_page(listagem_bolsa_page)
+            pass
 
     with st.form("buscar_bolsa", border=True):
 

@@ -26,8 +26,7 @@ def telaViewCompra():
             "⬅ Voltar",
             use_container_width=True,
         ):
-            from modulos.rotas import listagem_compra_page
-            st.switch_page(listagem_compra_page)
+            pass
 
     with st.form("buscar_compra", border=True):
 

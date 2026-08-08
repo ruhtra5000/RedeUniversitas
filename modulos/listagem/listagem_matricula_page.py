@@ -89,8 +89,7 @@ def telaListagemMatriculas():
                     "turma_id": matricula.turma_id,
                 }
 
-                from modulos.rotas import view_matricula_page
-                st.switch_page(view_matricula_page)
+                st.rerun()
 
             if indice < len(listaMatriculas) - 1:
                 separador()
