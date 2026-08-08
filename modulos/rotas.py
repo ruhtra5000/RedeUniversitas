@@ -103,7 +103,6 @@ def get_navigation():
             campus_page, curso_page, disciplina_page, turma_page,
             matricula_page, bolsa_page, compra_page, fornecedor_page, estoque_page
         ])
-        operacoes_list.append(gestao_financeira)
         
         pages["Edições (Oculto)"] = [
             editar_aluno_page, editar_professor_page, editar_almoxarife_page, editar_financeiro_page,
