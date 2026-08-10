@@ -74,6 +74,22 @@ Para popular o banco de dados com um conjunto inicial de dados, execute o seguin
 psql -U nome_usuario -d nome_banco -f dados.sql
 ```
 
+### Recuperar backup do banco (opcional)
+
+Se houve algum problema nas últimas etapas relacionadas ao banco de dados, tente recuperar o backup completo do banco:
+
+```bash
+# Arquivo banco.backup (substituir "nome_banco")
+pg_restore -U postgres -C -d nome_banco banco.backup
+```
+
+Dessa forma, em `example.toml`:
+
+```bash
+user = "postgres"
+password = senha do usuário postgres
+```
+
 ### Configuração do login com OAuth
 
 Para realizar login com Google na aplicação, basta seguir os passos a seguir:
