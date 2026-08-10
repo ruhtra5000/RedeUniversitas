@@ -160,13 +160,17 @@ def get_navigation():
 
     # Admin tem acesso a absolutamente tudo
     if "ADMIN" in roles:
+
+        operacoes_list.append(gestao_financeira)
+        
+        pages["Operações"] = operacoes_list
+
         pages["Gestão Acadêmica"] = [gestao_cargos, gestao_bolsas]
         cadastros_list.extend([
             cadastro_aluno, cadastro_prof, cadastro_financeiro, cadastro_almoxarife,
             cadastro_campus, cadastro_curso, cadastro_disc, cadastro_turma,
             cadastro_matricula, cadastro_bolsa, cadastro_compra, cadastro_fornecedor, cadastro_estoque
         ])
-        operacoes_list.append(gestao_financeira)
 
     if "ADMIN" in roles:
         pages["Listagens"] = [listagem_aluno_page,
@@ -232,9 +236,6 @@ def get_navigation():
     if "ALMOXARIFE" in roles and "ADMIN" not in roles:
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
-
-    if operacoes_list:
-        pages["Operações"] = operacoes_list
 
     if cadastros_list:
         pages["Cadastros"] = cadastros_list
