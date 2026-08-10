@@ -25,35 +25,24 @@ def marcarPainelPagina():
     st.html('<span class="pv-panel-marker"></span>')
 
 # Função para renderizar o topo da página com título, descrição e categoria.
-def renderizarTopoPagina(
-    titulo: str,
-    descricao: str,
-    categoria: str,
-):
+def renderizarTopoPagina(titulo: str, descricao: str, categoria: str):
     marcarPagina()
 
-    st.html(
-        f"""
+    st.html(f"""
         <header class="pv-header">
             <div class="pv-eyebrow">{escape(categoria)}</div>
             <h1 class="pv-title">{escape(titulo)}</h1>
             <p class="pv-description">{escape(descricao)}</p>
         </header>
-        """
-    )
+        """)
 
 # Context manager para criar um painel na página com título, descrição e contexto. O conteúdo do painel é definido dentro do bloco `with`.
 @contextmanager
-def painelPagina(
-    titulo: str,
-    descricao: str,
-    contexto: str = "PAINEL",
-) -> Iterator[None]:
+def painelPagina(titulo: str, descricao: str, contexto: str = "PAINEL") -> Iterator[None]:
     with st.container(border=True):
         marcarPainelPagina()
 
-        st.html(
-            f"""
+        st.html(f"""
             <div class="pv-panel-heading">
                 <div>
                     <div class="pv-panel-kicker">{escape(contexto)}</div>
@@ -63,19 +52,13 @@ def painelPagina(
                     </div>
                 </div>
             </div>
-            """
-        )
+            """)
 
         yield
 
 # Função para renderizar uma seção na página com número, título e descrição.
-def renderizarSecaoPagina(
-    numero: int,
-    titulo: str,
-    descricao: str,
-):
-    st.html(
-        f"""
+def renderizarSecaoPagina(numero: int, titulo: str, descricao: str):
+    st.html(f"""
         <div class="pv-section-heading">
             <div class="pv-section-number">{numero:02d}</div>
             <div>
@@ -85,8 +68,7 @@ def renderizarSecaoPagina(
                 </div>
             </div>
         </div>
-        """
-    )
+        """)
 
 # Função para renderizar um divisor de página, que é uma linha horizontal separando seções ou elementos na página.
 def renderizarDivisorPagina():
@@ -94,8 +76,7 @@ def renderizarDivisorPagina():
 
 # Função para renderizar o status da página com um rótulo e valor, exibindo um ponto de status colorido ao lado do rótulo.
 def renderizarStatusPagina(rotulo: str, valor: str):
-    st.html(
-        f"""
+    st.html(f"""
         <div class="pv-status">
             <span class="pv-status-dot"></span>
             <div>
@@ -103,13 +84,11 @@ def renderizarStatusPagina(rotulo: str, valor: str):
                 <div class="pv-status-value">{escape(valor)}</div>
             </div>
         </div>
-        """
-    )
+        """)
 
 # Função para aplicar o estilo CSS personalizado nas páginas acadêmicas.
 def aplicarEstiloPagina():
-    st.html(
-        """
+    st.html("""
         <style>
         [data-testid="stMainBlockContainer"]:has(.pv-page-marker) {
             width: 100%;
@@ -464,5 +443,4 @@ def aplicarEstiloPagina():
 
         }
         </style>
-        """
-    )
+        """)

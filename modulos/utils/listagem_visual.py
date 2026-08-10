@@ -42,26 +42,16 @@ def obterTextoPesquisa(item, colunas):
     valores = []
 
     for coluna in colunas:
-        valores.append(
-            normalizarValor(
-                resolverValor(coluna.valor, item)
-            )
-        )
+        valores.append(normalizarValor(resolverValor(coluna.valor, item)))
 
         if coluna.subtitulo is not None:
-            valores.append(
-                normalizarValor(
-                    resolverValor(coluna.subtitulo, item)
-                )
-            )
+            valores.append(normalizarValor(resolverValor(coluna.subtitulo, item)))
 
     return " ".join(valores).casefold()
 
 # Função para renderizar uma célula da tabela, dependendo do tipo da coluna
 def renderizarCelula(coluna, item, primeiraColuna=False):
-    valor = normalizarValor(
-        resolverValor(coluna.valor, item)
-    )
+    valor = normalizarValor(resolverValor(coluna.valor, item))
 
     valorSeguro = escape(valor)
 
@@ -69,12 +59,9 @@ def renderizarCelula(coluna, item, primeiraColuna=False):
         subtitulo = ""
 
         if coluna.subtitulo is not None:
-            subtitulo = normalizarValor(
-                resolverValor(coluna.subtitulo, item)
-            )
+            subtitulo = normalizarValor(resolverValor(coluna.subtitulo, item))
 
-        st.html(
-            f"""
+        st.html(f"""
             <span class="lv-row-marker"></span>
 
             <div class="lv-person">
@@ -92,20 +79,14 @@ def renderizarCelula(coluna, item, primeiraColuna=False):
                     </div>
                 </div>
             </div>
-            """
-        )
+            """)
 
         return
 
-    marcador = (
-        '<span class="lv-row-marker"></span>'
-        if primeiraColuna
-        else ""
-    )
+    marcador = '<span class="lv-row-marker"></span>' if primeiraColuna else ""
 
     if coluna.tipo == "badge":
-        st.html(
-            f"""
+        st.html(f"""
             {marcador}
 
             <div class="lv-highlight">
@@ -115,13 +96,11 @@ def renderizarCelula(coluna, item, primeiraColuna=False):
                     {valorSeguro}
                 </span>
             </div>
-            """
-        )
+            """)
 
         return
 
-    st.html(
-        f"""
+    st.html(f"""
         {marcador}
 
         <div class="lv-cell-wrapper">
@@ -129,26 +108,10 @@ def renderizarCelula(coluna, item, primeiraColuna=False):
                 {valorSeguro}
             </div>
         </div>
-        """
-    )
+        """)
 
 # Função principal para renderizar a listagem de itens, com cabeçalho, pesquisa e ações
-def renderizarListagem(
-    *,
-    itens,
-    categoria,
-    titulo,
-    descricao,
-    singular,
-    plural,
-    colunas,
-    obter_id,
-    ao_visualizar,
-    ao_voltar,
-    prefixo_chave,
-    mensagem_vazia=None,
-    titulo_tabela="Registros cadastrados",
-):
+def renderizarListagem(*, itens, categoria, titulo, descricao, singular, plural, colunas, obter_id, ao_visualizar, ao_voltar, prefixo_chave, mensagem_vazia=None, titulo_tabela="Registros cadastrados"):
     aplicarEstiloListagem()
 
     st.html('<span class="lv-page-marker"></span>')
@@ -168,8 +131,7 @@ def renderizarListagem(
         ):
             ao_voltar()
 
-    st.html(
-        f"""
+    st.html(f"""
         <div class="lv-header">
             <div class="lv-eyebrow">
                 {escape(categoria)}
@@ -183,8 +145,7 @@ def renderizarListagem(
                 {escape(descricao)}
             </p>
         </div>
-        """
-    )
+        """)
 
     with st.container(border=True):
 
@@ -211,8 +172,7 @@ def renderizarListagem(
             itensFiltrados = [
                 item
                 for item in itens
-                if pesquisaNormalizada
-                in obterTextoPesquisa(item, colunas)
+                if pesquisaNormalizada in obterTextoPesquisa(item, colunas)
             ]
         else:
             itensFiltrados = itens
@@ -221,20 +181,14 @@ def renderizarListagem(
         quantidadeExibida = len(itensFiltrados)
 
         if pesquisaNormalizada:
-            textoQuantidade = (
-                f"{quantidadeExibida} de "
-                f"{quantidadeTotal} resultados"
-            )
+            textoQuantidade = f"{quantidadeExibida} de " f"{quantidadeTotal} resultados"
         elif quantidadeTotal == 1:
             textoQuantidade = f"1 {singular}"
         else:
-            textoQuantidade = (
-                f"{quantidadeTotal} {plural}"
-            )
+            textoQuantidade = f"{quantidadeTotal} {plural}"
 
         with colunaInformacao:
-            st.html(
-                f"""
+            st.html(f"""
                 <div class="lv-table-information">
                     <div class="lv-table-title">
                         {escape(titulo_tabela)}
@@ -245,8 +199,7 @@ def renderizarListagem(
                         {escape(textoQuantidade)}
                     </div>
                 </div>
-                """
-            )
+                """)
 
         st.html('<div class="lv-divider"></div>')
 
@@ -254,26 +207,18 @@ def renderizarListagem(
             mensagem = (
                 "Nenhum resultado encontrado para a busca."
                 if pesquisaNormalizada
-                else (
-                    mensagem_vazia
-                    or f"Nenhum {singular} foi encontrado."
-                )
+                else (mensagem_vazia or f"Nenhum {singular} foi encontrado.")
             )
 
-            st.html(
-                f"""
+            st.html(f"""
                 <div class="lv-empty">
                     {escape(mensagem)}
                 </div>
-                """
-            )
+                """)
 
             return
 
-        proporcoes = [
-            coluna.proporcao
-            for coluna in colunas
-        ]
+        proporcoes = [coluna.proporcao for coluna in colunas]
 
         proporcoes.append(0.85)
 
@@ -287,22 +232,18 @@ def renderizarListagem(
             colunas,
         ):
             with colunaStreamlit:
-                st.html(
-                    f"""
+                st.html(f"""
                     <div class="lv-column-label">
                         {escape(coluna.titulo)}
                     </div>
-                    """
-                )
+                    """)
 
         with colunasCabecalho[-1]:
-            st.html(
-                """
+            st.html("""
                 <div class="lv-column-label lv-action-label">
                     Ação
                 </div>
-                """
-            )
+                """)
 
         st.html('<div class="lv-divider"></div>')
 
@@ -317,20 +258,13 @@ def renderizarListagem(
                 zip(colunasLinha[:-1], colunas)
             ):
                 with colunaStreamlit:
-                    renderizarCelula(
-                        coluna,
-                        item,
-                        primeiraColuna=posicao == 0,
-                    )
+                    renderizarCelula(coluna, item, primeiraColuna=posicao == 0)
 
             with colunasLinha[-1]:
                 visualizar = st.button(
                     "Ver",
                     icon=":material/visibility:",
-                    key=(
-                        f"{prefixo_chave}_visualizar_"
-                        f"{obter_id(item)}"
-                    ),
+                    key=(f"{prefixo_chave}_visualizar_" f"{obter_id(item)}"),
                     help=f"Visualizar {singular}",
                     width="stretch",
                 )
@@ -343,8 +277,7 @@ def renderizarListagem(
 
 # Função para aplicar o estilo CSS personalizado à listagem
 def aplicarEstiloListagem():
-    st.html(
-        """
+    st.html("""
         <style>
         [data-testid="stMainBlockContainer"]:has(.lv-page-marker) {
             width: 100%;
@@ -744,5 +677,4 @@ def aplicarEstiloListagem():
             }
         }
         </style>
-        """
-    )
+        """)

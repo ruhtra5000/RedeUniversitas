@@ -3,10 +3,148 @@ from html import escape
 from typing import Callable, Iterator
 import streamlit as st
 
+# Função para renderizar o topo do cadastro com título, descrição e botões de ação
+def renderizarTopoCadastro(titulo: str, descricao: str, aoVoltar: Callable[[], None], prefixoChave: str, categoria: str = "CADASTRO", rotuloAcao: str | None = None, iconeAcao: str | None = None, aoAcao: Callable[[], None] | None = None):
+    aplicarEstiloCadastro()
+
+    st.html('<span class="cv-page-marker"></span>')
+
+    if rotuloAcao and aoAcao:
+        colVoltar, _, colAcao = st.columns([1.05, 4.9, 1.05])
+    else:
+        colVoltar, _ = st.columns([1.05, 5.95])
+
+    with colVoltar:
+        st.html('<span class="cv-nav-marker"></span>')
+
+        if st.button(
+            "Voltar",
+            icon=":material/arrow_back:",
+            key=f"{prefixoChave}_voltar",
+            width="stretch",
+        ):
+            aoVoltar()
+
+    if rotuloAcao and aoAcao:
+        with colAcao:
+            if st.button(
+                rotuloAcao,
+                icon=iconeAcao,
+                key=f"{prefixoChave}_acao",
+                width="stretch",
+            ):
+                aoAcao()
+
+    st.html(f"""
+        <header class="cv-header">
+            <div class="cv-eyebrow">{escape(categoria)}</div>
+            <h1 class="cv-title">{escape(titulo)}</h1>
+            <p class="cv-description">{escape(descricao)}</p>
+        </header>
+        """)
+
+# Função para marcar o formulário de cadastro com um marcador visual
+def marcarFormularioCadastro():
+    st.html('<span class="cv-form-marker"></span>')
+
+# Função para marcar o painel de cadastro com um marcador visual
+def marcarPainelCadastro():
+    st.html('<span class="cv-panel-marker"></span>')
+
+# Função para renderizar o cabeçalho do formulário de cadastro com título, descrição e contexto
+def renderizarCabecalhoFormulario(titulo: str, descricao: str, contexto: str = "NOVO REGISTRO"):
+    st.html(f"""
+        <div class="cv-form-heading">
+            <div>
+                <div class="cv-form-kicker">{escape(contexto)}</div>
+                <div class="cv-form-title">{escape(titulo)}</div>
+                <div class="cv-form-description">
+                    {escape(descricao)}
+                </div>
+            </div>
+
+            <div class="cv-required-badge">
+                <span class="cv-required-dot"></span>
+                Campos com * são obrigatórios
+            </div>
+        </div>
+        """)
+
+# Context manager para criar o painel visual único usado por todos os cadastros
+@contextmanager
+def painelCadastro(titulo: str, descricao: str, contexto: str = "NOVO REGISTRO") -> Iterator[None]:
+    """Cria o painel visual único usado por todos os cadastros."""
+
+    with st.container(border=True):
+        marcarPainelCadastro()
+
+        renderizarCabecalhoFormulario(
+            titulo=titulo,
+            descricao=descricao,
+            contexto=contexto,
+        )
+
+        yield
+
+# Função para renderizar uma seção do formulário de cadastro com número, título e descrição
+def renderizarSecaoCadastro(numero: int, titulo: str, descricao: str):
+    st.html(f"""
+        <div class="cv-section-heading">
+            <div class="cv-section-number">{numero:02d}</div>
+            <div>
+                <div class="cv-section-title">
+                    {escape(titulo)}
+                </div>
+                <div class="cv-section-description">
+                    {escape(descricao)}
+                </div>
+            </div>
+        </div>
+        """)
+
+# Função para renderizar um divisor visual entre seções do formulário de cadastro
+def renderizarDivisorCadastro():
+    st.html('<div class="cv-divider"></div>')
+
+# Função para marcar as ações do formulário de cadastro com um marcador visual
+def marcarAcoesCadastro():
+    st.html('<span class="cv-actions-marker"></span>')
+
+# Função para renderizar o botão de ação principal do formulário de cadastro com rótulo, ícone e chave
+def renderizarBotaoCadastro(rotulo: str, icone: str, chave: str, desabilitado: bool = False) -> bool:
+    """Renderiza a ação principal sempre com a mesma largura e posição."""
+
+    _, colunaCentral, _ = st.columns([2, 3, 2])
+
+    with colunaCentral:
+        marcarAcoesCadastro()
+
+        return st.button(
+            rotulo,
+            icon=icone,
+            key=chave,
+            type="primary",
+            width="stretch",
+            disabled=desabilitado,
+        )
+
+# Função para renderizar um aviso de cadastro com título e descrição
+def renderizarAvisoCadastro(titulo: str, descricao: str):
+    st.html(f"""
+        <div class="cv-alert">
+            <div class="cv-alert-icon">!</div>
+            <div>
+                <div class="cv-alert-title">{escape(titulo)}</div>
+                <div class="cv-alert-description">
+                    {escape(descricao)}
+                </div>
+            </div>
+        </div>
+        """)
+
 # Função para aplicar o estilo CSS personalizado na página inicial
 def aplicarEstiloCadastro():
-    st.html(
-        """
+    st.html("""
         <style>
         [data-testid="stMainBlockContainer"]:has(.cv-page-marker) {
             width: 100%;
@@ -711,178 +849,4 @@ def aplicarEstiloCadastro():
             }
         }
         </style>
-        """
-    )
-
-# Função para renderizar o topo do cadastro com título, descrição e botões de ação
-def renderizarTopoCadastro(
-    titulo: str,
-    descricao: str,
-    aoVoltar: Callable[[], None],
-    prefixoChave: str,
-    categoria: str = "CADASTRO",
-    rotuloAcao: str | None = None,
-    iconeAcao: str | None = None,
-    aoAcao: Callable[[], None] | None = None,
-):
-    aplicarEstiloCadastro()
-
-    st.html('<span class="cv-page-marker"></span>')
-
-    if rotuloAcao and aoAcao:
-        colVoltar, _, colAcao = st.columns([1.05, 4.9, 1.05])
-    else:
-        colVoltar, _ = st.columns([1.05, 5.95])
-
-    with colVoltar:
-        st.html('<span class="cv-nav-marker"></span>')
-
-        if st.button(
-            "Voltar",
-            icon=":material/arrow_back:",
-            key=f"{prefixoChave}_voltar",
-            width="stretch",
-        ):
-            aoVoltar()
-
-    if rotuloAcao and aoAcao:
-        with colAcao:
-            if st.button(
-                rotuloAcao,
-                icon=iconeAcao,
-                key=f"{prefixoChave}_acao",
-                width="stretch",
-            ):
-                aoAcao()
-
-    st.html(
-        f"""
-        <header class="cv-header">
-            <div class="cv-eyebrow">{escape(categoria)}</div>
-            <h1 class="cv-title">{escape(titulo)}</h1>
-            <p class="cv-description">{escape(descricao)}</p>
-        </header>
-        """
-    )
-
-# Função para marcar o formulário de cadastro com um marcador visual
-def marcarFormularioCadastro():
-    st.html('<span class="cv-form-marker"></span>')
-
-# Função para marcar o painel de cadastro com um marcador visual
-def marcarPainelCadastro():
-    st.html('<span class="cv-panel-marker"></span>')
-
-# Função para renderizar o cabeçalho do formulário de cadastro com título, descrição e contexto
-def renderizarCabecalhoFormulario(
-    titulo: str,
-    descricao: str,
-    contexto: str = "NOVO REGISTRO",
-):
-    st.html(
-        f"""
-        <div class="cv-form-heading">
-            <div>
-                <div class="cv-form-kicker">{escape(contexto)}</div>
-                <div class="cv-form-title">{escape(titulo)}</div>
-                <div class="cv-form-description">
-                    {escape(descricao)}
-                </div>
-            </div>
-
-            <div class="cv-required-badge">
-                <span class="cv-required-dot"></span>
-                Campos com * são obrigatórios
-            </div>
-        </div>
-        """
-    )
-
-# Context manager para criar o painel visual único usado por todos os cadastros
-@contextmanager
-def painelCadastro(
-    titulo: str,
-    descricao: str,
-    contexto: str = "NOVO REGISTRO",
-) -> Iterator[None]:
-    """Cria o painel visual único usado por todos os cadastros."""
-
-    with st.container(border=True):
-        marcarPainelCadastro()
-
-        renderizarCabecalhoFormulario(
-            titulo=titulo,
-            descricao=descricao,
-            contexto=contexto,
-        )
-
-        yield
-
-# Função para renderizar uma seção do formulário de cadastro com número, título e descrição
-def renderizarSecaoCadastro(
-    numero: int,
-    titulo: str,
-    descricao: str,
-):
-    st.html(
-        f"""
-        <div class="cv-section-heading">
-            <div class="cv-section-number">{numero:02d}</div>
-            <div>
-                <div class="cv-section-title">
-                    {escape(titulo)}
-                </div>
-                <div class="cv-section-description">
-                    {escape(descricao)}
-                </div>
-            </div>
-        </div>
-        """
-    )
-
-# Função para renderizar um divisor visual entre seções do formulário de cadastro
-def renderizarDivisorCadastro():
-    st.html('<div class="cv-divider"></div>')
-
-# Função para marcar as ações do formulário de cadastro com um marcador visual
-def marcarAcoesCadastro():
-    st.html('<span class="cv-actions-marker"></span>')
-
-# Função para renderizar o botão de ação principal do formulário de cadastro com rótulo, ícone e chave
-def renderizarBotaoCadastro(
-    rotulo: str,
-    icone: str,
-    chave: str,
-    desabilitado: bool = False,
-) -> bool:
-    """Renderiza a ação principal sempre com a mesma largura e posição."""
-
-    _, colunaCentral, _ = st.columns([2, 3, 2])
-
-    with colunaCentral:
-        marcarAcoesCadastro()
-
-        return st.button(
-            rotulo,
-            icon=icone,
-            key=chave,
-            type="primary",
-            width="stretch",
-            disabled=desabilitado,
-        )
-
-# Função para renderizar um aviso de cadastro com título e descrição
-def renderizarAvisoCadastro(titulo: str, descricao: str):
-    st.html(
-        f"""
-        <div class="cv-alert">
-            <div class="cv-alert-icon">!</div>
-            <div>
-                <div class="cv-alert-title">{escape(titulo)}</div>
-                <div class="cv-alert-description">
-                    {escape(descricao)}
-                </div>
-            </div>
-        </div>
-        """
-    )
+        """)

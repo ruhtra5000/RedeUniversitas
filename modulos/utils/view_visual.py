@@ -63,14 +63,7 @@ def obterIniciais(nome):
     return f"{partes[0][0]}{partes[-1][0]}".upper()
 
 # Função para renderizar o cabeçalho da página, incluindo categoria, título, descrição e botão de voltar.
-def renderizarCabecalhoView(
-    *,
-    categoria,
-    titulo,
-    descricao,
-    ao_voltar,
-    prefixo_chave,
-):
+def renderizarCabecalhoView(*, categoria, titulo, descricao, ao_voltar, prefixo_chave):
     aplicarEstiloView()
 
     st.html('<span class="vv-page-marker"></span>')
@@ -88,8 +81,7 @@ def renderizarCabecalhoView(
         ):
             ao_voltar()
 
-    st.html(
-        f"""
+    st.html(f"""
         <div class="vv-header">
             <div class="vv-eyebrow">
                 {escape(str(categoria))}
@@ -103,18 +95,10 @@ def renderizarCabecalhoView(
                 {escape(str(descricao))}
             </p>
         </div>
-        """
-    )
+        """)
 
 # Função para renderizar o formulário de busca, incluindo campos de entrada e botão de busca.
-def renderizarFormularioBusca(
-    *,
-    campos,
-    prefixo_chave,
-    titulo="Localizar registro",
-    descricao="Informe um dos dados abaixo para realizar a consulta.",
-    texto_botao="Buscar",
-):
+def renderizarFormularioBusca(*, campos, prefixo_chave, titulo="Localizar registro", descricao="Informe um dos dados abaixo para realizar a consulta.", texto_botao="Buscar"):
     valores = {}
 
     with st.form(
@@ -123,8 +107,7 @@ def renderizarFormularioBusca(
     ):
         st.html('<span class="vv-search-marker"></span>')
 
-        st.html(
-            f"""
+        st.html(f"""
             <div class="vv-search-heading">
                 <div class="vv-search-title">
                     {escape(str(titulo))}
@@ -134,18 +117,14 @@ def renderizarFormularioBusca(
                     {escape(str(descricao))}
                 </div>
             </div>
-            """
-        )
+            """)
 
         proporcoes = [campo.proporcao for campo in campos]
         colunas = st.columns(proporcoes)
 
         for colunaStreamlit, campo in zip(colunas, campos):
             with colunaStreamlit:
-                chave = (
-                    campo.chave
-                    or f"{prefixo_chave}_{campo.nome}"
-                )
+                chave = campo.chave or f"{prefixo_chave}_{campo.nome}"
 
                 valores[campo.nome] = st.text_input(
                     campo.rotulo,
@@ -167,9 +146,7 @@ def renderizarFormularioBusca(
 
 # Função para renderizar um campo de visualização, incluindo rótulo e valor, com diferentes estilos dependendo do tipo de campo.
 def renderizarCampoView(campo, registro):
-    valor = normalizarValor(
-        resolverValor(campo.valor, registro)
-    )
+    valor = normalizarValor(resolverValor(campo.valor, registro))
 
     valorSeguro = escape(valor)
 
@@ -181,20 +158,13 @@ def renderizarCampoView(campo, registro):
         </span>
         """
     elif campo.tipo == "destaque":
-        conteudo = (
-            '<span class="vv-field-value-highlight">'
-            f"{valorSeguro}</span>"
-        )
+        conteudo = '<span class="vv-field-value-highlight">' f"{valorSeguro}</span>"
     elif campo.tipo == "email" and valor != "Não informado":
-        conteudo = (
-            f'<a href="mailto:{escape(valor, quote=True)}">'
-            f"{valorSeguro}</a>"
-        )
+        conteudo = f'<a href="mailto:{escape(valor, quote=True)}">' f"{valorSeguro}</a>"
     else:
         conteudo = valorSeguro
 
-    st.html(
-        f"""
+    st.html(f"""
         <div class="vv-field">
             <div class="vv-field-label">
                 {escape(str(campo.rotulo))}
@@ -204,41 +174,20 @@ def renderizarCampoView(campo, registro):
                 {conteudo}
             </div>
         </div>
-        """
-    )
+        """)
 
 # Função para renderizar a visualização de um registro, incluindo informações do registro, seções e ações disponíveis.
-def renderizarRegistroView(
-    *,
-    registro,
-    nome,
-    tipo_registro,
-    secoes,
-    prefixo_chave,
-    ao_limpar=None,
-    meta=None,
-    status=None,
-    icone=None,
-    acoes=None,
-):
-    nomeResolvido = normalizarValor(
-        resolverValor(nome, registro)
-    )
+def renderizarRegistroView(*, registro, nome, tipo_registro, secoes, prefixo_chave, ao_limpar=None, meta=None, status=None, icone=None, acoes=None):
+    nomeResolvido = normalizarValor(resolverValor(nome, registro))
 
-    tipoResolvido = normalizarValor(
-        resolverValor(tipo_registro, registro)
-    )
+    tipoResolvido = normalizarValor(resolverValor(tipo_registro, registro))
 
     metaResolvida = (
-        normalizarValor(resolverValor(meta, registro))
-        if meta is not None
-        else None
+        normalizarValor(resolverValor(meta, registro)) if meta is not None else None
     )
 
     statusResolvido = (
-        normalizarValor(resolverValor(status, registro))
-        if status is not None
-        else None
+        normalizarValor(resolverValor(status, registro)) if status is not None else None
     )
 
     identificador = (
@@ -261,11 +210,7 @@ def renderizarRegistroView(
         )
 
     for acao in acoes or []:
-        visivel = (
-            acao.visivel(registro)
-            if callable(acao.visivel)
-            else acao.visivel
-        )
+        visivel = acao.visivel(registro) if callable(acao.visivel) else acao.visivel
 
         if visivel:
             acoesVisiveis.append(
@@ -274,20 +219,14 @@ def renderizarRegistroView(
                     "icone": acao.icone,
                     "tipo": acao.tipo,
                     "chave": acao.chave or acao.rotulo.lower(),
-                    "ao_clicar": (
-                        lambda acaoAtual=acao:
-                        acaoAtual.ao_clicar(registro)
-                    ),
+                    "ao_clicar": (lambda acaoAtual=acao: acaoAtual.ao_clicar(registro)),
                 }
             )
 
     with st.container(border=True):
         st.html('<span class="vv-record-marker"></span>')
 
-        proporcoes = [5.2] + [
-            0.9
-            for _ in acoesVisiveis
-        ]
+        proporcoes = [5.2] + [0.9 for _ in acoesVisiveis]
 
         colunas = st.columns(
             proporcoes,
@@ -296,8 +235,7 @@ def renderizarRegistroView(
 
         with colunas[0]:
             metaHtml = (
-                f'<div class="vv-record-meta">'
-                f'{escape(metaResolvida)}</div>'
+                f'<div class="vv-record-meta">' f"{escape(metaResolvida)}</div>"
                 if metaResolvida
                 else ""
             )
@@ -305,13 +243,12 @@ def renderizarRegistroView(
             statusHtml = (
                 '<div class="vv-record-status">'
                 '<span class="vv-status-dot"></span>'
-                f'{escape(statusResolvido)}</div>'
+                f"{escape(statusResolvido)}</div>"
                 if statusResolvido
                 else ""
             )
 
-            st.html(
-                f"""
+            st.html(f"""
                 <div class="vv-record">
                     <div class="vv-avatar">
                         {escape(identificador)}
@@ -330,8 +267,7 @@ def renderizarRegistroView(
                         {statusHtml}
                     </div>
                 </div>
-                """
-            )
+                """)
 
         for colunaAcao, acao in zip(
             colunas[1:],
@@ -342,10 +278,7 @@ def renderizarRegistroView(
                     acao["rotulo"],
                     icon=acao.get("icone"),
                     type=acao.get("tipo", "secondary"),
-                    key=(
-                        f"{prefixo_chave}_"
-                        f"{acao.get('chave', 'acao')}"
-                    ),
+                    key=(f"{prefixo_chave}_" f"{acao.get('chave', 'acao')}"),
                     use_container_width=True,
                 ):
                     acao["ao_clicar"]()
@@ -356,13 +289,12 @@ def renderizarRegistroView(
 
             descricaoHtml = (
                 '<div class="vv-section-description">'
-                f'{escape(secao.descricao)}</div>'
+                f"{escape(secao.descricao)}</div>"
                 if secao.descricao
                 else ""
             )
 
-            st.html(
-                f"""
+            st.html(f"""
                 <div class="vv-section-heading">
                     <div class="vv-section-number">
                         {indice:02d}
@@ -376,14 +308,10 @@ def renderizarRegistroView(
                         {descricaoHtml}
                     </div>
                 </div>
-                """
-            )
+                """)
 
             for linha in secao.linhas:
-                proporcoes = [
-                    campo.proporcao
-                    for campo in linha
-                ]
+                proporcoes = [campo.proporcao for campo in linha]
 
                 colunas = st.columns(proporcoes)
 
@@ -399,18 +327,15 @@ def renderizarRegistroView(
 
 # Função para renderizar uma mensagem inicial, geralmente usada quando não há registros para exibir.
 def renderizarMensagemInicial(mensagem):
-    st.html(
-        f"""
+    st.html(f"""
         <div class="vv-empty-state">
             {escape(str(mensagem))}
         </div>
-        """
-    )
+        """)
 
 # Função para aplicar estilos CSS personalizados à interface do usuário.
 def aplicarEstiloView():
-    st.html(
-        """
+    st.html("""
         <style>
         [data-testid="stMainBlockContainer"]:has(.vv-page-marker) {
             width: 100%;
@@ -856,5 +781,4 @@ def aplicarEstiloView():
             }
         }
         </style>
-        """
-    )
+        """)
