@@ -1,0 +1,17 @@
+
+# Caso preencha os dados desse arquivo, MUDE O SEU NOME PARA "secrets.toml"
+# Assim o Streamlit consegue fazer a leitura normalmente
+
+[auth]
+redirect_uri = "http://localhost:8501/oauth2callback"
+cookie_secret = ""      # Senha secreta
+client_id = ""          # Id do cliente (gerado pelo Google)
+client_secret = ""      # Chave secreta do cliente (gerado pelo Google)
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+
+[database]
+host = "localhost"      # Nome do host 
+port = 5432             # Porta
+database_name = ""      # Nome do Banco
+user = ""               # Nome do usuário
+password = ""           # Senha do usuário
