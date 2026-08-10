@@ -2,10 +2,13 @@ import streamlit as st
 from sqlalchemy.exc import SQLAlchemyError
 from modulos.academico.academico_service import editarPessoa
 from modulos.financeiro.financeiro_service import listarFinanceiroId
-from modulos.utils.cadastro_visual import (marcarAcoesCadastro, marcarPainelCadastro, renderizarCabecalhoFormulario, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
+from modulos.utils.cadastro_visual import (marcarAcoesCadastro, marcarPainelCadastro, renderizarCabecalhoFormulario, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro, aplicarEstiloCamposBloqueados)
 
 # Tela de edição para membros do financeiro
 def telaEdicaoFinanceiro():
+
+    aplicarEstiloCamposBloqueados()
+
     if "ADMIN" not in st.session_state.roles:
         st.error("Acesso negado. Apenas administradores podem " "editar registros.")
         st.stop()

@@ -1,10 +1,13 @@
 import streamlit as st
 from sqlalchemy.exc import SQLAlchemyError
 from modulos.academico.academico_service import editarCampus, listarCampusId
-from modulos.utils.cadastro_visual import (marcarAcoesCadastro, marcarPainelCadastro, renderizarCabecalhoFormulario, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
+from modulos.utils.cadastro_visual import (marcarAcoesCadastro, marcarPainelCadastro, renderizarCabecalhoFormulario, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro, aplicarEstiloCamposBloqueados)
 
 # Tela de edição para Campus
 def telaEdicaoCampus():
+
+    aplicarEstiloCamposBloqueados()
+
     if "ADMIN" not in st.session_state.roles:
         st.error("Acesso negado. Apenas administradores podem " "editar registros.")
         st.stop()
