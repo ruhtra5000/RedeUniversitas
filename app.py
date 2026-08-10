@@ -1,12 +1,11 @@
 from sqlalchemy import select
 import streamlit as st
-
 from database.Conexao import SessionLocal
-import database.entidades 
 from database.entidades.Pessoa import Pessoa
 from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
 from modulos.rotas import get_navigation
-from modulos.sidebar import renderizar_perfil_usuario
+from modulos.temaRedeUniversitas import temaRedeUniversitas
+from modulos.sidebar import (aplicarEstiloSidebar, renderizarLogoutSidebar, renderizarPerfilUsuario, renderizarTituloSecaoSidebar)
 
 st.set_page_config(
     page_title="RedeUniversitas",
@@ -14,6 +13,9 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed",
 )
+
+# Aplicar tema personalizado da RedeUniversitas
+temaRedeUniversitas()
 
 # Gerar mensalidades automaticamente
 geracaoAutomaticaMensalidade()
@@ -100,17 +102,30 @@ pg = st.navigation(nav_dict, position="hidden")
 
 # Renderização do Perfil e Menu na Sidebar
 with st.sidebar:
-    renderizar_perfil_usuario()
-    
-    st.divider()
-    
-    # Renderiza manualmente as seções, pulando "Edições (Oculto)"
-    for section, pages in nav_dict.items():
-        if section != "Edições (Oculto)":
-            st.markdown(f"**{section}**")
+    aplicarEstiloSidebar()
+
+    renderizarPerfilUsuario()
+
+    with st.container(
+        key="sidebar_menu",
+    ):
+        for section, pages in nav_dict.items():
+
+            if section == "Edições (Oculto)":
+                continue
+
+            renderizarTituloSecaoSidebar(
+                section
+            )
+
             for page in pages:
-                st.page_link(page, label=page.title, icon=page.icon)
-            st.write("") # Espaço extra entre seções
+                st.page_link(
+                    page,
+                    label=page.title,
+                    icon=page.icon,
+                )
+
+    renderizarLogoutSidebar()
 
 # Execução da página atual
 pg.run()
