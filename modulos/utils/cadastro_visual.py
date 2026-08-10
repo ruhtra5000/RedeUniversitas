@@ -141,6 +141,29 @@ def renderizarAvisoCadastro(titulo: str, descricao: str):
             </div>
         </div>
         """)
+    
+# Função para aplicar o estilo CSS personalizado nos campos de entrada bloqueados
+def aplicarEstiloCamposBloqueados():
+    st.html(
+        """
+        <style>
+
+        div[data-testid="stTextInput"]:has(input:disabled)
+        div[data-testid="stTextInputRootElement"] {
+            background-color: #132A3A !important;
+            border-color: #31506A !important;
+        }
+
+        div[data-testid="stTextInput"]
+        input[data-testid="stTextInputField"]:disabled {
+            color: #9FBAD0 !important;
+            -webkit-text-fill-color: #9FBAD0 !important;
+            opacity: 1 !important;
+            cursor: not-allowed !important;
+        }
+        </style>
+        """
+    )
 
 # Função para aplicar o estilo CSS personalizado na página inicial
 def aplicarEstiloCadastro():
