@@ -70,7 +70,8 @@ psql -U nome_usuario -d nome_banco -f schema.sql
 Para popular o banco de dados com um conjunto inicial de dados, execute o seguinte comando:
 
 ```bash
-# to do
+# Arquivo dados.sql (substituir "nome_usuario" e "nome_banco")
+psql -U nome_usuario -d nome_banco -f dados.sql
 ```
 
 ### Configuração do login com OAuth
