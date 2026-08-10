@@ -1,177 +1,165 @@
 import re
 import streamlit as st
 from modulos.academico.academico_service import listarCampusCnpj, listarCampusId
-from modulos.utils.view_utils import formatar_cnpj, exibirCampo, limpar_consulta_campus
+from modulos.utils.view_utils import formatar_cnpj, limpar_consulta_campus
+from modulos.utils.view_visual import (AcaoView, CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de campus
 def telaViewCampus():
 
-    st.title("🔎 Consulta de Campus")
-    st.caption("Pesquise um campus pelo CNPJ ou pelo ID.")
-
     if "campus_id" in st.session_state:
-        st.session_state["consulta_campus_id"] = (
-            st.session_state.pop("campus_id")
-        )
+        st.session_state["consulta_campus_id"] = st.session_state.pop("campus_id")
 
     campus = None
 
-    col_voltar, _ = st.columns([1, 5])
+    # Função de navegação 
+    def voltar():
+        from modulos.rotas import listagem_campus_page
 
-    with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_campus_page
-            st.switch_page(listagem_campus_page)
+        st.switch_page(listagem_campus_page)
 
-    with st.form("buscar_campus", border=True):
+    renderizarCabecalhoView(categoria="View", titulo="Consultar campus", descricao=("Localize uma unidade utilizando o CNPJ " "ou o identificador."), ao_voltar=voltar, prefixo_chave="campus")
 
-        st.markdown("#### 🔍 Buscar campus")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            cnpjDigitado = st.text_input(
-                "CNPJ",
+    buscar, valores = renderizarFormularioBusca(
+        campos=[
+            CampoBusca(
+                nome="cnpj",
+                rotulo="CNPJ",
                 placeholder="Somente números",
-                key="consulta_campus_cnpj",
-            )
-
-        with col2:
-            idDigitado = st.text_input(
-                "ID",
+                proporcao=1,
+                chave="consulta_campus_cnpj",
+            ),
+            CampoBusca(
+                nome="id",
+                rotulo="ID",
                 placeholder="Ex.: 1",
-                key="consulta_campus_id_digitado",
-            )
-
-        colunaBotao, _ = st.columns([1.3, 4.7])
-
-        with colunaBotao:
-            buscar = st.form_submit_button(
-                "🔍 Buscar",
-                type="primary",
-                use_container_width=True,
-            )
+                proporcao=1,
+                chave="consulta_campus_id_digitado",
+            ),
+        ],
+        prefixo_chave="campus",
+        titulo="Localizar campus",
+        descricao=("Informe somente o CNPJ ou somente o ID."),
+    )
 
     if buscar:
-
         st.session_state.pop("consulta_campus_id", None)
 
-        cnpj = re.sub(r"\D", "", cnpjDigitado)
-        idCampus = idDigitado.strip()
+        cnpj = re.sub(r"\D", "", valores["cnpj"])
+        idCampus = valores["id"].strip()
 
         if not cnpj and not idCampus:
             st.warning("Informe um CNPJ ou um ID.")
 
         elif cnpj and idCampus:
-            st.warning(
-                "Informe somente o CNPJ ou somente o ID."
-            )
+            st.warning("Informe somente o CNPJ ou somente o ID.")
 
         elif cnpj:
             if len(cnpj) != 14:
                 st.error("O CNPJ deve possuir 14 números.")
+
             else:
                 campus = listarCampusCnpj(cnpj)
 
                 if campus is None:
                     st.error("Campus não encontrado.")
+
                 else:
-                    st.session_state["consulta_campus_id"] = (
-                        campus.id
-                    )
+                    st.session_state["consulta_campus_id"] = campus.id
+
+        elif not idCampus.isdigit():
+            st.error("O ID deve conter somente números.")
 
         else:
-            if not idCampus.isdigit():
-                st.error("O ID deve conter somente números.")
+            campus = listarCampusId(int(idCampus))
+
+            if campus is None:
+                st.error("Campus não encontrado.")
+
             else:
-                campus = listarCampusId(int(idCampus))
+                st.session_state["consulta_campus_id"] = campus.id
 
-                if campus is None:
-                    st.error("Campus não encontrado.")
-                else:
-                    st.session_state["consulta_campus_id"] = (
-                        campus.id
-                    )
+    campusId = st.session_state.get("consulta_campus_id")
 
-    idCampus = st.session_state.get("consulta_campus_id")
-
-    if campus is None and idCampus is not None:
-        campus = listarCampusId(idCampus)
+    if campus is None and campusId is not None:
+        campus = listarCampusId(campusId)
 
     if campus is None:
         if not buscar:
-            st.info(
-                "Informe um CNPJ ou ID para consultar um campus."
+            renderizarMensagemInicial(
+                "Informe um CNPJ ou ID para consultar " "um campus."
             )
 
         return
 
-    st.write("")
+    # Função para edição de campus
+    def editar(registro):
+        st.session_state["edicao_campus_id"] = registro.id
 
-    titulo, botao_limpar, botao_editar = st.columns(
-        [4.2, 0.9, 0.9],
-        vertical_alignment="center",
-    )
+        from modulos.rotas import editar_campus_page
 
-    with titulo:
-        st.subheader(f"🏛️ {campus.nome}")
+        st.switch_page(editar_campus_page)
 
-    with botao_limpar:
-        st.button(
-            "Limpar",
-            icon=":material/close:",
-            use_container_width=True,
-            on_click=limpar_consulta_campus,
+    acoes = []
+
+    if "ADMIN" in st.session_state.get("roles", []):
+        acoes.append(
+            AcaoView(
+                rotulo="Editar",
+                icone=":material/edit:",
+                tipo="secondary",
+                chave="editar",
+                ao_clicar=editar,
+            )
         )
 
-    with botao_editar:
-        if "ADMIN" in st.session_state.roles:
-            if st.button(
-                "Editar",
-                icon=":material/edit:",
-                use_container_width=True,
-                type="secondary"
-            ):
-                st.session_state["edicao_campus_id"] = campus.id
-                from modulos.rotas import editar_campus_page
-                st.switch_page(editar_campus_page)
+    secoes = [
+        SecaoView(
+            titulo="Dados do campus",
+            descricao=("Informações institucionais e de contato."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="ID",
+                        valor=lambda item: item.id,
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="Nome",
+                        valor=lambda item: item.nome,
+                        proporcao=3,
+                    ),
+                    CampoView(
+                        rotulo="CNPJ",
+                        valor=lambda item: formatar_cnpj(item.cnpj),
+                        proporcao=2,
+                    ),
+                ],
+                [
+                    CampoView(
+                        rotulo="E-mail",
+                        valor=lambda item: (item.email or "Não informado"),
+                        proporcao=3.5,
+                        tipo="email",
+                    ),
+                    CampoView(
+                        rotulo="Telefone",
+                        valor=lambda item: (item.telefone or "Não informado"),
+                        proporcao=2.5,
+                    ),
+                ],
+            ],
+        ),
+    ]
 
-    with st.container(border=True):
-
-        st.markdown("#### 🏛️ Dados do Campus")
-
-        col1, col2, col3 = st.columns([1, 3, 2])
-
-        with col1:
-            exibirCampo(
-                "ID",
-                campus.id,
-            )
-
-        with col2:
-            exibirCampo(
-                "Nome",
-                campus.nome,
-            )
-
-        with col3:
-            exibirCampo(
-                "CNPJ",
-                formatar_cnpj(campus.cnpj),
-            )
-
-        st.write("")
-
-        col1, col2 = st.columns([3.5, 2.5])
-
-        with col1:
-            exibirCampo(
-                "E-mail",
-                campus.email or "Não informado",
-            )
-
-        with col2:
-            exibirCampo(
-                "Telefone",
-                campus.telefone or "Não informado",
-            )
+    renderizarRegistroView(
+        registro=campus,
+        nome=lambda item: item.nome,
+        tipo_registro="Campus",
+        meta=lambda item: formatar_cnpj(item.cnpj),
+        status="Registro localizado",
+        secoes=secoes,
+        prefixo_chave="campus",
+        ao_limpar=limpar_consulta_campus,
+        acoes=acoes,
+    )

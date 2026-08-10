@@ -1,67 +1,63 @@
 import streamlit as st
-from modulos.academico.academico_service import listarDisciplinaCodigo, listarDisciplinaId, listarPreRequisitosDisciplina
-from modulos.utils.view_utils import exibirCampo, limpar_consulta_disciplina
+from modulos.academico.academico_service import (listarDisciplinaCodigo, listarDisciplinaId, listarPreRequisitosDisciplina)
+from modulos.utils.view_utils import limpar_consulta_disciplina
+from modulos.utils.view_visual import (AcaoView, CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de disciplina
 def telaViewDisciplina():
 
-    st.title("🔎 Consulta de Disciplina")
-    st.caption("Pesquise uma disciplina pelo código ou pelo ID.")
-
     if "disciplina_id" in st.session_state:
-        st.session_state["consulta_disciplina_id"] = (
-            st.session_state.pop("disciplina_id")
+        st.session_state["consulta_disciplina_id"] = st.session_state.pop(
+            "disciplina_id"
         )
 
     disciplina = None
 
-    col_voltar, _ = st.columns([1, 5])
+    # Função de navegação 
+    def voltar():
+        from modulos.rotas import (
+            listagem_disciplina_page,
+        )
 
-    with col_voltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_disciplina_page
-            st.switch_page(listagem_disciplina_page)
+        st.switch_page(listagem_disciplina_page)
 
-    with st.form("buscar_disciplina", border=True):
+    renderizarCabecalhoView(categoria="View", titulo="Consultar disciplina", descricao=("Localize uma disciplina utilizando " "o código ou o identificador."), ao_voltar=voltar, prefixo_chave="disciplina")
 
-        st.markdown("#### 🔍 Buscar disciplina")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            codigo_digitado = st.text_input(
-                "Código",
+    buscar, valores = renderizarFormularioBusca(
+        campos=[
+            CampoBusca(
+                nome="codigo",
+                rotulo="Código",
                 placeholder="Ex.: 1-00001",
-                key="consulta_disciplina_codigo",
-            )
-
-        with col2:
-            id_digitado = st.text_input(
-                "ID",
+                proporcao=1,
+                chave="consulta_disciplina_codigo",
+            ),
+            CampoBusca(
+                nome="id",
+                rotulo="ID",
                 placeholder="Ex.: 1",
-                key="consulta_disciplina_id_digitado",
-            )
-
-        coluna_botao, _ = st.columns([1.3, 4.7])
-
-        with coluna_botao:
-            buscar = st.form_submit_button(
-                "🔍 Buscar",
-                type="primary",
-                use_container_width=True,
-            )
+                proporcao=1,
+                chave="consulta_disciplina_id_digitado",
+            ),
+        ],
+        prefixo_chave="disciplina",
+        titulo="Localizar disciplina",
+        descricao=("Informe somente o código ou somente o ID."),
+    )
 
     if buscar:
+        st.session_state.pop(
+            "consulta_disciplina_id",
+            None,
+        )
 
-        st.session_state.pop("consulta_disciplina_id", None)
+        codigo = valores["codigo"].strip()
+        idDisciplina = valores["id"].strip()
 
-        codigo = codigo_digitado.strip()
-        id_disciplina = id_digitado.strip()
-
-        if not codigo and not id_disciplina:
+        if not codigo and not idDisciplina:
             st.warning("Informe um código ou um ID.")
 
-        elif codigo and id_disciplina:
+        elif codigo and idDisciplina:
             st.warning("Informe somente o código ou somente o ID.")
 
         elif codigo:
@@ -69,134 +65,138 @@ def telaViewDisciplina():
 
             if disciplina is None:
                 st.error("Disciplina não encontrada.")
+
             else:
                 st.session_state["consulta_disciplina_id"] = disciplina.id
 
+        elif not idDisciplina.isdigit():
+            st.error("O ID deve conter somente números.")
+
         else:
-            if not id_disciplina.isdigit():
-                st.error("O ID deve conter somente números.")
+            disciplina = listarDisciplinaId(int(idDisciplina))
+
+            if disciplina is None:
+                st.error("Disciplina não encontrada.")
+
             else:
-                disciplina = listarDisciplinaId(int(id_disciplina))
+                st.session_state["consulta_disciplina_id"] = disciplina.id
 
-                if disciplina is None:
-                    st.error("Disciplina não encontrada.")
-                else:
-                    st.session_state["consulta_disciplina_id"] = (
-                        disciplina.id
-                    )
+    disciplinaId = st.session_state.get("consulta_disciplina_id")
 
-    disciplina_id = st.session_state.get("consulta_disciplina_id")
-
-    if disciplina is None and disciplina_id is not None:
-        disciplina = listarDisciplinaId(disciplina_id)
+    if disciplina is None and disciplinaId is not None:
+        disciplina = listarDisciplinaId(disciplinaId)
 
     if disciplina is None:
         if not buscar:
-            st.info("Informe um código ou ID para consultar uma disciplina.")
+            renderizarMensagemInicial(
+                "Informe um código ou ID para " "consultar uma disciplina."
+            )
+
         return
 
-    pre_requisitos = listarPreRequisitosDisciplina(disciplina.id)
+    preRequisitos = listarPreRequisitosDisciplina(disciplina.id)
 
-    st.write("")
-
-    titulo, botao_limpar, botao_editar = st.columns(
-        [4.2, 0.9, 0.9],
-        vertical_alignment="center",
+    textoPreRequisitos = (
+        " • ".join(
+            (f"{preRequisito.codigo or 'Sem código'}" f" — {preRequisito.nome}")
+            for preRequisito in preRequisitos
+        )
+        if preRequisitos
+        else "Esta disciplina não possui pré-requisitos."
     )
 
-    with titulo:
-        st.subheader(f"📘 {disciplina.nome}")
+    # Função para edição de disciplina
+    def editar(registro):
+        st.session_state["edicao_disciplina_id"] = registro.id
 
-    with botao_limpar:
-        st.button(
-            "Limpar",
-            icon=":material/close:",
-            use_container_width=True,
-            on_click=limpar_consulta_disciplina,
+        from modulos.rotas import (
+            editar_disciplina_page,
         )
 
-    with botao_editar:
-        if "ADMIN" in st.session_state.roles:
-            if st.button(
-                "Editar",
-                icon=":material/edit:",
-                use_container_width=True,
-                type="secondary"
-            ):
-                st.session_state["edicao_disciplina_id"] = disciplina.id
-                from modulos.rotas import editar_disciplina_page
-                st.switch_page(editar_disciplina_page)
+        st.switch_page(editar_disciplina_page)
 
-    with st.container(border=True):
+    acoes = []
 
-        st.markdown("#### 📚 Dados da Disciplina")
-
-        col1, col2, col3 = st.columns([1, 1.8, 3.2])
-
-        with col1:
-            exibirCampo(
-                "ID",
-                disciplina.id,
+    if "ADMIN" in st.session_state.get("roles", []):
+        acoes.append(
+            AcaoView(
+                rotulo="Editar",
+                icone=":material/edit:",
+                tipo="secondary",
+                chave="editar",
+                ao_clicar=editar,
             )
+        )
 
-        with col2:
-            exibirCampo(
-                "Código",
-                disciplina.codigo or "Não informado",
-            )
+    secoes = [
+        SecaoView(
+            titulo="Dados da disciplina",
+            descricao=("Identificação e informações " "acadêmicas."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="ID",
+                        valor=lambda item: item.id,
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="Código",
+                        valor=lambda item: (item.codigo or "Não informado"),
+                        proporcao=1.8,
+                    ),
+                    CampoView(
+                        rotulo="Nome",
+                        valor=lambda item: item.nome,
+                        proporcao=3.2,
+                    ),
+                ],
+                [
+                    CampoView(
+                        rotulo="Carga horária",
+                        valor=lambda item: (f"{item.carga_horaria} horas"),
+                        proporcao=1.5,
+                    ),
+                    CampoView(
+                        rotulo="Tipo",
+                        valor=lambda item: (
+                            "Obrigatória" if item.obrigatoria else "Optativa"
+                        ),
+                        proporcao=1.5,
+                        tipo="badge",
+                    ),
+                    CampoView(
+                        rotulo="Curso",
+                        valor=lambda item: (
+                            item.curso.nome if item.curso else "Não informado"
+                        ),
+                        proporcao=3,
+                    ),
+                ],
+            ],
+        ),
+        SecaoView(
+            titulo="Pré-requisitos",
+            descricao=("Disciplinas exigidas antes " "deste componente curricular."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="Disciplinas",
+                        valor=textoPreRequisitos,
+                        proporcao=1,
+                    ),
+                ],
+            ],
+        ),
+    ]
 
-        with col3:
-            exibirCampo(
-                "Nome",
-                disciplina.nome,
-            )
-
-        st.write("")
-
-        col1, col2, col3 = st.columns([1.5, 1.5, 3])
-
-        with col1:
-            exibirCampo(
-                "Carga Horária",
-                f"{disciplina.carga_horaria} horas",
-            )
-
-        with col2:
-            exibirCampo(
-                "Obrigatória",
-                "Sim" if disciplina.obrigatoria else "Não",
-            )
-
-        with col3:
-            exibirCampo(
-                "Curso",
-                disciplina.curso.nome,
-            )
-
-    st.write("")
-
-    with st.container(border=True):
-
-        st.markdown("#### 🔗 Pré-requisitos")
-
-        if not pre_requisitos:
-            st.info("Esta disciplina não possui pré-requisitos.")
-
-        else:
-            for pre_requisito in pre_requisitos:
-
-                with st.container(border=True):
-                    col1, col2 = st.columns(
-                        [1.5, 4.5],
-                        vertical_alignment="center",
-                    )
-
-                    with col1:
-                        st.caption("Código")
-                        st.markdown(
-                            f"**{pre_requisito.codigo or 'Não informado'}**"
-                        )
-
-                    with col2:
-                        st.caption("Disciplina")
-                        st.markdown(f"**{pre_requisito.nome}**")
+    renderizarRegistroView(
+        registro=disciplina,
+        nome=lambda item: item.nome,
+        tipo_registro="Disciplina",
+        meta=lambda item: (item.codigo or "Código não informado"),
+        status=lambda item: ("Obrigatória" if item.obrigatoria else "Optativa"),
+        secoes=secoes,
+        prefixo_chave="disciplina",
+        ao_limpar=limpar_consulta_disciplina,
+        acoes=acoes,
+    )

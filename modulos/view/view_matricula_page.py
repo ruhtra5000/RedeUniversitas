@@ -1,17 +1,13 @@
 import streamlit as st
-from modulos.academico.academico_service import listarMatriculaId, listarMatricula
-from modulos.utils.view_utils import exibirCampo, formatar_aprovacao, limpar_consulta_matricula
+from modulos.academico.academico_service import listarMatriculaId
+from modulos.utils.view_utils import formatar_aprovacao, limpar_consulta_matricula
+from modulos.utils.view_visual import (CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de matrícula
 def telaViewMatricula():
 
-    st.title("🔎 Consulta de Matrícula")
-    st.caption(
-        "Pesquise utilizando os IDs do aluno e da turma."
-    )
-
     selecionada = st.session_state.pop(
-        "matricula_selecionada",    
+        "matricula_selecionada",
         None,
     )
 
@@ -20,58 +16,52 @@ def telaViewMatricula():
 
     matricula = None
 
-    colVoltar, _ = st.columns([1, 5])
+    # Função de navegação 
+    def voltar():
+        from modulos.rotas import (
+            listagem_matricula_page,
+        )
 
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_matricula_page
-            st.switch_page(listagem_matricula_page)
+        st.switch_page(listagem_matricula_page)
 
-    with st.form("buscar_matricula", border=True):
+    renderizarCabecalhoView(categoria="View", titulo="Consultar matrícula", descricao=("Localize uma matrícula utilizando os IDs " "do aluno e da turma."), ao_voltar=voltar, prefixo_chave="matricula")
 
-        st.markdown("#### 🔍 Buscar matrícula")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            alunoDigitado = st.text_input(
-                "ID do aluno",
+    buscar, valores = renderizarFormularioBusca(
+        campos=[
+            CampoBusca(
+                nome="aluno",
+                rotulo="ID do aluno",
                 placeholder="Ex.: 1",
-                key="consulta_matricula_aluno",
-            )
-
-        with col2:
-            turmaDigitada = st.text_input(
-                "ID da turma",
+                proporcao=1,
+                chave="consulta_matricula_aluno",
+            ),
+            CampoBusca(
+                nome="turma",
+                rotulo="ID da turma",
                 placeholder="Ex.: 1",
-                key="consulta_matricula_turma",
-            )
-
-        colunaBotao, _ = st.columns([1.3, 4.7])
-
-        with colunaBotao:
-            buscar = st.form_submit_button(
-                "🔍 Buscar",
-                type="primary",
-                use_container_width=True,
-            )
+                proporcao=1,
+                chave="consulta_matricula_turma",
+            ),
+        ],
+        prefixo_chave="matricula",
+        titulo="Localizar matrícula",
+        descricao=("Informe os identificadores do aluno " "e da turma."),
+    )
 
     if buscar:
-        st.session_state.pop("consulta_matricula_chave", None)
+        st.session_state.pop(
+            "consulta_matricula_chave",
+            None,
+        )
 
-        idAluno = alunoDigitado.strip()
-        idTurma = turmaDigitada.strip()
+        idAluno = valores["aluno"].strip()
+        idTurma = valores["turma"].strip()
 
         if not idAluno or not idTurma:
-            st.warning(
-                "Informe os IDs do aluno e da turma."
-            )
+            st.warning("Informe os IDs do aluno e da turma.")
 
-        elif not all(
-            valor.isdigit()
-            for valor in [idAluno, idTurma]
-        ):
-            st.error("Todos os IDs devem conter somente números.")
+        elif not all(valor.isdigit() for valor in [idAluno, idTurma]):
+            st.error("Todos os IDs devem conter " "somente números.")
 
         else:
             matricula = listarMatriculaId(
@@ -81,6 +71,7 @@ def telaViewMatricula():
 
             if matricula is None:
                 st.error("Matrícula não encontrada.")
+
             else:
                 st.session_state["consulta_matricula_chave"] = {
                     "aluno_id": matricula.aluno_id,
@@ -97,84 +88,83 @@ def telaViewMatricula():
 
     if matricula is None:
         if not buscar:
-            st.info("Informe os dados para consultar uma matrícula.")
+            renderizarMensagemInicial(
+                "Informe os dados para consultar " "uma matrícula."
+            )
 
         return
 
-    st.write("")
+    secoes = [
+        SecaoView(
+            titulo="Dados do aluno",
+            descricao=("Aluno vinculado à matrícula acadêmica."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="ID",
+                        valor=lambda item: (item.aluno_id),
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="Aluno",
+                        valor=lambda item: (item.aluno.pessoa.nome),
+                        proporcao=3,
+                    ),
+                    CampoView(
+                        rotulo="Matrícula institucional",
+                        valor=lambda item: (item.aluno.matricula),
+                        proporcao=2,
+                    ),
+                ],
+            ],
+        ),
+        SecaoView(
+            titulo="Vínculo acadêmico",
+            descricao=("Turma, disciplina e situação " "da matrícula."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="Turma",
+                        valor=lambda item: (
+                            item.turma.codigo or f"Turma {item.turma_id}"
+                        ),
+                        proporcao=2,
+                    ),
+                    CampoView(
+                        rotulo="Disciplina",
+                        valor=lambda item: (item.disciplina.nome),
+                        proporcao=2,
+                    ),
+                    CampoView(
+                        rotulo="Situação",
+                        valor=lambda item: (formatar_aprovacao(item.aprovacao)),
+                        proporcao=2,
+                        tipo="badge",
+                    ),
+                ],
+                [
+                    CampoView(
+                        rotulo="ID do aluno",
+                        valor=lambda item: (item.aluno_id),
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="ID da turma",
+                        valor=lambda item: (item.turma_id),
+                        proporcao=1,
+                    ),
+                ],
+            ],
+        ),
+    ]
 
-    titulo, botao = st.columns(
-        [4.7, 1.3],
-        vertical_alignment="center",
+    renderizarRegistroView(
+        registro=matricula,
+        nome=lambda item: (f"Matrícula de " f"{item.aluno.pessoa.nome}"),
+        tipo_registro="Matrícula",
+        meta=lambda item: (item.disciplina.nome),
+        status=lambda item: formatar_aprovacao(item.aprovacao),
+        secoes=secoes,
+        prefixo_chave="matricula",
+        ao_limpar=limpar_consulta_matricula,
     )
-
-    with titulo:
-        st.subheader(
-            f"📝 Matrícula de {matricula.aluno.pessoa.nome}"
-        )
-
-    with botao:
-        st.button(
-            "Limpar",
-            icon=":material/close:",
-            use_container_width=True,
-            on_click=limpar_consulta_matricula,
-        )
-
-    with st.container(border=True):
-
-        st.markdown("#### 👤 Dados do Aluno")
-
-        col1, col2, col3 = st.columns([1, 3, 2])
-
-        with col1:
-            exibirCampo("ID", matricula.aluno_id)
-
-        with col2:
-            exibirCampo(
-                "Aluno",
-                matricula.aluno.pessoa.nome,
-            )
-
-        with col3:
-            exibirCampo(
-                "Matrícula institucional",
-                matricula.aluno.matricula,
-            )
-
-    st.write("")
-
-    with st.container(border=True):
-
-        st.markdown("#### 📚 Vínculo Acadêmico")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            exibirCampo(
-                "Turma",
-                matricula.turma.codigo or
-                f"Turma {matricula.turma_id}",
-            )
-
-        with col2:
-            exibirCampo(
-                "Disciplina",
-                matricula.disciplina.nome,
-            )
-
-        with col3:
-            exibirCampo(
-                "Situação",
-                formatar_aprovacao(matricula.aprovacao),
-            )
-
-        st.write("")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            exibirCampo("ID do aluno", matricula.aluno_id)
-
-        with col2:
-            exibirCampo("ID da turma", matricula.turma_id)

@@ -1,199 +1,183 @@
-import re
 import streamlit as st
 from modulos.compras.compras_service import listarFornecedorId
-from modulos.utils.view_utils import exibirCampo, formatar_cnpj, limpar_consulta_fornecedor
+from modulos.utils.view_utils import formatar_cnpj, limpar_consulta_fornecedor
+from modulos.utils.view_visual import (AcaoView, CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de fornecedor
 def telaViewFornecedor():
 
-    st.title("🔎 Consulta de Fornecedor")
-    st.caption("Pesquise um fornecedor pelo ID.")
-
-    selecionado = st.session_state.pop("fornecedor_selecionado", None)
+    selecionado = st.session_state.pop(
+        "fornecedor_selecionado",
+        None,
+    )
 
     if selecionado is not None:
-        st.session_state[
-            "consulta_fornecedor_id"
-        ] = selecionado
+        st.session_state["consulta_fornecedor_id"] = selecionado
 
     fornecedor = None
-    erro_consulta = False
+    erroConsulta = False
 
-    col_voltar, _ = st.columns([1, 5])
-
-    with col_voltar:
-        if st.button(
-            "⬅ Voltar",
-            use_container_width=True,
-        ):
-            from modulos.rotas import listagem_fornecedor_page
-            st.switch_page(listagem_fornecedor_page)
-
-    with st.form("buscar_fornecedor", border=True):
-
-        st.markdown("#### 🔍 Buscar fornecedor")
-
-        id_digitado = st.text_input(
-            "ID",
-            placeholder="Ex.: 1",
-            key="consulta_fornecedor_id_digitado",
+    # Função de navegação 
+    def voltar():
+        from modulos.rotas import (
+            listagem_fornecedor_page,
         )
 
-        coluna_botao, _ = st.columns([1.3, 4.7])
+        st.switch_page(listagem_fornecedor_page)
 
-        with coluna_botao:
-            buscar = st.form_submit_button(
-                "🔍 Buscar",
-                type="primary",
-                use_container_width=True,
-            )
+    renderizarCabecalhoView(categoria="View", titulo="Consultar fornecedor", descricao=("Localize um fornecedor utilizando " "o seu identificador."), ao_voltar=voltar, prefixo_chave="fornecedor")
+
+    buscar, valores = renderizarFormularioBusca(
+        campos=[
+            CampoBusca(
+                nome="id",
+                rotulo="ID",
+                placeholder="Ex.: 1",
+                proporcao=1,
+                chave="consulta_fornecedor_id_digitado",
+            ),
+        ],
+        prefixo_chave="fornecedor",
+        titulo="Localizar fornecedor",
+        descricao="Informe o ID do fornecedor.",
+    )
 
     if buscar:
-        st.session_state.pop("consulta_fornecedor_id", None)
+        st.session_state.pop(
+            "consulta_fornecedor_id",
+            None,
+        )
 
-        id_fornecedor = id_digitado.strip()
+        idFornecedor = valores["id"].strip()
 
-        if not id_fornecedor:
+        if not idFornecedor:
             st.warning("Informe o ID do fornecedor.")
 
-        elif not id_fornecedor.isdigit():
-            st.error(
-                "O ID deve conter somente números."
-            )
+        elif not idFornecedor.isdigit():
+            st.error("O ID deve conter somente números.")
 
         else:
             try:
-                fornecedor = listarFornecedorId(
-                    int(id_fornecedor)
-                )
+                fornecedor = listarFornecedorId(int(idFornecedor))
 
                 if fornecedor is None:
-                    st.error(
-                        "Fornecedor não encontrado."
-                    )
+                    st.error("Fornecedor não encontrado.")
 
                 else:
                     st.session_state["consulta_fornecedor_id"] = fornecedor.id
 
             except Exception as erro:
-                erro_consulta = True
+                erroConsulta = True
                 st.error(str(erro))
 
-    fornecedor_id = st.session_state.get(
-        "consulta_fornecedor_id"
-    )
+    fornecedorId = st.session_state.get("consulta_fornecedor_id")
 
-    if fornecedor is None and fornecedor_id is not None:
+    if fornecedor is None and fornecedorId is not None:
         try:
-            fornecedor = listarFornecedorId(
-                fornecedor_id
-            )
+            fornecedor = listarFornecedorId(fornecedorId)
 
             if fornecedor is None:
-                erro_consulta = True
+                erroConsulta = True
 
-                st.session_state.pop("consulta_fornecedor_id", None)
+                st.session_state.pop(
+                    "consulta_fornecedor_id",
+                    None,
+                )
 
                 st.error("Fornecedor não encontrado.")
 
         except Exception as erro:
-            erro_consulta = True
+            erroConsulta = True
 
-            st.session_state.pop("consulta_fornecedor_id", None)
+            st.session_state.pop(
+                "consulta_fornecedor_id",
+                None,
+            )
 
             st.error(str(erro))
 
     if fornecedor is None:
-        if not buscar and not erro_consulta:
-            st.info(
-                "Informe um ID para consultar um fornecedor."
-            )
+        if not buscar and not erroConsulta:
+            renderizarMensagemInicial("Informe um ID para consultar " "um fornecedor.")
 
         return
 
-    st.write("")
+    # Função para edição de fornecedor
+    def editar(registro):
+        st.session_state["edicao_fornecedor_id"] = registro.id
 
-    titulo, botao_limpar, botao_editar = st.columns(
-        [4.2, 0.9, 0.9],
-        vertical_alignment="center",
+        from modulos.rotas import (
+            editar_fornecedor_page,
+        )
+
+        st.switch_page(editar_fornecedor_page)
+
+    acoes = []
+
+    if "ADMIN" in st.session_state.get("roles", []):
+        acoes.append(
+            AcaoView(
+                rotulo="Editar",
+                icone=":material/edit:",
+                tipo="secondary",
+                chave="editar",
+                ao_clicar=editar,
+            )
+        )
+
+    secoes = [
+        SecaoView(
+            titulo="Dados do fornecedor",
+            descricao=("Identificação da empresa fornecedora."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="ID",
+                        valor=lambda item: item.id,
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="Fornecedor",
+                        valor=lambda item: item.nome,
+                        proporcao=3,
+                    ),
+                    CampoView(
+                        rotulo="CNPJ",
+                        valor=lambda item: formatar_cnpj(item.cnpj),
+                        proporcao=2,
+                    ),
+                ],
+            ],
+        ),
+        SecaoView(
+            titulo="Informações de contato",
+            descricao=("Canais de comunicação do fornecedor."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="E-mail",
+                        valor=lambda item: (item.email or "Não informado"),
+                        proporcao=1,
+                        tipo="email",
+                    ),
+                    CampoView(
+                        rotulo="Telefone",
+                        valor=lambda item: (item.telefone or "Não informado"),
+                        proporcao=1,
+                    ),
+                ],
+            ],
+        ),
+    ]
+
+    renderizarRegistroView(
+        registro=fornecedor,
+        nome=lambda item: item.nome,
+        tipo_registro="Fornecedor",
+        meta=lambda item: formatar_cnpj(item.cnpj),
+        status="Registro localizado",
+        secoes=secoes,
+        prefixo_chave="fornecedor",
+        ao_limpar=limpar_consulta_fornecedor,
+        acoes=acoes,
     )
-
-    with titulo:
-        st.subheader(f"🏭 {fornecedor.nome}")
-
-    with botao_limpar:
-        st.button(
-            "Limpar",
-            icon=":material/close:",
-            use_container_width=True,
-            on_click=limpar_consulta_fornecedor,
-        )
-
-    with botao_editar:
-        if "ADMIN" in st.session_state.roles:
-            if st.button(
-                "Editar",
-                icon=":material/edit:",
-                use_container_width=True,
-                type="secondary"
-            ):
-                st.session_state["edicao_fornecedor_id"] = fornecedor.id
-                from modulos.rotas import editar_fornecedor_page
-                st.switch_page(editar_fornecedor_page)
-
-    with st.container(border=True):
-
-        st.markdown("#### 🏭 Dados do Fornecedor")
-
-        col1, col2, col3 = st.columns(
-            [1, 3, 2]
-        )
-
-        altura_dados = 115
-
-        with col1:
-            exibirCampo(
-                "ID",
-                fornecedor.id,
-                altura=altura_dados,
-            )
-
-        with col2:
-            exibirCampo(
-                "Fornecedor",
-                fornecedor.nome,
-                altura=altura_dados,
-            )
-
-        with col3:
-            exibirCampo(
-                "CNPJ",
-                formatar_cnpj(fornecedor.cnpj),
-                altura=altura_dados,
-            )
-
-    st.write("")
-
-    with st.container(border=True):
-
-        st.markdown("#### 📞 Informações de Contato")
-
-        col1, col2 = st.columns(2)
-
-        altura_contato = 110
-
-        with col1:
-            exibirCampo(
-                "E-mail",
-                fornecedor.email
-                or "Não informado",
-                altura=altura_contato,
-            )
-
-        with col2:
-            exibirCampo(
-                "Telefone",
-                fornecedor.telefone
-                or "Não informado",
-                altura=altura_contato,
-            )

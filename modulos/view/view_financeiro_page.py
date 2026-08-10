@@ -1,62 +1,59 @@
 import re
 import streamlit as st
-from modulos.financeiro.financeiro_service import listarFinanceiroCpf, listarFinanceiroId
-from modulos.utils.view_utils import exibirCampo, formatar_cpf, limpar_consulta_financeiro
+from modulos.financeiro.financeiro_service import (listarFinanceiroCpf, listarFinanceiroId)
+from modulos.utils.view_utils import formatar_cpf, limpar_consulta_financeiro
+from modulos.utils.view_visual import (AcaoView, CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de financeiro
 def telaViewFinanceiro():
 
-    st.title("🔎 Consulta do Financeiro")
-    st.caption("Pesquise um funcionário pelo CPF ou pelo ID.")
-
     if "financeiro_id" in st.session_state:
-        st.session_state["consulta_financeiro_id"] = (
-            st.session_state.pop("financeiro_id")
+        st.session_state["consulta_financeiro_id"] = st.session_state.pop(
+            "financeiro_id"
         )
 
     financeiro = None
 
-    colVoltar, _ = st.columns([1, 5])
+    # Função de navegação 
+    def voltar():
+        from modulos.rotas import (
+            listagem_financeiro_page,
+        )
 
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import listagem_financeiro_page
-            st.switch_page(listagem_financeiro_page)
+        st.switch_page(listagem_financeiro_page)
 
-    with st.form("buscar_financeiro", border=True):
+    renderizarCabecalhoView(categoria="View", titulo="Consultar financeiro", descricao=("Localize um funcionário utilizando " "o CPF ou o identificador."), ao_voltar=voltar, prefixo_chave="financeiro")
 
-        st.markdown("#### 🔍 Buscar funcionário")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            cpfDigitado = st.text_input(
-                "CPF",
+    buscar, valores = renderizarFormularioBusca(
+        campos=[
+            CampoBusca(
+                nome="cpf",
+                rotulo="CPF",
                 placeholder="Somente números",
-                key="consulta_financeiro_cpf",
-            )
-
-        with col2:
-            idDigitado = st.text_input(
-                "ID",
+                proporcao=1,
+                chave="consulta_financeiro_cpf",
+            ),
+            CampoBusca(
+                nome="id",
+                rotulo="ID",
                 placeholder="Ex.: 1",
-                key="consulta_financeiro_id_digitado",
-            )
-
-        colunaBotao, _ = st.columns([1.3, 4.7])
-
-        with colunaBotao:
-            buscar = st.form_submit_button(
-                "🔍 Buscar",
-                type="primary",
-                use_container_width=True,
-            )
+                proporcao=1,
+                chave="consulta_financeiro_id_digitado",
+            ),
+        ],
+        prefixo_chave="financeiro",
+        titulo="Localizar funcionário",
+        descricao=("Informe somente o CPF ou somente o ID."),
+    )
 
     if buscar:
-        st.session_state.pop("consulta_financeiro_id", None)
+        st.session_state.pop(
+            "consulta_financeiro_id",
+            None,
+        )
 
-        cpf = re.sub(r"\D", "", cpfDigitado)
-        idPessoa = idDigitado.strip()
+        cpf = re.sub(r"\D", "", valores["cpf"])
+        idPessoa = valores["id"].strip()
 
         if not cpf and not idPessoa:
             st.warning("Informe um CPF ou um ID.")
@@ -67,15 +64,15 @@ def telaViewFinanceiro():
         elif cpf:
             if len(cpf) != 11:
                 st.error("O CPF deve possuir 11 números.")
+
             else:
                 financeiro = listarFinanceiroCpf(cpf)
 
                 if financeiro is None:
                     st.error("Funcionário não encontrado.")
+
                 else:
-                    st.session_state["consulta_financeiro_id"] = (
-                        financeiro.pessoa_id
-                    )
+                    st.session_state["consulta_financeiro_id"] = financeiro.pessoa_id
 
         elif not idPessoa.isdigit():
             st.error("O ID deve conter somente números.")
@@ -85,10 +82,9 @@ def telaViewFinanceiro():
 
             if financeiro is None:
                 st.error("Funcionário não encontrado.")
+
             else:
-                st.session_state["consulta_financeiro_id"] = (
-                    financeiro.pessoa_id
-                )
+                st.session_state["consulta_financeiro_id"] = financeiro.pessoa_id
 
     idPessoa = st.session_state.get("consulta_financeiro_id")
 
@@ -97,76 +93,96 @@ def telaViewFinanceiro():
 
     if financeiro is None:
         if not buscar:
-            st.info("Informe um CPF ou ID para consultar.")
+            renderizarMensagemInicial("Informe um CPF ou ID para consultar.")
 
         return
 
-    st.write("")
+    # Função para edição de financeiro
+    def editar(registro):
+        st.session_state["edicao_financeiro_id"] = registro.pessoa_id
 
-    titulo, botao_limpar, botao_editar = st.columns(
-        [4.2, 0.9, 0.9],
-        vertical_alignment="center",
-    )
-
-    with titulo:
-        st.subheader(f"💰 {financeiro.pessoa.nome}")
-
-    with botao_limpar:
-        st.button(
-            "Limpar",
-            icon=":material/close:",
-            use_container_width=True,
-            on_click=limpar_consulta_financeiro,
+        from modulos.rotas import (
+            editar_financeiro_page,
         )
 
-    with botao_editar:
-        if "ADMIN" in st.session_state.roles:
-            if st.button(
-                "Editar",
-                icon=":material/edit:",
-                use_container_width=True,
-                type="secondary"
-            ):
-                st.session_state["edicao_financeiro_id"] = financeiro.pessoa_id
-                from modulos.rotas import editar_financeiro_page
-                st.switch_page(editar_financeiro_page)
+        st.switch_page(editar_financeiro_page)
 
-    with st.container(border=True):
+    acoes = []
 
-        st.markdown("#### 👤 Dados Pessoais")
-
-        col1, col2, col3 = st.columns([1, 3, 2])
-
-        with col1:
-            exibirCampo("ID", financeiro.pessoa_id)
-
-        with col2:
-            exibirCampo("Nome", financeiro.pessoa.nome)
-
-        with col3:
-            exibirCampo(
-                "CPF",
-                formatar_cpf(financeiro.pessoa.cpf),
+    if "ADMIN" in st.session_state.get("roles", []):
+        acoes.append(
+            AcaoView(
+                rotulo="Editar",
+                icone=":material/edit:",
+                tipo="secondary",
+                chave="editar",
+                ao_clicar=editar,
             )
-
-        st.write("")
-
-        col1, col2 = st.columns([3.5, 2.5])
-
-        with col1:
-            exibirCampo("E-mail", financeiro.pessoa.email)
-
-        with col2:
-            exibirCampo("Telefone", financeiro.pessoa.telefone)
-
-    st.write("")
-
-    with st.container(border=True):
-        st.markdown("#### 🏛️ Vínculo")
-
-        exibirCampo(
-            "Campus",
-            financeiro.campus.nome
-            if financeiro.campus
-            else "Não informado",
         )
+
+    secoes = [
+        SecaoView(
+            titulo="Dados pessoais",
+            descricao=("Informações de identificação " "e contato do funcionário."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="ID",
+                        valor=lambda item: (item.pessoa_id),
+                        proporcao=1,
+                    ),
+                    CampoView(
+                        rotulo="Nome",
+                        valor=lambda item: (item.pessoa.nome),
+                        proporcao=3,
+                    ),
+                    CampoView(
+                        rotulo="CPF",
+                        valor=lambda item: formatar_cpf(item.pessoa.cpf),
+                        proporcao=2,
+                    ),
+                ],
+                [
+                    CampoView(
+                        rotulo="E-mail",
+                        valor=lambda item: (item.pessoa.email),
+                        proporcao=3.5,
+                        tipo="email",
+                    ),
+                    CampoView(
+                        rotulo="Telefone",
+                        valor=lambda item: (item.pessoa.telefone or "Não informado"),
+                        proporcao=2.5,
+                    ),
+                ],
+            ],
+        ),
+        SecaoView(
+            titulo="Vínculo institucional",
+            descricao=("Campus ao qual o funcionário " "está vinculado."),
+            linhas=[
+                [
+                    CampoView(
+                        rotulo="Campus",
+                        valor=lambda item: (
+                            item.campus.nome if item.campus else "Não informado"
+                        ),
+                        proporcao=1,
+                        tipo="badge",
+                    ),
+                ],
+            ],
+        ),
+    ]
+
+    renderizarRegistroView(
+        registro=financeiro,
+        nome=lambda item: item.pessoa.nome,
+        tipo_registro="Financeiro",
+        meta=lambda item: (item.campus.nome if item.campus else "Campus não informado"),
+        status="Registro localizado",
+        secoes=secoes,
+        prefixo_chave="financeiro",
+        ao_limpar=limpar_consulta_financeiro,
+        acoes=acoes,
+    )
