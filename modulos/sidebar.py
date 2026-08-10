@@ -9,9 +9,7 @@ def renderizar_perfil_usuario():
         st.user.name,
     )
 
-    nome_usuario = formata_primeiro_nome(
-        nome_completo
-    )
+    nome_usuario = formata_primeiro_nome(nome_completo)
 
     if not nome_usuario:
         nome_usuario = "Usuário"
@@ -46,8 +44,7 @@ def renderizar_perfil_usuario():
     with st.container(
         key="sidebar_perfil",
     ):
-        st.html(
-            f"""
+        st.html(f"""
             <div class="ru-perfil">
 
                 <div class="ru-avatar">
@@ -77,20 +74,15 @@ def renderizar_perfil_usuario():
                 </div>
 
             </div>
-            """
-        )
+            """)
 
 # Função para renderizar o título de uma seção na barra lateral
-def renderizar_titulo_secao_sidebar(
-    titulo: str
-):
-    st.html(
-        f"""
+def renderizar_titulo_secao_sidebar(titulo: str):
+    st.html(f"""
         <div class="ru-menu-section">
             {escape(titulo)}
         </div>
-        """
-    )
+        """)
 
 # Função para renderizar o botão de logout na barra lateral
 def renderizar_logout_sidebar():
@@ -105,11 +97,10 @@ def renderizar_logout_sidebar():
         ):
             st.logout()
             st.stop()
-            
+
 # Função para aplicar estilo personalizado na barra lateral do Streamlit
 def aplicar_estilo_sidebar():
-    st.html(
-        """
+    st.html("""
         <style>
 
         section[data-testid="stSidebar"] {
@@ -388,5 +379,4 @@ def aplicar_estilo_sidebar():
         }
 
         </style>
-        """
-    )
+        """)
