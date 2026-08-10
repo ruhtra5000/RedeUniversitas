@@ -1,165 +1,314 @@
 import streamlit as st
-from modulos.academico.academico_service import (
-    listarCampus, listarCursos, listarProfessoresCampus,
-    definirReitor, removerReitor, definirCoordenador, removerCoordenador
-)
+from modulos.academico.academico_service import (definirCoordenador, definirReitor, listarCampus, listarCursos, listarProfessoresCampus, removerCoordenador, removerReitor)
+from modulos.utils.academico_visual import (marcarAcoesPagina, painelPagina, renderizarDivisorPagina, renderizarSecaoPagina, renderizarStatusPagina, renderizarTopoPagina)
 
+# Tela de designação de cargos acadêmicos
 def telaDesignacaoCargos():
-    st.title(":material/badge: Designação de Cargos")
-    st.caption("Faça a designação ou destituição de Reitores de Campus e Coordenadores de Curso.")
+    renderizarTopoPagina(
+        titulo="Designação de cargos",
+        descricao=(
+            "Gerencie os reitores dos campi e os coordenadores "
+            "responsáveis pelos cursos."
+        ),
+        categoria="GESTÃO ACADÊMICA",
+    )
 
     if st.session_state.pop("cargo_sucesso", False):
-        st.toast("Operação realizada com sucesso!", icon=":material/check:")
+        st.toast(
+            "Operação realizada com sucesso!",
+            icon=":material/check:",
+        )
 
     if "cache_campus_cargos" not in st.session_state:
         st.session_state.cache_campus_cargos = listarCampus()
+
     if "cache_cursos_cargos" not in st.session_state:
         st.session_state.cache_cursos_cargos = listarCursos()
 
-    lista_campus = st.session_state.cache_campus_cargos
-    lista_cursos = st.session_state.cache_cursos_cargos
+    listaCampus = st.session_state.cache_campus_cargos
+    listaCursos = st.session_state.cache_cursos_cargos
 
-    aba_reitor, aba_coordenador = st.tabs(["Reitores de Campus", "Coordenadores de Curso"])
+    abaReitor, abaCoordenador = st.tabs(
+        ["Reitores de campus", "Coordenadores de curso"]
+    )
 
-    with aba_reitor:
-        with st.container():
-            campus_selecionado = st.selectbox(
-                "Selecione o Campus",
-                options=lista_campus,
-                format_func=lambda c: c.nome,
+    with abaReitor:
+        with painelPagina(
+            titulo="Reitoria do campus",
+            descricao=(
+                "Selecione uma unidade para consultar ou alterar "
+                "o professor designado como reitor."
+            ),
+            contexto="CARGO INSTITUCIONAL",
+        ):
+            renderizarSecaoPagina(
+                numero=1,
+                titulo="Campus",
+                descricao="Unidade em que a designação será realizada.",
+            )
+
+            campusSelecionado = st.selectbox(
+                "Selecione o campus",
+                options=listaCampus,
+                format_func=lambda campus: campus.nome,
                 index=None,
                 placeholder="Escolha um campus...",
-                key="sel_campus_reitor"
+                key="sel_campus_reitor",
             )
 
-            if campus_selecionado:
-                campus_real = next((c for c in lista_campus if c.id == campus_selecionado.id), None)
-                
-                if campus_real:
-                    # Verifica reitor atual
+            if campusSelecionado:
+                campus = next(
+                    (item for item in listaCampus if item.id == campusSelecionado.id),
+                    None,
+                )
+
+                if campus:
                     try:
-                        reitor_atual = campus_real.reitor
+                        reitorAtual = campus.reitor
                     except Exception:
-                        reitor_atual = None
-                        st.warning("Não foi possível carregar as informações do reitor atual devido à falta de carregamento no banco.")
+                        reitorAtual = None
+                        st.warning(
+                            "Não foi possível carregar os dados do " "reitor atual."
+                        )
 
-                    if reitor_atual:
+                    if reitorAtual:
                         try:
-                            nome_reitor = reitor_atual.pessoa.nome
+                            nomeReitor = reitorAtual.pessoa.nome
                         except Exception:
-                            nome_reitor = f"ID do Professor: {reitor_atual.pessoa_id}"
-                        st.info(f"**Reitor Atual:** {nome_reitor}")
+                            nomeReitor = f"Professor ID {reitorAtual.pessoa_id}"
+
+                        renderizarStatusPagina(
+                            rotulo="Reitor atual",
+                            valor=nomeReitor,
+                        )
+
                     else:
-                        st.warning("Este Campus atualmente não possui um Reitor designado.")
+                        renderizarStatusPagina(
+                            rotulo="Reitor atual",
+                            valor="Nenhum professor designado",
+                        )
 
-                    st.write("---")
-                    st.write("#### Atualizar Cargo")
-                    
+                    renderizarDivisorPagina()
+
+                    renderizarSecaoPagina(
+                        numero=2,
+                        titulo="Nova designação",
+                        descricao=("Escolha um professor vinculado ao mesmo campus."),
+                    )
+
                     try:
-                        professores_campus = listarProfessoresCampus(campus_real.id)
-                    except Exception as e:
-                        professores_campus = []
-                        st.error(f"Erro ao buscar professores do campus: {e}")
+                        professoresCampus = listarProfessoresCampus(campus.id)
+                    except Exception as erro:
+                        professoresCampus = []
+                        st.error("Erro ao buscar professores do campus: " f"{erro}")
 
-                    col1, col2 = st.columns([3, 2], vertical_alignment="bottom")
-                    with col1:
-                        novo_reitor = st.selectbox(
-                            "Selecione um Professor do Campus para Designar",
-                            options=professores_campus,
-                            format_func=lambda p: p.pessoa.nome if hasattr(p, 'pessoa') else f"ID: {p.pessoa_id}",
+                    colProfessor, colDesignar = st.columns(
+                        [3, 2],
+                        vertical_alignment="bottom",
+                    )
+
+                    with colProfessor:
+                        novoReitor = st.selectbox(
+                            "Professor do campus",
+                            options=professoresCampus,
+                            format_func=lambda professor: (
+                                professor.pessoa.nome
+                                if hasattr(professor, "pessoa")
+                                else f"ID: {professor.pessoa_id}"
+                            ),
                             index=None,
                             placeholder="Escolha um professor...",
-                            key="novo_reitor_sel"
+                            key="novo_reitor_sel",
                         )
-                    
-                    with col2:
-                        if st.button("Designar Novo Reitor", type="primary", width="stretch", disabled=not novo_reitor):
-                            try:
-                                definirReitor(campus_real.id, novo_reitor.pessoa_id)
-                                st.session_state.cargo_sucesso = True
-                                if "cache_campus_cargos" in st.session_state: del st.session_state["cache_campus_cargos"]
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Erro ao designar: {e}")
-                    
-                    if reitor_atual:
-                        st.write("")
-                        if st.button("Destituir Reitor Atual", type="secondary"):
-                            try:
-                                removerReitor(campus_real.id)
-                                st.session_state.cargo_sucesso = True
-                                if "cache_campus_cargos" in st.session_state: del st.session_state["cache_campus_cargos"]
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Erro ao destituir: {e}")
 
-    with aba_coordenador:
-        with st.container():
-            curso_selecionado = st.selectbox(
-                "Selecione o Curso",
-                options=lista_cursos,
-                format_func=lambda c: f"{c.nome}",
+                    with colDesignar:
+                        marcarAcoesPagina()
+
+                        designarReitor = st.button(
+                            "Designar reitor",
+                            icon=":material/badge:",
+                            type="primary",
+                            width="stretch",
+                            disabled=not novoReitor,
+                            key="btn_designar_reitor",
+                        )
+
+                    if designarReitor:
+                        try:
+                            definirReitor(
+                                campus.id,
+                                novoReitor.pessoa_id,
+                            )
+                            st.session_state.cargo_sucesso = True
+                            st.session_state.pop(
+                                "cache_campus_cargos",
+                                None,
+                            )
+                            st.rerun()
+
+                        except Exception as erro:
+                            st.error(f"Erro ao designar: {erro}")
+
+                    if reitorAtual:
+                        destituirReitor = st.button(
+                            "Destituir reitor atual",
+                            icon=":material/person_remove:",
+                            width="stretch",
+                            key="btn_destituir_reitor",
+                        )
+
+                        if destituirReitor:
+                            try:
+                                removerReitor(campus.id)
+                                st.session_state.cargo_sucesso = True
+                                st.session_state.pop(
+                                    "cache_campus_cargos",
+                                    None,
+                                )
+                                st.rerun()
+
+                            except Exception as erro:
+                                st.error(f"Erro ao destituir: {erro}")
+
+    with abaCoordenador:
+        with painelPagina(
+            titulo="Coordenação do curso",
+            descricao=(
+                "Selecione um curso para consultar ou alterar "
+                "seu professor coordenador."
+            ),
+            contexto="CARGO ACADÊMICO",
+        ):
+            renderizarSecaoPagina(
+                numero=1,
+                titulo="Curso",
+                descricao="Curso em que a designação será realizada.",
+            )
+
+            cursoSelecionado = st.selectbox(
+                "Selecione o curso",
+                options=listaCursos,
+                format_func=lambda curso: curso.nome,
                 index=None,
                 placeholder="Escolha um curso...",
-                key="sel_curso_coord"
+                key="sel_curso_coord",
             )
 
-            if curso_selecionado:
-                curso_real = next((c for c in lista_cursos if c.id == curso_selecionado.id), None)
-                
-                if curso_real:
+            if cursoSelecionado:
+                curso = next(
+                    (item for item in listaCursos if item.id == cursoSelecionado.id),
+                    None,
+                )
+
+                if curso:
                     try:
-                        coord_atual = curso_real.coordenador
+                        coordenadorAtual = curso.coordenador
                     except Exception:
-                        coord_atual = None
-                        st.warning("Não foi possível carregar as informações do coordenador atual devido à falta de carregamento no banco.")
+                        coordenadorAtual = None
+                        st.warning(
+                            "Não foi possível carregar os dados do "
+                            "coordenador atual."
+                        )
 
-                    if coord_atual:
+                    if coordenadorAtual:
                         try:
-                            nome_coord = coord_atual.pessoa.nome
+                            nomeCoordenador = coordenadorAtual.pessoa.nome
                         except Exception:
-                            nome_coord = f"ID do Professor: {coord_atual.pessoa_id}"
-                        st.info(f"**Coordenador Atual:** {nome_coord}")
+                            nomeCoordenador = (
+                                "Professor ID " f"{coordenadorAtual.pessoa_id}"
+                            )
+
+                        renderizarStatusPagina(
+                            rotulo="Coordenador atual",
+                            valor=nomeCoordenador,
+                        )
+
                     else:
-                        st.warning("Este Curso atualmente não possui um Coordenador designado.")
+                        renderizarStatusPagina(
+                            rotulo="Coordenador atual",
+                            valor="Nenhum professor designado",
+                        )
 
-                    st.write("---")
-                    st.write("#### Atualizar Cargo")
-                    
+                    renderizarDivisorPagina()
+
+                    renderizarSecaoPagina(
+                        numero=2,
+                        titulo="Nova designação",
+                        descricao=(
+                            "Escolha um professor vinculado ao campus " "do curso."
+                        ),
+                    )
+
                     try:
-                        professores_curso_campus = listarProfessoresCampus(curso_real.campus_id)
-                    except Exception as e:
-                        professores_curso_campus = []
-                        st.error(f"Erro ao buscar professores do campus: {e}")
+                        professoresCampus = listarProfessoresCampus(curso.campus_id)
+                    except Exception as erro:
+                        professoresCampus = []
+                        st.error("Erro ao buscar professores do campus: " f"{erro}")
 
-                    col1, col2 = st.columns([3, 2], vertical_alignment="bottom")
-                    with col1:
-                        novo_coord = st.selectbox(
-                            "Selecione um Professor do Campus para Designar",
-                            options=professores_curso_campus,
-                            format_func=lambda p: p.pessoa.nome if hasattr(p, 'pessoa') else f"ID: {p.pessoa_id}",
+                    colProfessor, colDesignar = st.columns(
+                        [3, 2],
+                        vertical_alignment="bottom",
+                    )
+
+                    with colProfessor:
+                        novoCoordenador = st.selectbox(
+                            "Professor do campus",
+                            options=professoresCampus,
+                            format_func=lambda professor: (
+                                professor.pessoa.nome
+                                if hasattr(professor, "pessoa")
+                                else f"ID: {professor.pessoa_id}"
+                            ),
                             index=None,
                             placeholder="Escolha um professor...",
-                            key="novo_coord_sel"
+                            key="novo_coord_sel",
                         )
-                    
-                    with col2:
-                        if st.button("Designar Novo Coordenador", type="primary", width="stretch", disabled=not novo_coord, key="btn_designar_coord"):
+
+                    with colDesignar:
+                        marcarAcoesPagina()
+
+                        designarCoordenador = st.button(
+                            "Designar coordenador",
+                            icon=":material/supervisor_account:",
+                            type="primary",
+                            width="stretch",
+                            disabled=not novoCoordenador,
+                            key="btn_designar_coord",
+                        )
+
+                    if designarCoordenador:
+                        try:
+                            definirCoordenador(
+                                curso.id,
+                                novoCoordenador.pessoa_id,
+                            )
+                            st.session_state.cargo_sucesso = True
+                            st.session_state.pop(
+                                "cache_cursos_cargos",
+                                None,
+                            )
+                            st.rerun()
+
+                        except Exception as erro:
+                            st.error(f"Erro ao designar: {erro}")
+
+                    if coordenadorAtual:
+                        destituirCoordenador = st.button(
+                            "Destituir coordenador atual",
+                            icon=":material/person_remove:",
+                            width="stretch",
+                            key="btn_destituir_coord",
+                        )
+
+                        if destituirCoordenador:
                             try:
-                                definirCoordenador(curso_real.id, novo_coord.pessoa_id)
+                                removerCoordenador(curso.id)
                                 st.session_state.cargo_sucesso = True
-                                if "cache_cursos_cargos" in st.session_state: del st.session_state["cache_cursos_cargos"]
+                                st.session_state.pop(
+                                    "cache_cursos_cargos",
+                                    None,
+                                )
                                 st.rerun()
-                            except Exception as e:
-                                st.error(f"Erro ao designar: {e}")
-                    
-                    if coord_atual:
-                        st.write("")
-                        if st.button("Destituir Coordenador Atual", type="secondary", key="btn_destituir_coord"):
-                            try:
-                                removerCoordenador(curso_real.id)
-                                st.session_state.cargo_sucesso = True
-                                if "cache_cursos_cargos" in st.session_state: del st.session_state["cache_cursos_cargos"]
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Erro ao destituir: {e}")
+
+                            except Exception as erro:
+                                st.error(f"Erro ao destituir: {erro}")
