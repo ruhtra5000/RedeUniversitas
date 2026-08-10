@@ -5,7 +5,7 @@ from database.entidades.Pessoa import Pessoa
 from modulos.cadastros.mensalidade import geracaoAutomaticaMensalidade
 from modulos.rotas import get_navigation
 from modulos.temaRedeUniversitas import temaRedeUniversitas
-from modulos.sidebar import (aplicarEstiloSidebar, renderizarLogoutSidebar, renderizarPerfilUsuario, renderizarTituloSecaoSidebar)
+from modulos.sidebar import (aplicarEstiloSidebar, renderizarLogoutSidebar, renderizarPerfilUsuario)
 
 st.set_page_config(
     page_title="RedeUniversitas",
@@ -111,19 +111,16 @@ with st.sidebar:
     ):
         for section, pages in nav_dict.items():
 
-            if section == "Edições (Oculto)":
+            if section in ["Edições (Oculto)"]:
                 continue
 
-            renderizarTituloSecaoSidebar(
-                section
-            )
-
-            for page in pages:
-                st.page_link(
-                    page,
-                    label=page.title,
-                    icon=page.icon,
-                )
+            with st.expander(section, expanded=False):
+                for page in pages:
+                    st.page_link(
+                        page,
+                        label=page.title,
+                        icon=page.icon,
+                    )
 
     renderizarLogoutSidebar()
 

@@ -311,6 +311,12 @@ def aplicarEstiloSidebar():
             height: 1rem;
         }
 
+        section[data-testid="stSidebar"]
+        [data-testid="stPageLink"] a:hover {
+            background-color: rgba(148, 163, 184, 0.08);
+            color: #ffffff;
+        }
+
         .st-key-sidebar_footer {
             margin-top: auto !important;
 
@@ -375,6 +381,11 @@ def aplicarEstiloSidebar():
 
         section[data-testid="stSidebar"]
         ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .st-key-sidebar_menu [data-testid="stExpander"] *{
+            border: none;
             background: transparent;
         }
 
