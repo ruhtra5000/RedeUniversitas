@@ -62,10 +62,7 @@ python -m database.CriarTabelas
 ou 
 
 ```bash
-# Arquivo schema.sql (sem alterações no secrets.toml)
-psql -U user_universitas -d rede_universitas -f schema.sql
-
-# Arquivo schema.sql (caso tenha alterado o secrets.toml, substituir "nome_usuario" e "nome_banco")
+# Arquivo schema.sql (substituir "nome_usuario" e "nome_banco")
 psql -U nome_usuario -d nome_banco -f schema.sql
 ```
 
