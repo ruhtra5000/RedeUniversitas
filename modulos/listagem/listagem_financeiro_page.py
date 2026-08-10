@@ -1,88 +1,71 @@
 import streamlit as st
 from modulos.financeiro.financeiro_service import listarFinanceiro
-from modulos.utils.listagem_utils import formatar_cpf, separador
+from modulos.utils.listagem_utils import formatar_cpf
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Financeiros
 def telaListagemFinanceiros():
 
-    st.title("📋 Listagem do Financeiro")
-    st.caption("Consulte os funcionários do financeiro.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaFinanceiros = listarFinanceiro()
 
-    if not listaFinanceiros:
-        st.info("💰 Nenhum funcionário financeiro cadastrado.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Funcionário",
+            valor=lambda financeiro: (financeiro.pessoa.nome),
+            subtitulo="Financeiro",
+            proporcao=2.6,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="CPF",
+            valor=lambda financeiro: formatar_cpf(financeiro.pessoa.cpf),
+            proporcao=1.7,
+        ),
+        ColunaListagem(
+            titulo="E-mail",
+            valor=lambda financeiro: (financeiro.pessoa.email or "Não informado"),
+            proporcao=2.5,
+        ),
+        ColunaListagem(
+            titulo="Campus",
+            valor=lambda financeiro: (
+                financeiro.campus.nome if financeiro.campus else "Não informado"
+            ),
+            proporcao=2.7,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"💰 {len(listaFinanceiros)} "
-        f"{'funcionário encontrado' if len(listaFinanceiros) == 1 else 'funcionários encontrados'}"
-    )
+        st.switch_page(home_page)
 
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+    # Função para visualizar detalhes do financeiro
+    def visualizar(financeiro):
+        st.session_state["financeiro_id"] = financeiro.pessoa_id
 
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
+        from modulos.rotas import (
+            view_financeiro_page,
         )
 
-        h1.markdown("**Funcionário**")
-        h2.markdown("**CPF**")
-        h3.markdown("**E-mail**")
-        h4.markdown("**Campus**")
-        h5.markdown("**Ações**")
+        st.switch_page(view_financeiro_page)
 
-        separador()
-
-        for indice, financeiro in enumerate(listaFinanceiros):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{financeiro.pessoa.nome}**")
-
-            with c2:
-                st.write(formatar_cpf(financeiro.pessoa.cpf))
-
-            with c3:
-                st.write(financeiro.pessoa.email)
-
-            with c4:
-                st.write(
-                    financeiro.campus.nome
-                    if financeiro.campus
-                    else "Não informado"
-                )
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_financeiro_{financeiro.pessoa_id}",
-                    help="Visualizar funcionário",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["financeiro_id"] = (
-                    financeiro.pessoa_id
-                )
-
-                from modulos.rotas import view_financeiro_page
-                st.switch_page(view_financeiro_page)
-
-            if indice < len(listaFinanceiros) - 1:
-                separador()
+    renderizarListagem(
+        itens=listaFinanceiros,
+        categoria="Listagem",
+        titulo="Financeiro",
+        descricao=(
+            "Consulte os funcionários responsáveis " "pelas operações financeiras."
+        ),
+        singular="funcionário",
+        plural="funcionários",
+        colunas=colunas,
+        obter_id=lambda financeiro: (financeiro.pessoa_id),
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="financeiro",
+        titulo_tabela="Funcionários cadastrados",
+        mensagem_vazia=("Nenhum funcionário financeiro foi cadastrado no sistema."),
+    )

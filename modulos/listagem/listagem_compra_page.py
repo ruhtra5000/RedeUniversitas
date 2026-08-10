@@ -1,94 +1,73 @@
 import streamlit as st
 from modulos.compras.compras_service import listarCompras
-from modulos.utils.listagem_utils import separador, formatar_moeda, formatar_data, obter_nome_produto
+from modulos.utils.listagem_utils import (formatar_data, formatar_moeda, obter_nome_produto)
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Compras
 def telaListagemCompras():
 
-    st.title("📋 Listagem de Compras")
-    st.caption("Consulte as compras cadastradas no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaCompras = listarCompras()
 
-    if not listaCompras:
-        st.info("🛒 Nenhuma compra cadastrada.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Produto",
+            valor=lambda compra: obter_nome_produto(compra),
+            subtitulo="Produto adquirido",
+            proporcao=2.6,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Fornecedor",
+            valor=lambda compra: (
+                compra.fornecedor.nome if compra.fornecedor else "Não informado"
+            ),
+            proporcao=2.3,
+        ),
+        ColunaListagem(
+            titulo="Quantidade",
+            valor=lambda compra: compra.qtde,
+            proporcao=1.1,
+        ),
+        ColunaListagem(
+            titulo="Valor total",
+            valor=lambda compra: formatar_moeda(compra.valor_unit * compra.qtde),
+            proporcao=1.6,
+        ),
+        ColunaListagem(
+            titulo="Data",
+            valor=lambda compra: formatar_data(compra.data_compra),
+            proporcao=1.4,
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"🛒 {len(listaCompras)} "
-        f"{'compra encontrada' if len(listaCompras) == 1 else 'compras encontradas'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes da compra
+    def visualizar(compra):
+        st.session_state["compra_selecionada"] = compra.id
+
+        from modulos.rotas import view_compra_page
+
+        st.switch_page(view_compra_page)
+
+    renderizarListagem(
+        itens=listaCompras,
+        categoria="Listagem",
+        titulo="Compras",
+        descricao=(
+            "Consulte os produtos adquiridos, " "fornecedores, valores e datas."
+        ),
+        singular="compra",
+        plural="compras",
+        colunas=colunas,
+        obter_id=lambda compra: compra.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="compra",
+        titulo_tabela="Compras registradas",
+        mensagem_vazia=("Nenhuma compra foi cadastrada no sistema."),
     )
-
-    proporcoes = [2.8, 2.5, 1.1, 1.8, 1.8, 1.2]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5, h6 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Produto**")
-        h2.markdown("**Fornecedor**")
-        h3.markdown("**Qtd.**")
-        h4.markdown("**Valor total**")
-        h5.markdown("**Data**")
-        h6.markdown("**Ações**")
-
-        separador()
-
-        for indice, compra in enumerate(listaCompras):
-
-            c1, c2, c3, c4, c5, c6 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            valorTotal = compra.valor_unit * compra.qtde
-
-            with c1:
-                st.markdown(
-                    f"**{obter_nome_produto(compra)}**"
-                )
-
-            with c2:
-                st.write(
-                    compra.fornecedor.nome
-                    if compra.fornecedor
-                    else "Não informado"
-                )
-
-            with c3:
-                st.write(compra.qtde)
-
-            with c4:
-                st.write(formatar_moeda(valorTotal))
-
-            with c5:
-                st.write(formatar_data(compra.data_compra))
-
-            with c6:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_compra_{compra.id}",
-                    help="Visualizar compra",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["compra_selecionada"] = compra.id
-
-                from modulos.rotas import view_compra_page
-                st.switch_page(view_compra_page)
-
-            if indice < len(listaCompras) - 1:
-                separador()

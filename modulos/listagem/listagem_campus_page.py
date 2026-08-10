@@ -1,84 +1,64 @@
-import re
 import streamlit as st
 from modulos.academico.academico_service import listarCampus
-from modulos.utils.listagem_utils import separador, formatar_cnpj
-from modulos.utils.view_utils import exibirCampo
+from modulos.utils.listagem_utils import formatar_cnpj
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Campus
 def telaListagemCampus():
 
-    st.title("📋 Listagem de Campus")
-    st.caption("Consulte os campus cadastrados no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaCampus = listarCampus()
 
-    if not listaCampus:
-        st.info("🏛️ Nenhum campus cadastrado.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Campus",
+            valor=lambda campus: campus.nome,
+            subtitulo="Unidade institucional",
+            proporcao=2.7,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="CNPJ",
+            valor=lambda campus: formatar_cnpj(campus.cnpj),
+            proporcao=2,
+        ),
+        ColunaListagem(
+            titulo="E-mail",
+            valor=lambda campus: (campus.email or "Não informado"),
+            proporcao=2.7,
+        ),
+        ColunaListagem(
+            titulo="Telefone",
+            valor=lambda campus: (campus.telefone or "Não informado"),
+            proporcao=1.8,
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"🏛️ {len(listaCampus)} "
-        f"{'campus encontrado' if len(listaCampus) == 1 else 'campus encontrados'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes do campus
+    def visualizar(campus):
+        st.session_state["campus_id"] = campus.id
+
+        from modulos.rotas import view_campus_page
+
+        st.switch_page(view_campus_page)
+
+    renderizarListagem(
+        itens=listaCampus,
+        categoria="Listagem",
+        titulo="Campus",
+        descricao=("Consulte as unidades institucionais " "cadastradas no sistema."),
+        singular="campus",
+        plural="campus",
+        colunas=colunas,
+        obter_id=lambda campus: campus.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="campus",
+        titulo_tabela="Campus cadastrados",
+        mensagem_vazia=("Nenhum campus foi cadastrado no sistema."),
     )
-
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Campus**")
-        h2.markdown("**CNPJ**")
-        h3.markdown("**E-mail**")
-        h4.markdown("**Telefone**")
-        h5.markdown("**Ações**")
-
-        separador()
-
-        for indice, campus in enumerate(listaCampus):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{campus.nome}**")
-
-            with c2:
-                st.write(formatar_cnpj(campus.cnpj))
-
-            with c3:
-                st.write(campus.email or "Não informado")
-
-            with c4:
-                st.write(campus.telefone or "Não informado")
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_campus_{campus.id}",
-                    help="Visualizar campus",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["campus_id"] = campus.id
-
-                from modulos.rotas import view_campus_page
-                st.switch_page(view_campus_page)
-
-            if indice < len(listaCampus) - 1:
-                separador()

@@ -1,90 +1,76 @@
 import streamlit as st
 from modulos.academico.academico_service import listarBolsasGeral
-from modulos.utils.listagem_utils import separador, formatar_percentual, formatar_data, formatar_status
+from modulos.utils.listagem_utils import (formatar_data, formatar_percentual, formatar_status)
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
-# Tela de listagem de bolsas
+# Tela de listagem para Bolsas
 def telaListagemBolsas():
-
-    st.title("📋 Listagem de Bolsas")
-    st.caption("Consulte as bolsas cadastradas no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
 
     listaBolsas = listarBolsasGeral()
 
-    if not listaBolsas:
-        st.info("🎓 Nenhuma bolsa cadastrada.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Aluno",
+            valor=lambda bolsa: (bolsa.aluno.pessoa.nome),
+            subtitulo="Beneficiário",
+            proporcao=2.5,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Tipo",
+            valor=lambda bolsa: getattr(
+                bolsa.tipo_bolsa,
+                "value",
+                bolsa.tipo_bolsa,
+            ),
+            proporcao=1.8,
+        ),
+        ColunaListagem(
+            titulo="Desconto",
+            valor=lambda bolsa: formatar_percentual(bolsa.percentual_desconto),
+            proporcao=1.2,
+        ),
+        ColunaListagem(
+            titulo="Início",
+            valor=lambda bolsa: formatar_data(bolsa.data_inicio),
+            proporcao=1.3,
+        ),
+        ColunaListagem(
+            titulo="Status",
+            valor=lambda bolsa: formatar_status(bolsa.status),
+            proporcao=1.7,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"🎓 {len(listaBolsas)} "
-        f"{'bolsa encontrada' if len(listaBolsas) == 1 else 'bolsas encontradas'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes da bolsa
+    def visualizar(bolsa):
+        st.session_state["bolsa_id"] = bolsa.id
+
+        from modulos.rotas import view_bolsa_page
+
+        st.switch_page(view_bolsa_page)
+
+    renderizarListagem(
+        itens=listaBolsas,
+        categoria="Listagem",
+        titulo="Bolsas",
+        descricao=(
+            "Consulte os benefícios concedidos aos " "alunos e acompanhe seus status."
+        ),
+        singular="bolsa",
+        plural="bolsas",
+        colunas=colunas,
+        obter_id=lambda bolsa: bolsa.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="bolsa",
+        titulo_tabela="Bolsas cadastradas",
+        mensagem_vazia=("Nenhuma bolsa foi cadastrada no sistema."),
     )
-
-    proporcoes = [3, 2.2, 2, 2, 2.5, 1.3]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5, h6 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Aluno**")
-        h2.markdown("**Tipo**")
-        h3.markdown("**Desconto**")
-        h4.markdown("**Início**")
-        h5.markdown("**Status**")
-        h6.markdown("**Ações**")
-
-        separador()
-
-        for indice, bolsa in enumerate(listaBolsas):
-
-            c1, c2, c3, c4, c5, c6 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{bolsa.aluno.pessoa.nome}**")
-
-            with c2:
-                st.write(bolsa.tipo_bolsa)
-
-            with c3:
-                st.write(
-                    formatar_percentual(
-                        bolsa.percentual_desconto
-                    )
-                )
-
-            with c4:
-                st.write(formatar_data(bolsa.data_inicio))
-
-            with c5:
-                st.write(formatar_status(bolsa.status))
-
-            with c6:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_bolsa_{bolsa.id}",
-                    help="Visualizar bolsa",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["bolsa_id"] = bolsa.id
-
-                from modulos.rotas import view_bolsa_page
-                st.switch_page(view_bolsa_page)
-
-            if indice < len(listaBolsas) - 1:
-                separador()

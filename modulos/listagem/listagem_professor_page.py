@@ -1,90 +1,71 @@
 import streamlit as st
 from modulos.academico.academico_service import listarProfessores
-from modulos.utils.listagem_utils import formatar_cpf, separador
+from modulos.utils.listagem_utils import formatar_cpf
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Professores
 def telaListagemProfessores():
 
-    st.title("📋 Listagem de Professores")
-    st.caption("Consulte os professores cadastrados no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaProfessores = listarProfessores()
 
-    if not listaProfessores:
-        st.info("👨‍🏫 Nenhum professor cadastrado.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Professor",
+            valor=lambda professor: (professor.pessoa.nome),
+            subtitulo="Professor",
+            proporcao=2.6,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="CPF",
+            valor=lambda professor: formatar_cpf(professor.pessoa.cpf),
+            proporcao=1.7,
+        ),
+        ColunaListagem(
+            titulo="E-mail",
+            valor=lambda professor: (professor.pessoa.email or "Não informado"),
+            proporcao=2.5,
+        ),
+        ColunaListagem(
+            titulo="Campus",
+            valor=lambda professor: (
+                professor.campus.nome if professor.campus else "Não informado"
+            ),
+            proporcao=2.7,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"👨‍🏫 {len(listaProfessores)} "
-        f"{'professor encontrado' if len(listaProfessores) == 1 else 'professores encontrados'}"
-    )
+        st.switch_page(home_page)
 
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+    # Função para visualizar detalhes do professor
+    def visualizar(professor):
+        st.session_state["professor_id"] = professor.pessoa_id
 
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
+        from modulos.rotas import (
+            view_professor_page,
         )
 
-        h1.markdown("**Professor**")
-        h2.markdown("**CPF**")
-        h3.markdown("**E-mail**")
-        h4.markdown("**Campus**")
-        h5.markdown("**Ações**")
+        st.switch_page(view_professor_page)
 
-        separador()
-
-        for indice, professor in enumerate(listaProfessores):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{professor.pessoa.nome}**")
-
-            with c2:
-                st.write(formatar_cpf(professor.pessoa.cpf))
-
-            with c3:
-                st.write(
-                    professor.pessoa.email or "Não informado"
-                )
-
-            with c4:
-                st.write(
-                    professor.campus.nome
-                    if professor.campus
-                    else "Não informado"
-                )
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_professor_{professor.pessoa_id}",
-                    help="Visualizar professor",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["professor_id"] = (
-                    professor.pessoa_id
-                )
-
-                from modulos.rotas import view_professor_page
-                st.switch_page(view_professor_page)
-
-            if indice < len(listaProfessores) - 1:
-                separador()
+    renderizarListagem(
+        itens=listaProfessores,
+        categoria="Listagem",
+        titulo="Professores",
+        descricao=(
+            "Consulte os docentes cadastrados e " "seus vínculos institucionais."
+        ),
+        singular="professor",
+        plural="professores",
+        colunas=colunas,
+        obter_id=lambda professor: (professor.pessoa_id),
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="professor",
+        titulo_tabela="Professores cadastrados",
+        mensagem_vazia=("Nenhum professor foi cadastrado no sistema."),
+    )

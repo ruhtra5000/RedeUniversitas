@@ -1,96 +1,76 @@
 import streamlit as st
 from modulos.academico.academico_service import listarDisciplinasGeral
-from modulos.utils.listagem_utils import separador
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Disciplinas
 def telaListagemDisciplinas():
 
-    st.title("📋 Listagem de Disciplinas")
-    st.caption("Consulte as disciplinas cadastradas no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaDisciplinas = listarDisciplinasGeral()
 
-    if not listaDisciplinas:
-        st.info("📖 Nenhuma disciplina cadastrada.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Disciplina",
+            valor=lambda disciplina: disciplina.nome,
+            subtitulo="Componente curricular",
+            proporcao=2.5,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Código",
+            valor=lambda disciplina: (disciplina.codigo or "Não informado"),
+            proporcao=1.4,
+        ),
+        ColunaListagem(
+            titulo="Curso",
+            valor=lambda disciplina: (
+                disciplina.curso.nome if disciplina.curso else "Não informado"
+            ),
+            proporcao=2.5,
+        ),
+        ColunaListagem(
+            titulo="Carga",
+            valor=lambda disciplina: (f"{disciplina.carga_horaria} h"),
+            proporcao=1.1,
+        ),
+        ColunaListagem(
+            titulo="Tipo",
+            valor=lambda disciplina: (
+                "Obrigatória" if disciplina.obrigatoria else "Optativa"
+            ),
+            proporcao=1.4,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"📖 {len(listaDisciplinas)} "
-        f"{'disciplina encontrada' if len(listaDisciplinas) == 1 else 'disciplinas encontradas'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes da disciplina
+    def visualizar(disciplina):
+        st.session_state["disciplina_id"] = disciplina.id
+
+        from modulos.rotas import view_disciplina_page
+
+        st.switch_page(view_disciplina_page)
+
+    renderizarListagem(
+        itens=listaDisciplinas,
+        categoria="Listagem",
+        titulo="Disciplinas",
+        descricao=(
+            "Consulte os componentes curriculares, "
+            "códigos, cursos e cargas horárias."
+        ),
+        singular="disciplina",
+        plural="disciplinas",
+        colunas=colunas,
+        obter_id=lambda disciplina: disciplina.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="disciplina",
+        titulo_tabela="Disciplinas cadastradas",
+        mensagem_vazia=("Nenhuma disciplina foi cadastrada no sistema."),
     )
-
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3, 1]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5, h6 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Código**")
-        h2.markdown("**Disciplina**")
-        h3.markdown("**Curso**")
-        h4.markdown("**Carga**")
-        h5.markdown("**Tipo**")
-        h6.markdown("**Ações**")
-
-        separador()
-
-        for indice, disciplina in enumerate(listaDisciplinas):
-
-            c1, c2, c3, c4, c5, c6 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.write(
-                    disciplina.codigo or "Não informado"
-                )
-
-            with c2:
-                st.markdown(f"**{disciplina.nome}**")
-
-            with c3:
-                st.write(
-                    disciplina.curso.nome
-                    if disciplina.curso
-                    else "Não informado"
-                )
-
-            with c4:
-                st.write(f"{disciplina.carga_horaria} h")
-
-            with c5:
-                st.write(
-                    "Obrigatória"
-                    if disciplina.obrigatoria
-                    else "Optativa"
-                )
-
-            with c6:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_disciplina_{disciplina.id}",
-                    help="Visualizar disciplina",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["disciplina_id"] = disciplina.id
-
-                from modulos.rotas import view_disciplina_page
-                st.switch_page(view_disciplina_page)
-
-            if indice < len(listaDisciplinas) - 1:
-                separador()
