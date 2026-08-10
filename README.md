@@ -74,21 +74,25 @@ Para popular o banco de dados com um conjunto inicial de dados, execute o seguin
 psql -U nome_usuario -d nome_banco -f dados.sql
 ```
 
+Depois de executar o comando acima, é necessário que o arquivo `usuarioslogin.sql` seja modificado nas linhas comentadas. Nos campos de e-mail (especialmente de Admin e Aluno), informe e-mails que você detenha, pois é com eles que você conseguirá ter acesso ao sistema. Interagir com o sistema nas facetas de Admin e Aluno é suficiente para visualizar todas as funcionalidades do mesmo.
+
+Após a modificação, execute o seguinte comando:
+
+```bash
+# Arquivo usuarioslogin.sql (substituir "nome_usuario" e "nome_banco")
+psql -U nome_usuario -d nome_banco -f usuarioslogin.sql
+```
+
 ### Recuperar backup do banco (opcional)
 
-Se houve algum problema nas últimas etapas relacionadas ao banco de dados, tente recuperar o backup completo do banco:
+Se houve algum problema nas últimas etapas relacionadas ao banco de dados, apenas recrie o database normalmente, e tente recuperar o backup completo do banco:
 
 ```bash
-# Arquivo banco.backup (substituir "nome_banco")
-pg_restore -U postgres -C -d nome_banco banco.backup
+# Arquivo banco.backup (substituir "nome_usuario" e "nome_banco")
+pg_restore -U nome_usuario -d nome_banco banco.backup
 ```
 
-Dessa forma, em `example.toml`:
-
-```bash
-user = "postgres"
-password = senha do usuário postgres
-```
+Se foi feita a restauração pelo backup, modifique os dados em `usuarioslogin.sql`, e execute o comando como citado na seção de "População do banco".
 
 ### Configuração do login com OAuth
 
