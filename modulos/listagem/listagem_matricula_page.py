@@ -1,96 +1,74 @@
 import streamlit as st
 from modulos.academico.academico_service import listarMatriculasGeral
-from modulos.utils.listagem_utils import separador, formatar_aprovacao
+from modulos.utils.listagem_utils import formatar_aprovacao
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
-# Tela de listagem de matrículas
+# Tela de listagem para Matrículas
 def telaListagemMatriculas():
-
-    st.title("📋 Listagem de Matrículas")
-    st.caption("Consulte as matrículas acadêmicas.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
 
     listaMatriculas = listarMatriculasGeral()
 
-    if not listaMatriculas:
-        st.info("📝 Nenhuma matrícula cadastrada.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Aluno",
+            valor=lambda matricula: (matricula.aluno.pessoa.nome),
+            subtitulo="Matrícula acadêmica",
+            proporcao=2.6,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Disciplina",
+            valor=lambda matricula: (matricula.disciplina.nome),
+            proporcao=2.5,
+        ),
+        ColunaListagem(
+            titulo="Turma",
+            valor=lambda matricula: (
+                matricula.turma.codigo or f"Turma {matricula.turma_id}"
+            ),
+            proporcao=1.8,
+        ),
+        ColunaListagem(
+            titulo="Situação",
+            valor=lambda matricula: (formatar_aprovacao(matricula.aprovacao)),
+            proporcao=1.7,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"📝 {len(listaMatriculas)} "
-        f"{'matrícula encontrada' if len(listaMatriculas) == 1 else 'matrículas encontradas'}"
-    )
+        st.switch_page(home_page)
 
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
+    # Função para visualizar detalhes da matricula
+    def visualizar(matricula):
+        st.session_state["matricula_selecionada"] = {
+            "aluno_id": matricula.aluno_id,
+            "turma_id": matricula.turma_id,
+        }
 
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
+        from modulos.rotas import (
+            view_matricula_page,
         )
 
-        h1.markdown("**Aluno**")
-        h2.markdown("**Disciplina**")
-        h3.markdown("**Turma**")
-        h4.markdown("**Situação**")
-        h5.markdown("**Ações**")
+        st.switch_page(view_matricula_page)
 
-        separador()
-
-        for indice, matricula in enumerate(listaMatriculas):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(
-                    f"**{matricula.aluno.pessoa.nome}**"
-                )
-
-            with c2:
-                st.write(matricula.disciplina.nome)
-
-            with c3:
-                st.write(
-                    matricula.turma.codigo or
-                    f"Turma {matricula.turma_id}"
-                )
-
-            with c4:
-                st.write(
-                    formatar_aprovacao(matricula.aprovacao)
-                )
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=(
-                        f"view_matricula_"
-                        f"{matricula.aluno_id}_"
-                        f"{matricula.turma_id}"
-                    ),
-                    help="Visualizar matrícula",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["matricula_selecionada"] = {
-                    "aluno_id": matricula.aluno_id,
-                    "turma_id": matricula.turma_id,
-                }
-
-                from modulos.rotas import view_matricula_page
-                st.switch_page(view_matricula_page)
-
-            if indice < len(listaMatriculas) - 1:
-                separador()
+    renderizarListagem(
+        itens=listaMatriculas,
+        categoria="Listagem",
+        titulo="Matrículas",
+        descricao=(
+            "Consulte os vínculos acadêmicos dos " "alunos com disciplinas e turmas."
+        ),
+        singular="matrícula",
+        plural="matrículas",
+        colunas=colunas,
+        obter_id=lambda matricula: (f"{matricula.aluno_id}_" f"{matricula.turma_id}"),
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="matricula",
+        titulo_tabela="Matrículas cadastradas",
+        mensagem_vazia=("Nenhuma matrícula foi cadastrada no sistema."),
+    )

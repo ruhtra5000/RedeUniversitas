@@ -1,89 +1,69 @@
 import streamlit as st
-
 from modulos.estoque.estoque_service import listarProdutos
-from modulos.utils.listagem_utils import separador, formatar_estoque
+from modulos.utils.listagem_utils import formatar_estoque
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Produtos
 def telaListagemProdutos():
 
-    st.title("📋 Listagem de Produtos")
-    st.caption("Consulte os produtos cadastrados no estoque.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaProdutos = listarProdutos()
 
-    if not listaProdutos:
-        st.info("📦 Nenhum produto cadastrado.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Produto",
+            valor=lambda produto: produto.nome,
+            subtitulo="Produto em estoque",
+            proporcao=2.7,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Marca",
+            valor=lambda produto: (produto.marca or "Não informada"),
+            proporcao=1.8,
+        ),
+        ColunaListagem(
+            titulo="Estoque",
+            valor=lambda produto: formatar_estoque(produto),
+            proporcao=1.8,
+            tipo="badge",
+        ),
+        ColunaListagem(
+            titulo="Campus",
+            valor=lambda produto: (
+                produto.campus.nome if produto.campus else "Não informado"
+            ),
+            proporcao=2.8,
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"📦 {len(listaProdutos)} "
-        f"{'produto encontrado' if len(listaProdutos) == 1 else 'produtos encontrados'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes do produto
+    def visualizar(produto):
+        st.session_state["produto_selecionado"] = produto.id
+
+        from modulos.rotas import view_produto_page
+
+        st.switch_page(view_produto_page)
+
+    renderizarListagem(
+        itens=listaProdutos,
+        categoria="Listagem",
+        titulo="Produtos",
+        descricao=(
+            "Consulte os produtos disponíveis, suas " "marcas, quantidades e campus."
+        ),
+        singular="produto",
+        plural="produtos",
+        colunas=colunas,
+        obter_id=lambda produto: produto.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="produto",
+        titulo_tabela="Produtos cadastrados",
+        mensagem_vazia=("Nenhum produto foi cadastrado no estoque."),
     )
-
-    proporcoes = [3, 2.2, 2.5, 3, 1.3]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Produto**")
-        h2.markdown("**Marca**")
-        h3.markdown("**Estoque**")
-        h4.markdown("**Campus**")
-        h5.markdown("**Ações**")
-
-        separador()
-
-        for indice, produto in enumerate(listaProdutos):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{produto.nome}**")
-
-            with c2:
-                st.write(
-                    produto.marca or "Não informada"
-                )
-
-            with c3:
-                st.write(formatar_estoque(produto))
-
-            with c4:
-                st.write(
-                    produto.campus.nome
-                    if produto.campus
-                    else "Não informado"
-                )
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_produto_{produto.id}",
-                    help="Visualizar produto",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["produto_selecionado"] = produto.id
-
-                from modulos.rotas import view_produto_page
-                st.switch_page(view_produto_page)
-
-            if indice < len(listaProdutos) - 1:
-                separador()

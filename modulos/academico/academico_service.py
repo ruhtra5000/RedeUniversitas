@@ -1,5 +1,4 @@
 from datetime import date
-
 from database.entidades.enums.ModalidadeCurso import ModalidadeCurso
 from modulos.academico.academico_db import *
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone
@@ -42,7 +41,7 @@ def editarCampus(idCampus: int, nome: str, email: str, telefone: str):
     if email != "" and not validarEmail(email):
         raise Exception("O e-mail informado não é válido.")
     
-    if telefone != "" and not validarTelefone(telefone):
+    if telefone not in ("", None) and not validarTelefone(telefone):
         raise Exception("O telefone informado não é válido.")
     
     campus = Campus(
@@ -416,20 +415,25 @@ def listarAlunoCpf(cpfAluno: str):
     return aluno
     
 def atualizarCoefRendMediaGeral(idAluno: int):
-    aluno = listarAlunoId(idAluno)
+    matriculas = listarMatriculasAluno(idAluno)
+
+    if not matriculas:
+        return
 
     mediaSoma: float = 0
     coefSoma: float = 0
     chSoma: int = 0
 
-    for matr in aluno.matriculas:
-        mediaSoma += matr.media.__float__()
+    for matr in matriculas:
+        disciplina = listarDisciplinaId(matr.disciplina_id)
 
-        coefSoma += (matr.media.__float__() * matr.disciplina.carga_horaria)
+        mediaMatricula = float(matr.media)
 
-        chSoma += matr.disciplina.carga_horaria
+        mediaSoma += mediaMatricula
+        coefSoma += mediaMatricula * disciplina.carga_horaria
+        chSoma += disciplina.carga_horaria
 
-    media = mediaSoma / len(aluno.matriculas)
+    media = mediaSoma / len(matriculas)
     coefRend = coefSoma / chSoma
 
     dbAtualizarCoefRendMediaGeral(idAluno, coefRend, media)

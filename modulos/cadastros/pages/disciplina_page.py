@@ -1,43 +1,34 @@
-from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
-from database.Conexao import SessionLocal
-from database.entidades.Curso import Curso
 from database.entidades.Disciplina import Disciplina
-from database.entidades.PreRequisito import PreRequisito
-from modulos.academico.academico_service import listarDisciplinaId
-from modulos.academico.academico_service import listarDisciplinasGeral
-import database.entidades
-from modulos.academico.academico_service import listarCursos
+from modulos.academico.academico_service import (listarCursos, listarDisciplinasGeral)
 from modulos.cadastros.disciplina import criarDisciplina
+from modulos.utils.cadastro_visual import (painelCadastro, renderizarAvisoCadastro, renderizarBotaoCadastro, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
 
+# Tela de cadastro para Disciplinas
 def telaCadastroDisciplina():
-
     if "form_key_disc" not in st.session_state:
         st.session_state.form_key_disc = 0
 
-    col1, _ = st.columns([1, 6])
+    # Função para voltar à página de cadastros
+    def voltarCadastros():
+        from modulos.rotas import cadastros_page
 
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page # evita import circular
-            st.switch_page(cadastros_page)
+        st.switch_page(cadastros_page)
 
-    st.title(":material/post_add: Cadastro de Disciplina")
-    st.caption("Preencha as informações abaixo para cadastrar uma nova disciplina no curso.")
-
-    st.markdown(
-        """
-        <style>
-        div[data-testid="InputInstructions"] {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    renderizarTopoCadastro(
+        titulo="Cadastrar disciplina",
+        descricao=(
+            "Adicione um novo componente curricular e configure " "seus pré-requisitos."
+        ),
+        aoVoltar=voltarCadastros,
+        prefixoChave="cadastro_disciplina",
     )
 
     if st.session_state.pop("cadastro_disc_realizado", False):
-        st.toast("Disciplina cadastrada com sucesso!", icon=":material/check:")
+        st.toast(
+            "Disciplina cadastrada com sucesso!",
+            icon=":material/check:",
+        )
 
     if "cache_cursos" not in st.session_state:
         st.session_state.cache_cursos = listarCursos()
@@ -49,105 +40,130 @@ def telaCadastroDisciplina():
     lista_disciplinas_existentes = st.session_state.cache_disciplinas
 
     if not lista_cursos:
-        st.warning(
-            """
-            :material/warning: Antes de cadastrar uma disciplina é necessário possuir:
-
-            - Pelo menos **1 Curso**
-            """
+        renderizarAvisoCadastro(
+            titulo="Curso necessário",
+            descricao=(
+                "Cadastre pelo menos um curso antes de adicionar " "uma disciplina."
+            ),
         )
 
-    with st.container(border=False):
+    with painelCadastro(
+        titulo="Informações da disciplina",
+        descricao=("Defina os dados acadêmicos e as dependências " "curriculares."),
+    ):
 
-        with st.container():
-            st.subheader("Dados da Disciplina")
-            
-            with st.container(horizontal=True):
-                nome = st.text_input(
-                    "Nome da Disciplina *",
-                    placeholder="Ex.: Banco de Dados I",
-                    key=f"disc_nome_{st.session_state.form_key_disc}"
-                )
+        renderizarSecaoCadastro(
+            numero=1,
+            titulo="Dados da disciplina",
+            descricao="Identificação, curso vinculado e carga horária.",
+        )
 
-            with st.container(horizontal=True):
-                curso_selecionado = st.selectbox(
-                    "Curso Vinculado *",
-                    options=lista_cursos if lista_cursos else [],
-                    format_func=lambda c: c.nome,
-                    index=None,
-                    placeholder="Selecione um curso...",
-                    disabled=not lista_cursos,
-                    key=f"disc_curso_{st.session_state.form_key_disc}"
-                )
-                carga_horaria = st.number_input(
-                    "Carga Horária (Horas) *",
-                    min_value=1,
-                    value=60,
-                    step=10,
-                    key=f"disc_ch_{st.session_state.form_key_disc}"
-                )
-            
-            obrigatoria_str = st.selectbox(
-                "Disciplina Obrigatória? *",
-                options=["Sim", "Não"],
-                key=f"disc_obrigatoria_{st.session_state.form_key_disc}"
-            )
-            obrigatoria = True if obrigatoria_str == "Sim" else False
+        nome = st.text_input(
+            "Nome da disciplina *",
+            placeholder="Ex.: Banco de Dados I",
+            key=(f"disc_nome_" f"{st.session_state.form_key_disc}"),
+        )
 
-            if curso_selecionado:
-                disciplinas_filtradas = [d for d in lista_disciplinas_existentes if d.curso_id == curso_selecionado.id]
-            else:
-                disciplinas_filtradas = []
-            
-            pre_requisitos_selecionados = st.multiselect(
-                "Pré-requisitos",
-                options=disciplinas_filtradas,
-                format_func=lambda d: d.nome,
-                placeholder="Selecione uma ou mais disciplinas..." if curso_selecionado else "Selecione o Curso primeiro",
-                help="Opcional. Selecione as disciplinas que são pré-requisito.",
-                disabled=not curso_selecionado,
-                key=f"disc_prereq_{st.session_state.form_key_disc}"
+        colCurso, colCarga = st.columns([3, 1])
+
+        with colCurso:
+            curso_selecionado = st.selectbox(
+                "Curso vinculado *",
+                options=lista_cursos if lista_cursos else [],
+                format_func=lambda item: item.nome,
+                index=None,
+                placeholder="Selecione um curso...",
+                disabled=not lista_cursos,
+                key=(f"disc_curso_" f"{st.session_state.form_key_disc}"),
             )
 
-        st.write("")
-
-        _, centro, _ = st.columns([2, 3, 2])
-        
-        with centro:
-            cadastrar = st.button(
-                "Cadastrar Disciplina", 
-                type="primary", 
-                width="stretch",
-                key=f"btn_cad_disc_{st.session_state.form_key_disc}"
+        with colCarga:
+            carga_horaria = st.number_input(
+                "Carga horária (horas) *",
+                min_value=1,
+                value=60,
+                step=10,
+                key=(f"disc_ch_" f"{st.session_state.form_key_disc}"),
             )
 
-    # Processamento
+        renderizarDivisorCadastro()
+
+        renderizarSecaoCadastro(
+            numero=2,
+            titulo="Configuração acadêmica",
+            descricao="Obrigatoriedade e disciplinas pré-requisito.",
+        )
+
+        obrigatoria_str = st.selectbox(
+            "Disciplina obrigatória? *",
+            options=["Sim", "Não"],
+            key=(f"disc_obrigatoria_" f"{st.session_state.form_key_disc}"),
+        )
+        obrigatoria = obrigatoria_str == "Sim"
+
+        if curso_selecionado:
+            disciplinas_filtradas = [
+                disciplina
+                for disciplina in lista_disciplinas_existentes
+                if disciplina.curso_id == curso_selecionado.id
+            ]
+        else:
+            disciplinas_filtradas = []
+
+        pre_requisitos_selecionados = st.multiselect(
+            "Pré-requisitos",
+            options=disciplinas_filtradas,
+            format_func=lambda item: item.nome,
+            placeholder=(
+                "Selecione uma ou mais disciplinas..."
+                if curso_selecionado
+                else "Selecione o Curso primeiro"
+            ),
+            help=("Opcional. Selecione as disciplinas que são " "pré-requisito."),
+            disabled=not curso_selecionado,
+            key=(f"disc_prereq_" f"{st.session_state.form_key_disc}"),
+        )
+
+        cadastrar = renderizarBotaoCadastro(
+            rotulo="Cadastrar disciplina",
+            icone=":material/post_add:",
+            chave=(f"btn_cad_disc_" f"{st.session_state.form_key_disc}"),
+        )
+
     if cadastrar:
         if not lista_cursos:
             st.error("Cadastre pelo menos um Curso antes de continuar.")
+
         elif not nome.strip():
             st.error("Por favor, preencha o Nome da Disciplina.")
+
         elif curso_selecionado is None:
             st.error("Por favor, selecione um Curso.")
+
         else:
             try:
                 curso_id = curso_selecionado.id
-                lista_pre_req_ids = [disc.id for disc in pre_requisitos_selecionados]
+                lista_pre_req_ids = [
+                    disciplina.id for disciplina in pre_requisitos_selecionados
+                ]
 
                 nova_disciplina = Disciplina(
                     nome=nome.strip(),
                     carga_horaria=carga_horaria,
                     obrigatoria=obrigatoria,
                     curso_id=curso_id,
-                    codigo="" 
+                    codigo="",
                 )
-                
-                criarDisciplina(disciplina=nova_disciplina, preRequisitos=lista_pre_req_ids)
-                
-                st.session_state.form_key_disc += 1 
+
+                criarDisciplina(
+                    disciplina=nova_disciplina,
+                    preRequisitos=lista_pre_req_ids,
+                )
+
+                st.session_state.form_key_disc += 1
                 st.session_state["cadastro_disc_realizado"] = True
                 st.session_state.pop("cache_disciplinas", None)
                 st.rerun()
-                
-            except Exception as e:
-                st.error(str(e))
+
+            except Exception as erro:
+                st.error(str(erro))

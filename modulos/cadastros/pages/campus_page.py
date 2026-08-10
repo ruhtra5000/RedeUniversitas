@@ -1,124 +1,160 @@
+import re
 from decimal import Decimal
-from sqlalchemy.exc import SQLAlchemyError
 import streamlit as st
-from database.Conexao import SessionLocal
+from sqlalchemy.exc import SQLAlchemyError
 from database.entidades.Caixa import Caixa
 from database.entidades.Campus import Campus
 from modulos.cadastros.campus import criarCampus
-import database.entidades
+from modulos.utils.cadastro_visual import (painelCadastro, renderizarBotaoCadastro, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
 
+# Tela de cadastro para Campus
 def telaCadastroCampus():
     if "form_key_campus" not in st.session_state:
         st.session_state.form_key_campus = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
+    # Função para voltar à página de cadastros
+    def voltarCadastros():
+        from modulos.rotas import cadastros_page
 
-    st.title(":material/domain_add: Cadastro de Campus")
-    st.caption("Preencha as informações abaixo para cadastrar um novo campus.")
+        st.switch_page(cadastros_page)
 
-    st.markdown(
-        """
-        <style>
-        div[data-testid="InputInstructions"] {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    renderizarTopoCadastro(
+        titulo="Cadastrar campus",
+        descricao=(
+            "Registre uma nova unidade institucional e seus " "dados de contato."
+        ),
+        aoVoltar=voltarCadastros,
+        prefixoChave="cadastro_campus",
     )
 
     if st.session_state.pop("cadastro_campus_realizado", False):
-        st.toast("Campus cadastrado com sucesso!", icon=":material/check:")
+        st.toast(
+            "Campus cadastrado com sucesso!",
+            icon=":material/check:",
+        )
 
-    with st.form(key=f"cadastro_campus_{st.session_state.form_key_campus}", border=False):
-        
-        with st.container():
-            st.subheader("Dados da Unidade")
-            
-            with st.container(horizontal=True):
-                nome = st.text_input(
-                    "Nome do Campus *",
-                    placeholder="Ex.: Campus Central",
-                    key=f"campus_nome_{st.session_state.form_key_campus}"
-                )
-                cnpj = st.text_input(
-                    "CNPJ *",
-                    placeholder="Somente números",
-                    key=f"campus_cnpj_{st.session_state.form_key_campus}"
-                )
-                valor_caixa = st.number_input(
-                    "Valor Inicial do Caixa (R$)",
-                    min_value=0.0,
-                    step=100.0,
-                    format="%.2f",
-                    key=f"campus_caixa_{st.session_state.form_key_campus}"
-                )
+    with painelCadastro(
+        titulo="Informações do campus",
+        descricao=(
+            "Preencha os dados da unidade, sua localização " "e os canais de contato."
+        ),
+    ):
 
-        with st.container():
-            with st.container(horizontal=True):
-                cidade = st.text_input(
-                    "Cidade *",
-                    placeholder="Ex.: São Paulo",
-                    key=f"campus_cidade_{st.session_state.form_key_campus}"
-                )
-                estado = st.text_input(
-                    "Estado *",
-                    placeholder="Ex.: SP",
-                    max_chars=2,
-                    key=f"campus_estado_{st.session_state.form_key_campus}"
-                )
+        renderizarSecaoCadastro(
+            numero=1,
+            titulo="Dados da unidade",
+            descricao="Identificação institucional e caixa inicial.",
+        )
 
-        with st.container():
-            c3, c4 = st.columns(2)
-            with c3:
-                email = st.text_input(
-                    "E-mail *",
-                    placeholder="contato@campus.com",
-                    key=f"campus_email_{st.session_state.form_key_campus}"
-                )
-            with c4:
-                telefone = st.text_input(
-                    "Telefone",
-                    placeholder="Opcional",
-                    key=f"campus_telefone_{st.session_state.form_key_campus}"
-                )
+        colNome, colCnpj, colCaixa = st.columns([2, 1.5, 1.3])
 
-        st.write("")
-
-        _, centro, _ = st.columns([2, 3, 2])
-        with centro:
-            cadastrar = st.form_submit_button(
-                "Cadastrar Campus", 
-                type="primary", 
-                width="stretch"
+        with colNome:
+            nome = st.text_input(
+                "Nome do campus *",
+                placeholder="Ex.: Campus Central",
+                key=(f"campus_nome_" f"{st.session_state.form_key_campus}"),
             )
+
+        with colCnpj:
+            cnpj = st.text_input(
+                "CNPJ *",
+                placeholder="Somente números",
+                key=(f"campus_cnpj_" f"{st.session_state.form_key_campus}"),
+            )
+
+        with colCaixa:
+            valor_caixa = st.number_input(
+                "Valor inicial do caixa (R$)",
+                min_value=0.0,
+                step=100.0,
+                format="%.2f",
+                key=(f"campus_caixa_" f"{st.session_state.form_key_campus}"),
+            )
+
+        renderizarDivisorCadastro()
+
+        renderizarSecaoCadastro(
+            numero=2,
+            titulo="Localização",
+            descricao="Cidade e unidade federativa do campus.",
+        )
+
+        colCidade, colEstado = st.columns([4, 1])
+
+        with colCidade:
+            cidade = st.text_input(
+                "Cidade *",
+                placeholder="Ex.: São Paulo",
+                key=(f"campus_cidade_" f"{st.session_state.form_key_campus}"),
+            )
+
+        with colEstado:
+            estado = st.text_input(
+                "Estado *",
+                placeholder="Ex.: SP",
+                max_chars=2,
+                key=(f"campus_estado_" f"{st.session_state.form_key_campus}"),
+            )
+
+        renderizarDivisorCadastro()
+
+        renderizarSecaoCadastro(
+            numero=3,
+            titulo="Contato",
+            descricao="Canais oficiais de comunicação da unidade.",
+        )
+
+        colEmail, colTelefone = st.columns([3, 2])
+
+        with colEmail:
+            email = st.text_input(
+                "E-mail *",
+                placeholder="contato@campus.com",
+                key=(f"campus_email_" f"{st.session_state.form_key_campus}"),
+            )
+
+        with colTelefone:
+            telefone = st.text_input(
+                "Telefone",
+                placeholder="Opcional",
+                key=(f"campus_telefone_" f"{st.session_state.form_key_campus}"),
+            )
+
+        cadastrar = renderizarBotaoCadastro(
+            rotulo="Cadastrar campus",
+            icone=":material/domain_add:",
+            chave=(f"btn_cad_campus_" f"{st.session_state.form_key_campus}"),
+        )
 
     if cadastrar:
         if not nome.strip() or not cnpj.strip() or not email.strip():
-            st.error("Por favor, preencha todos os campos obrigatórios (Nome, CNPJ e E-mail).")
+            st.error(
+                "Por favor, preencha todos os campos obrigatórios "
+                "(Nome, CNPJ e E-mail)."
+            )
+
         else:
             try:
-                import re
                 novo_campus = Campus(
-                    cnpj=re.sub(r'\D', '', cnpj),
+                    cnpj=re.sub(r"\D", "", cnpj),
                     nome=nome.strip(),
                     email=email.strip(),
-                    telefone=telefone.strip() if telefone.strip() != "" else None
+                    telefone=(telefone.strip() if telefone.strip() else None),
                 )
-                
-                criarCampus(campus=novo_campus, valorInicialCaixa=valor_caixa)
-                
+
+                criarCampus(
+                    campus=novo_campus,
+                    valorInicialCaixa=valor_caixa,
+                )
+
                 st.session_state.form_key_campus += 1
-                st.session_state.pop("cache_campus", None) 
+                st.session_state.pop("cache_campus", None)
                 st.session_state["cadastro_campus_realizado"] = True
-                
+
                 st.rerun()
-                
-            except SQLAlchemyError as e:
-                st.error(f"Erro ao salvar os dados no banco: {e}")
-            except Exception as e:
-                st.error(str(e))
+
+            except SQLAlchemyError as erro:
+                st.error("Erro ao salvar os dados no banco: " f"{erro}")
+
+            except Exception as erro:
+                st.error(str(erro))

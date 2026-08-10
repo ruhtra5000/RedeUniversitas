@@ -1,8 +1,6 @@
 from decimal import Decimal
-
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-
 from database.Conexao import SessionLocal
 from sqlalchemy.orm import joinedload
 from database.entidades.Aluno import Aluno
@@ -298,7 +296,7 @@ def dbListarTurmaId(idTurma: int):
 def dbAlterarProfessorTurma(idTurma: int, idNovoProfessor: int):
     with SessionLocal() as session:
         query = select(Turma).where(Turma.id == idTurma)
-        turma = session.execute(query).scalar_one()
+        turma = session.execute(query).unique().scalar_one()
 
         turma.professor_id = idNovoProfessor
 

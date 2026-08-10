@@ -1,82 +1,72 @@
 import streamlit as st
 from modulos.academico.academico_service import listarTurmasGeral
-from modulos.utils.listagem_utils import separador
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Turmas
 def telaListagemTurmas():
 
-    st.title("📋 Listagem de Turmas")
-    st.caption("Consulte as turmas cadastradas no sistema.")
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaTurmas = listarTurmasGeral()
 
-    if not listaTurmas:
-        st.info("🏫 Nenhuma turma cadastrada.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Disciplina",
+            valor=lambda turma: (
+                turma.disciplina.nome if turma.disciplina else "Não informada"
+            ),
+            subtitulo="Turma acadêmica",
+            proporcao=2.7,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="Código",
+            valor=lambda turma: (turma.codigo or "Não informado"),
+            proporcao=1.7,
+        ),
+        ColunaListagem(
+            titulo="Professor",
+            valor=lambda turma: (
+                turma.professor.pessoa.nome
+                if turma.professor and turma.professor.pessoa
+                else "Não informado"
+            ),
+            proporcao=2.7,
+        ),
+        ColunaListagem(
+            titulo="Semestre",
+            valor=lambda turma: (turma.semestre or "Não informado"),
+            proporcao=1.5,
+            tipo="badge",
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"🏫 {len(listaTurmas)} "
-        f"{'turma encontrada' if len(listaTurmas) == 1 else 'turmas encontradas'}"
+        st.switch_page(home_page)
+
+    # Função para visualizar detalhes da turma
+    def visualizar(turma):
+        st.session_state["turma_id"] = turma.id
+
+        from modulos.rotas import view_turma_page
+
+        st.switch_page(view_turma_page)
+
+    renderizarListagem(
+        itens=listaTurmas,
+        categoria="Listagem",
+        titulo="Turmas",
+        descricao=(
+            "Consulte as turmas, disciplinas, " "professores responsáveis e semestres."
+        ),
+        singular="turma",
+        plural="turmas",
+        colunas=colunas,
+        obter_id=lambda turma: turma.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="turma",
+        titulo_tabela="Turmas cadastradas",
+        mensagem_vazia=("Nenhuma turma foi cadastrada no sistema."),
     )
-
-    proporcoes = [3, 2.2, 3.2, 2.5, 1.3]
-
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
-        )
-
-        h1.markdown("**Código**")
-        h2.markdown("**Disciplina**")
-        h3.markdown("**Professor**")
-        h4.markdown("**Semestre**")
-        h5.markdown("**Ações**")
-
-        separador()
-
-        for indice, turma in enumerate(listaTurmas):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.write(turma.codigo or "Não informado")
-
-            with c2:
-                st.markdown(f"**{turma.disciplina.nome}**")
-
-            with c3:
-                st.write(turma.professor.pessoa.nome)
-
-            with c4:
-                st.write(turma.semestre)
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_turma_{turma.id}",
-                    help="Visualizar turma",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["turma_id"] = turma.id
-
-                from modulos.rotas import view_turma_page
-                st.switch_page(view_turma_page)
-
-            if indice < len(listaTurmas) - 1:
-                separador()

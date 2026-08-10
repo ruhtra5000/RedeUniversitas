@@ -1,131 +1,150 @@
-from sqlalchemy.exc import SQLAlchemyError
+import re
 import streamlit as st
-from database.Conexao import SessionLocal
+from sqlalchemy.exc import SQLAlchemyError
 from database.entidades.Pessoa import Pessoa
-from database.entidades.Almoxarife import Almoxarife
-from modulos.cadastros.almoxarife import criarAlmoxarife
 from modulos.academico.academico_service import listarCampus
-import database.entidades
+from modulos.cadastros.almoxarife import criarAlmoxarife
+from modulos.utils.cadastro_visual import (painelCadastro, renderizarAvisoCadastro, renderizarBotaoCadastro, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
 
+# Tela de cadastro para Almoxarifes
 def telaCadastroAlmoxarife():
     if "form_key_alm" not in st.session_state:
         st.session_state.form_key_alm = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
+    # Função para voltar à página de cadastros
+    def voltarCadastros():
+        from modulos.rotas import cadastros_page
 
-    st.title(":material/person_add: Cadastro de Almoxarife")
-    st.caption("Preencha as informações abaixo para cadastrar um novo almoxarife no sistema.")
+        st.switch_page(cadastros_page)
 
-    st.markdown(
-        """
-        <style>
-        div[data-testid="InputInstructions"] {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    renderizarTopoCadastro(
+        titulo="Cadastrar almoxarife",
+        descricao=(
+            "Inclua um novo profissional e defina o campus " "ao qual ficará vinculado."
+        ),
+        aoVoltar=voltarCadastros,
+        prefixoChave="cadastro_almoxarife",
     )
 
     if st.session_state.pop("cadastro_alm_realizado", False):
-        st.toast("Almoxarife cadastrado com sucesso!", icon=":material/check:")
+        st.toast(
+            "Almoxarife cadastrado com sucesso!",
+            icon=":material/check:",
+        )
 
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
 
-    lista_campus = st.session_state.cache_campus
+    listaCampus = st.session_state.cache_campus
 
-    if not lista_campus:
-        st.warning(
-            """
-            :material/warning: Antes de cadastrar um almoxarife é necessário possuir:
-            - Pelo menos **1 Campus**
-            """
+    if not listaCampus:
+        renderizarAvisoCadastro(
+            titulo="Campus necessário",
+            descricao=(
+                "Cadastre pelo menos um campus antes de adicionar " "um almoxarife."
+            ),
         )
 
-    with st.form(key=f"cadastro_alm_{st.session_state.form_key_alm}", border=False):
-        
-        with st.container():
-            st.subheader("Dados Pessoais")
-            
-            with st.container(horizontal=True):
-                nome = st.text_input(
-                    "Nome Completo *",
-                    placeholder="Ex.: Maria Oliveira",
-                    key=f"alm_nome_{st.session_state.form_key_alm}"
-                )
-                email = st.text_input(
-                    "E-mail *",
-                    placeholder="email@exemplo.com",
-                    key=f"alm_email_{st.session_state.form_key_alm}"
-                )
+    with painelCadastro(
+        titulo="Informações do almoxarife",
+        descricao=(
+            "Preencha os dados pessoais e o vínculo " "institucional do profissional."
+        ),
+    ):
 
-            with st.container(horizontal=True):
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"alm_cpf_{st.session_state.form_key_alm}"
-                )
-                telefone = st.text_input(
-                    "Telefone",
-                    placeholder="Opcional",
-                    key=f"alm_telefone_{st.session_state.form_key_alm}"
-                )
+        renderizarSecaoCadastro(
+            numero=1,
+            titulo="Dados pessoais",
+            descricao=("Informações de identificação e contato " "do profissional."),
+        )
 
-        st.write("")
+        colNome, colEmail = st.columns(2)
 
-        with st.container():
-            st.subheader("Vínculo Institucional")
-
-            campus = st.selectbox(
-                "Campus *",
-                options=lista_campus if lista_campus else [],
-                format_func=lambda x: x.nome,
-                index=None,
-                placeholder="Selecione um campus...",
-                disabled=not lista_campus,
-                key=f"alm_campus_{st.session_state.form_key_alm}"
+        with colNome:
+            nome = st.text_input(
+                "Nome completo *",
+                placeholder="Ex.: Maria Oliveira",
+                key=(f"alm_nome_" f"{st.session_state.form_key_alm}"),
             )
 
-        st.write("")
-
-        _, centro, _ = st.columns([2, 3, 2])
-        with centro:
-            cadastrar = st.form_submit_button(
-                "Cadastrar Almoxarife", 
-                type="primary", 
-                width="stretch"
+        with colEmail:
+            email = st.text_input(
+                "E-mail *",
+                placeholder="email@exemplo.com",
+                key=(f"alm_email_" f"{st.session_state.form_key_alm}"),
             )
+
+        colCpf, colTelefone = st.columns(2)
+
+        with colCpf:
+            cpf = st.text_input(
+                "CPF *",
+                placeholder="Somente números",
+                key=(f"alm_cpf_" f"{st.session_state.form_key_alm}"),
+            )
+
+        with colTelefone:
+            telefone = st.text_input(
+                "Telefone",
+                placeholder="Opcional",
+                key=(f"alm_telefone_" f"{st.session_state.form_key_alm}"),
+            )
+
+        renderizarDivisorCadastro()
+
+        renderizarSecaoCadastro(
+            numero=2,
+            titulo="Vínculo institucional",
+            descricao=("Selecione a unidade em que o profissional " "atuará."),
+        )
+
+        campus = st.selectbox(
+            "Campus *",
+            options=listaCampus if listaCampus else [],
+            format_func=lambda item: item.nome,
+            index=None,
+            placeholder="Selecione um campus...",
+            disabled=not listaCampus,
+            key=(f"alm_campus_" f"{st.session_state.form_key_alm}"),
+        )
+
+        cadastrar = renderizarBotaoCadastro(
+            rotulo="Cadastrar almoxarife",
+            icone=":material/person_add:",
+            chave=(f"btn_cad_alm_" f"{st.session_state.form_key_alm}"),
+        )
 
     if cadastrar:
-        if not lista_campus:
+        if not listaCampus:
             st.error("Cadastre pelo menos um Campus antes de continuar.")
+
         elif not nome.strip() or not cpf.strip() or not email.strip():
             st.error("Por favor, preencha todos os campos obrigatórios.")
+
         elif campus is None:
             st.error("Por favor, selecione um Campus.")
+
         else:
             try:
-                import re
-                nova_pessoa = Pessoa(
+                novaPessoa = Pessoa(
                     nome=nome.strip(),
-                    cpf=re.sub(r'\D', '', cpf),
+                    cpf=re.sub(r"\D", "", cpf),
                     email=email.strip(),
-                    telefone=telefone.strip() if telefone.strip() != "" else None
+                    telefone=(telefone.strip() if telefone.strip() else None),
                 )
-                
-                criarAlmoxarife(pessoa=nova_pessoa, idCampus=campus.id)
-                
-                st.session_state.form_key_alm += 1 
+
+                criarAlmoxarife(
+                    pessoa=novaPessoa,
+                    idCampus=campus.id,
+                )
+
+                st.session_state.form_key_alm += 1
                 st.session_state["cadastro_alm_realizado"] = True
-                
+
                 st.rerun()
-                
-            except SQLAlchemyError as e:
-                st.error(f"Erro ao salvar os dados no banco: {e}")
-            except Exception as e:
-                st.error(str(e))
+
+            except SQLAlchemyError as erro:
+                st.error("Erro ao salvar os dados no banco: " f"{erro}")
+
+            except Exception as erro:
+                st.error(str(erro))

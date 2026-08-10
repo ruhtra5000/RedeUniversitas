@@ -1,38 +1,37 @@
-from sqlalchemy.exc import SQLAlchemyError
+import re
 import streamlit as st
-from database.Conexao import SessionLocal
+from sqlalchemy.exc import SQLAlchemyError
 from database.entidades.Pessoa import Pessoa
-from database.entidades.Financeiro import Financeiro
-from modulos.cadastros.financeiro import criarFinanceiro
 from modulos.academico.academico_service import listarCampus
-import database.entidades
+from modulos.cadastros.financeiro import criarFinanceiro
+from modulos.utils.cadastro_visual import (painelCadastro, renderizarAvisoCadastro, renderizarBotaoCadastro, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
 
+# Tela de cadastro para Funcionários Financeiros
 def telaCadastroFinanceiro():
     if "form_key_fin" not in st.session_state:
         st.session_state.form_key_fin = 0
 
-    col1, _ = st.columns([1, 6])
-    with col1:
-        if st.button(":material/arrow_back: Voltar", width="stretch"):
-            from modulos.rotas import cadastros_page
-            st.switch_page(cadastros_page)
+    # Função para voltar à página de cadastros
+    def voltarCadastros():
+        from modulos.rotas import cadastros_page
 
-    st.title(":material/person_add: Cadastro de Financeiro")
-    st.caption("Preencha as informações abaixo para cadastrar um novo funcionário financeiro no sistema.")
+        st.switch_page(cadastros_page)
 
-    st.markdown(
-        """
-        <style>
-        div[data-testid="InputInstructions"] {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    renderizarTopoCadastro(
+        titulo="Cadastrar financeiro",
+        descricao=(
+            "Inclua um funcionário da área financeira e defina "
+            "seu campus de atuação."
+        ),
+        aoVoltar=voltarCadastros,
+        prefixoChave="cadastro_financeiro",
     )
 
     if st.session_state.pop("cadastro_fin_realizado", False):
-        st.toast("Funcionário financeiro cadastrado com sucesso!", icon=":material/check:")
+        st.toast(
+            "Funcionário financeiro cadastrado com sucesso!",
+            icon=":material/check:",
+        )
 
     if "cache_campus" not in st.session_state:
         st.session_state.cache_campus = listarCampus()
@@ -40,91 +39,114 @@ def telaCadastroFinanceiro():
     lista_campus = st.session_state.cache_campus
 
     if not lista_campus:
-        st.warning(
-            """
-            :material/warning: Antes de cadastrar um funcionário financeiro é necessário possuir:
-            - Pelo menos **1 Campus**
-            """
+        renderizarAvisoCadastro(
+            titulo="Campus necessário",
+            descricao=(
+                "Cadastre pelo menos um campus antes de adicionar "
+                "um funcionário financeiro."
+            ),
         )
 
-    with st.form(key=f"cadastro_fin_{st.session_state.form_key_fin}", border=False):
-        
-        with st.container():
-            st.subheader("Dados Pessoais")
-            
-            with st.container(horizontal=True):
-                nome = st.text_input(
-                    "Nome Completo *",
-                    placeholder="Ex.: Carlos Mendes",
-                    key=f"fin_nome_{st.session_state.form_key_fin}"
-                )
-                email = st.text_input(
-                    "E-mail *",
-                    placeholder="email@exemplo.com",
-                    key=f"fin_email_{st.session_state.form_key_fin}"
-                )
+    with painelCadastro(
+        titulo="Informações do funcionário",
+        descricao=(
+            "Preencha os dados pessoais e o vínculo " "institucional do profissional."
+        ),
+    ):
 
-            with st.container(horizontal=True):
-                cpf = st.text_input(
-                    "CPF *",
-                    placeholder="Somente números",
-                    key=f"fin_cpf_{st.session_state.form_key_fin}"
-                )
-                telefone = st.text_input(
-                    "Telefone",
-                    placeholder="Opcional",
-                    key=f"fin_telefone_{st.session_state.form_key_fin}"
-                )
+        renderizarSecaoCadastro(
+            numero=1,
+            titulo="Dados pessoais",
+            descricao="Informações de identificação e contato.",
+        )
 
+        colNome, colEmail = st.columns(2)
 
-        with st.container():
-            st.subheader("Vínculo Institucional")
-
-            campus = st.selectbox(
-                "Campus *",
-                options=lista_campus if lista_campus else [],
-                format_func=lambda x: x.nome,
-                index=None,
-                placeholder="Selecione um campus...",
-                disabled=not lista_campus,
-                key=f"fin_campus_{st.session_state.form_key_fin}"
+        with colNome:
+            nome = st.text_input(
+                "Nome completo *",
+                placeholder="Ex.: Carlos Mendes",
+                key=(f"fin_nome_" f"{st.session_state.form_key_fin}"),
             )
 
-        st.write("")
-
-        _, centro, _ = st.columns([2, 3, 2])
-        with centro:
-            cadastrar = st.form_submit_button(
-                "Cadastrar Financeiro", 
-                type="primary", 
-                width="stretch"
+        with colEmail:
+            email = st.text_input(
+                "E-mail *",
+                placeholder="email@exemplo.com",
+                key=(f"fin_email_" f"{st.session_state.form_key_fin}"),
             )
+
+        colCpf, colTelefone = st.columns(2)
+
+        with colCpf:
+            cpf = st.text_input(
+                "CPF *",
+                placeholder="Somente números",
+                key=(f"fin_cpf_" f"{st.session_state.form_key_fin}"),
+            )
+
+        with colTelefone:
+            telefone = st.text_input(
+                "Telefone",
+                placeholder="Opcional",
+                key=(f"fin_telefone_" f"{st.session_state.form_key_fin}"),
+            )
+
+        renderizarDivisorCadastro()
+
+        renderizarSecaoCadastro(
+            numero=2,
+            titulo="Vínculo institucional",
+            descricao="Campus em que o funcionário atuará.",
+        )
+
+        campus = st.selectbox(
+            "Campus *",
+            options=lista_campus if lista_campus else [],
+            format_func=lambda item: item.nome,
+            index=None,
+            placeholder="Selecione um campus...",
+            disabled=not lista_campus,
+            key=(f"fin_campus_" f"{st.session_state.form_key_fin}"),
+        )
+
+        cadastrar = renderizarBotaoCadastro(
+            rotulo="Cadastrar financeiro",
+            icone=":material/person_add:",
+            chave=(f"btn_cad_fin_" f"{st.session_state.form_key_fin}"),
+        )
 
     if cadastrar:
         if not lista_campus:
             st.error("Cadastre pelo menos um Campus antes de continuar.")
+
         elif not nome.strip() or not cpf.strip() or not email.strip():
             st.error("Por favor, preencha todos os campos obrigatórios.")
+
         elif campus is None:
             st.error("Por favor, selecione um Campus.")
+
         else:
             try:
-                import re
                 nova_pessoa = Pessoa(
                     nome=nome.strip(),
-                    cpf=re.sub(r'\D', '', cpf),
+                    cpf=re.sub(r"\D", "", cpf),
                     email=email.strip(),
-                    telefone=telefone.strip() if telefone.strip() != "" else None
+                    telefone=(telefone.strip() if telefone.strip() else None),
                 )
-                
-                criarFinanceiro(pessoa=nova_pessoa, idCampus=campus.id)
-                
-                st.session_state.form_key_fin += 1 
+
+                criarFinanceiro(
+                    pessoa=nova_pessoa,
+                    idCampus=campus.id,
+                )
+
+                st.session_state.form_key_fin += 1
                 st.session_state["cadastro_fin_realizado"] = True
-                
+
                 st.rerun()
-                
-            except SQLAlchemyError as e:
-                st.error(f"Erro ao salvar os dados no banco: {e}")
-            except Exception as e:
-                st.error(str(e))
+
+            except SQLAlchemyError as erro:
+                st.error("Erro ao salvar os dados no banco: " f"{erro}")
+
+            except Exception as erro:
+                st.error(str(erro))

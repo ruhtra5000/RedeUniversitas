@@ -1,91 +1,68 @@
-import re
 import streamlit as st
 from modulos.compras.compras_service import listarFornecedores
-from modulos.utils.listagem_utils import separador, formatar_cnpj
+from modulos.utils.listagem_utils import formatar_cnpj
+from modulos.utils.listagem_visual import ColunaListagem, renderizarListagem
 
 # Tela de listagem para Fornecedores
 def telaListagemFornecedores():
 
-    st.title("📋 Listagem de Fornecedores")
-    st.caption(
-        "Consulte os fornecedores cadastrados no sistema."
-    )
-
-    colVoltar, _ = st.columns([1, 5])
-
-    with colVoltar:
-        if st.button("⬅ Voltar", use_container_width=True):
-            from modulos.rotas import home_page
-            st.switch_page(home_page)
-
     listaFornecedores = listarFornecedores()
 
-    if not listaFornecedores:
-        st.info("🏭 Nenhum fornecedor cadastrado.")
-        return
+    colunas = [
+        ColunaListagem(
+            titulo="Fornecedor",
+            valor=lambda fornecedor: fornecedor.nome,
+            subtitulo="Fornecedor",
+            proporcao=2.6,
+            tipo="principal",
+        ),
+        ColunaListagem(
+            titulo="CNPJ",
+            valor=lambda fornecedor: formatar_cnpj(fornecedor.cnpj),
+            proporcao=2,
+        ),
+        ColunaListagem(
+            titulo="E-mail",
+            valor=lambda fornecedor: (fornecedor.email or "Não informado"),
+            proporcao=2.7,
+        ),
+        ColunaListagem(
+            titulo="Telefone",
+            valor=lambda fornecedor: (fornecedor.telefone or "Não informado"),
+            proporcao=1.8,
+        ),
+    ]
 
-    st.write("")
+    # Função de navegação
+    def voltar():
+        from modulos.rotas import home_page
 
-    st.caption(
-        f"🏭 {len(listaFornecedores)} "
-        f"{'fornecedor encontrado' if len(listaFornecedores) == 1 else 'fornecedores encontrados'}"
-    )
+        st.switch_page(home_page)
 
-    proporcoes = [3, 2.4, 3.2, 2.2, 1.2]
+    # Função para visualizar detalhes do fornecedor
+    def visualizar(fornecedor):
+        st.session_state["fornecedor_selecionado"] = fornecedor.id
 
-    with st.container(border=True):
-
-        h1, h2, h3, h4, h5 = st.columns(
-            proporcoes,
-            vertical_alignment="center",
+        from modulos.rotas import (
+            view_fornecedor_page,
         )
 
-        h1.markdown("**Fornecedor**")
-        h2.markdown("**CNPJ**")
-        h3.markdown("**E-mail**")
-        h4.markdown("**Telefone**")
-        h5.markdown("**Ações**")
+        st.switch_page(view_fornecedor_page)
 
-        separador()
-
-        for indice, fornecedor in enumerate(listaFornecedores):
-
-            c1, c2, c3, c4, c5 = st.columns(
-                proporcoes,
-                vertical_alignment="center",
-            )
-
-            with c1:
-                st.markdown(f"**{fornecedor.nome}**")
-
-            with c2:
-                st.write(formatar_cnpj(fornecedor.cnpj))
-
-            with c3:
-                st.write(
-                    fornecedor.email or "Não informado"
-                )
-
-            with c4:
-                st.write(
-                    fornecedor.telefone or "Não informado"
-                )
-
-            with c5:
-                visualizar = st.button(
-                    "👁️",
-                    key=f"view_fornecedor_{fornecedor.id}",
-                    help="Visualizar fornecedor",
-                    use_container_width=True,
-                )
-
-            if visualizar:
-                st.session_state["fornecedor_selecionado"] = (
-                    fornecedor.id
-                )
-
-                from modulos.rotas import view_fornecedor_page
-                st.switch_page(view_fornecedor_page)
-
-            if indice < len(listaFornecedores) - 1:
-                separador()
+    renderizarListagem(
+        itens=listaFornecedores,
+        categoria="Listagem",
+        titulo="Fornecedores",
+        descricao=(
+            "Consulte as empresas fornecedoras e " "suas informações de contato."
+        ),
+        singular="fornecedor",
+        plural="fornecedores",
+        colunas=colunas,
+        obter_id=lambda fornecedor: fornecedor.id,
+        ao_visualizar=visualizar,
+        ao_voltar=voltar,
+        prefixo_chave="fornecedor",
+        titulo_tabela="Fornecedores cadastrados",
+        mensagem_vazia=("Nenhum fornecedor foi cadastrado no sistema."),
+    )
