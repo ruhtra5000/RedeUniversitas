@@ -46,6 +46,20 @@ CREATE TYPE public.modalidadecurso AS ENUM (
 ALTER TYPE public.modalidadecurso OWNER TO user_universitas;
 
 --
+-- Name: statusaluno; Type: TYPE; Schema: public; Owner: user_universitas
+--
+
+CREATE TYPE public.statusaluno AS ENUM (
+    'ATIVO',
+    'FORMADO',
+    'TRANCADO',
+    'EVADIDO'
+);
+
+
+ALTER TYPE public.statusaluno OWNER TO user_universitas;
+
+--
 -- Name: statusbolsa; Type: TYPE; Schema: public; Owner: user_universitas
 --
 
@@ -100,6 +114,7 @@ CREATE TABLE public.aluno (
     coef_rend double precision NOT NULL,
     campus_id integer NOT NULL,
     curso_id integer NOT NULL,
+    status public.statusaluno NOT NULL,
     CONSTRAINT ck_aluno_coef_rend CHECK (((coef_rend >= (0)::double precision) AND (coef_rend <= (10)::double precision))),
     CONSTRAINT ck_aluno_media_geral CHECK (((media_geral >= (0)::double precision) AND (media_geral <= (10)::double precision)))
 );

@@ -100,9 +100,9 @@ WHERE pessoa_id = 3;
 
 -- Garante que seja aluno no Campus 1
 INSERT INTO aluno
-    (pessoa_id, matricula, media_geral, coef_rend, campus_id, curso_id)
+    (pessoa_id, matricula, media_geral, coef_rend, campus_id, curso_id, status)
 VALUES
-    (3, 20261001, 0, 0, 1, 1)
+    (3, 20261001, 0, 0, 1, 1, 'ATIVO')
 ON CONFLICT (pessoa_id)
 DO UPDATE SET
     campus_id = 1,

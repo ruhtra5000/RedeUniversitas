@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
-\restrict V4UCFts1SeLBEef8BsdRsjoiZA6LjYzw04CTG4opH2hM3YldbUc09P3KsY095md
-
--- Dumped from database version 18.4
--- Dumped by pg_dump version 18.4
+-- Dumped from database version 17.3
+-- Dumped by pg_dump version 17.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -203,33 +201,33 @@ COPY public.curso (id, nome, modalidade, mensalidade_base, carga_horaria, dur_mi
 -- Data for Name: aluno; Type: TABLE DATA; Schema: public; Owner: user_universitas
 --
 
-COPY public.aluno (pessoa_id, matricula, media_geral, coef_rend, campus_id, curso_id) FROM stdin;
-3	20261001	0	0	1	1
-20	20260020	0	0	9	16
-21	20260021	0	0	15	3
-22	20260022	0	0	2	14
-23	20260023	0	0	11	9
-24	20260024	0	0	1	3
-25	20260025	0	0	8	1
-26	20260026	0	0	9	2
-27	20260027	0	0	6	16
-28	20260028	0	0	15	9
-29	20260029	0	0	6	14
-30	20260030	0	0	16	3
-31	20260031	0	0	16	12
-32	20260032	0	0	14	11
-33	20260033	0	0	11	4
-34	20260034	0	0	6	11
-35	20260035	0	0	14	16
-36	20260036	0	0	10	13
-37	20260037	0	0	2	15
-38	20260038	0	0	3	11
-39	20260039	0	0	9	11
-40	20260040	0	0	4	13
-41	20260041	0	0	1	15
-42	20260042	0	0	14	2
-43	20260043	0	0	7	12
-44	20260044	0	0	16	15
+COPY public.aluno (pessoa_id, matricula, media_geral, coef_rend, campus_id, curso_id, status) FROM stdin;
+3	20261001	0	0	1	1	ATIVO
+20	20260020	0	0	9	16	ATIVO
+21	20260021	0	0	15	3	ATIVO
+22	20260022	0	0	2	14	ATIVO
+23	20260023	0	0	11	9	ATIVO
+24	20260024	0	0	1	3	ATIVO
+25	20260025	0	0	8	1	ATIVO
+26	20260026	0	0	9	2	ATIVO
+27	20260027	0	0	6	16	ATIVO
+28	20260028	0	0	15	9	ATIVO
+29	20260029	0	0	6	14	ATIVO
+30	20260030	0	0	16	3	ATIVO
+31	20260031	0	0	16	12	ATIVO
+32	20260032	0	0	14	11	ATIVO
+33	20260033	0	0	11	4	ATIVO
+34	20260034	0	0	6	11	ATIVO
+35	20260035	0	0	14	16	ATIVO
+36	20260036	0	0	10	13	ATIVO
+37	20260037	0	0	2	15	ATIVO
+38	20260038	0	0	3	11	ATIVO
+39	20260039	0	0	9	11	ATIVO
+40	20260040	0	0	4	13	ATIVO
+41	20260041	0	0	1	15	ATIVO
+42	20260042	0	0	14	2	ATIVO
+43	20260043	0	0	7	12	ATIVO
+44	20260044	0	0	16	15	ATIVO
 \.
 
 
@@ -650,6 +648,4 @@ SELECT pg_catalog.setval('public.turma_id_seq', 20, true);
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict V4UCFts1SeLBEef8BsdRsjoiZA6LjYzw04CTG4opH2hM3YldbUc09P3KsY095md
 
