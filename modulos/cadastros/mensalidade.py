@@ -9,7 +9,7 @@ from database.Conexao import SessionLocal
 from database.entidades.Bolsa import Bolsa
 from database.entidades.ContaReceber import ContaReceber
 from database.entidades.Mensalidade import Mensalidade
-from modulos.academico.academico_service import listarAlunos, listarBolsasAtivasAluno
+from modulos.academico.academico_service import listarAlunosAtivos, listarBolsasAtivasAluno
 import database.entidades
 
 # Teoricamente, não é necessária interface para
@@ -20,7 +20,7 @@ import database.entidades
 # Service
 def criarMensalidades():
     try:
-        alunos = listarAlunos()
+        alunos = listarAlunosAtivos()
         emissao = date.today()
         vencimento = emissao + relativedelta(months=1)
         

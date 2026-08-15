@@ -7,6 +7,7 @@ from database.entidades.Pessoa import Pessoa
 from database.entidades.Aluno import Aluno
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
+from database.entidades.enums.StatusAluno import StatusAluno
 from modulos.cadastros.cadastro_utils import validarEmail, validarTelefone 
 from modulos.academico.academico_db import dbExisteCpf, dbExisteEmail
 
@@ -62,7 +63,8 @@ def dbCriarAluno(pessoa: Pessoa, idCampus: int, idCurso: int):
                 pessoa_id = pessoa.id,
                 matricula = f"{anoAtual}-{pessoa.id:05d}",
                 campus_id = idCampus,
-                curso_id = idCurso
+                curso_id = idCurso,
+                status = StatusAluno.ATIVO
             )
 
             session.add(aluno)

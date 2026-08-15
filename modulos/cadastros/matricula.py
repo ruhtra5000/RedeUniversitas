@@ -3,6 +3,7 @@ from database.Conexao import SessionLocal
 from database.entidades.Aluno import Aluno
 from database.entidades.Disciplina import Disciplina
 from database.entidades.Matricula import Matricula
+from database.entidades.enums.StatusAluno import StatusAluno
 from decimal import Decimal
 
 # === Dados recebidos ===
@@ -16,6 +17,9 @@ from decimal import Decimal
 # Service
 def criarMatricula(matricula: Matricula, aluno: Aluno, disciplina: Disciplina):
     try:
+        if aluno.status != StatusAluno.ATIVO:
+            raise Exception("O aluno não consta como ativo.")
+
         if aluno.curso_id != disciplina.curso_id:
             raise Exception("O aluno deve pertencer ao mesmo curso da disciplina.")
 

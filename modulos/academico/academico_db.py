@@ -7,8 +7,6 @@ from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
 from database.entidades.Campus import Campus
 from database.entidades.Curso import Curso
-from database.entidades.Almoxarife import Almoxarife
-from database.entidades.Financeiro import Financeiro
 from database.entidades.Disciplina import Disciplina
 from database.entidades.Matricula import Matricula
 from database.entidades.Mensalidade import Mensalidade
@@ -16,8 +14,9 @@ from database.entidades.PreRequisito import PreRequisito
 from database.entidades.Professor import Professor 
 from database.entidades.Turma import Turma
 from database.entidades.enums.StatusBolsa import StatusBolsa
-import database.entidades
+from database.entidades.enums.StatusAluno import StatusAluno
 from database.entidades.Pessoa import Pessoa
+import database.entidades
 
 #  _____                                      
 # /  __ \                                     
@@ -539,6 +538,13 @@ def dbListarAlunos():
 
         return alunos
 
+def dbListarAlunosAtivos():
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.status == StatusAluno.ATIVO)
+        alunos = session.execute(query).unique().scalars().all()
+
+        return alunos
+
 def dbListarAlunosCampus(idCampus: int):
     with SessionLocal() as session:
         query = select(Aluno).where(Aluno.campus_id == idCampus)
@@ -565,6 +571,15 @@ def dbListarAlunoCpf(cpfAluno: str):
         aluno = session.execute(query).scalar_one_or_none()
                         
         return aluno
+
+def dbAlterarStatusAluno(idAluno: int, novoStatus: StatusAluno):
+    with SessionLocal() as session:
+        query = select(Aluno).where(Aluno.pessoa_id == idAluno)
+        aluno = session.execute(query).scalar_one()
+
+        aluno.status = novoStatus
+    
+        session.commit()
     
 def dbAtualizarCoefRendMediaGeral(idAluno: int, coef_rend: float, media_geral: float):
     with SessionLocal() as session:

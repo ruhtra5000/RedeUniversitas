@@ -392,6 +392,9 @@ def listarProfessorCpf(cpfProfessor: str):
 def listarAlunos():
     return dbListarAlunos()
 
+def listarAlunosAtivos():
+    return dbListarAlunosAtivos()
+
 def listarAlunosCampus(idCampus: int):
     return dbListarAlunosCampus(idCampus)
     
@@ -413,6 +416,9 @@ def listarAlunoCpf(cpfAluno: str):
         raise Exception(f"Aluno com CPF {cpfAluno} não existente.")
 
     return aluno
+
+def alterarStatusAluno(idAluno: int, novoStatus: StatusAluno):
+    dbAlterarStatusAluno(idAluno, novoStatus)
     
 def atualizarCoefRendMediaGeral(idAluno: int):
     matriculas = listarMatriculasAluno(idAluno)

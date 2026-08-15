@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
 from database.entidades.Bolsa import Bolsa
+from database.entidades.enums.StatusAluno import StatusAluno
 from modulos.academico.academico_db import dbListarBolsasAtivasAluno
 import database.entidades
 
@@ -26,6 +27,9 @@ def criarBolsa(bolsa: Bolsa, aluno):
         
         else:
             raise Exception(f"O aluno {aluno.pessoa.nome} já tem uma bolsa ativa vinculada a si.")
+
+        if aluno.status != StatusAluno.ATIVO:
+            raise Exception(f"O aluno selecionado não consta como ativo.")
         
         if bolsa.data_fim < bolsa.data_inicio:
             raise Exception(f"A data de início deve vir antes da data de fim.")
