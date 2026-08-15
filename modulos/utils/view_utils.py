@@ -83,6 +83,12 @@ def limpar_consulta_aluno():
         "consulta_id",
     )
 
+def formatar_status_aluno(aluno):
+    if aluno.status is None:
+        return "Não informado"
+
+    return aluno.status.value.replace("_", " ").title()
+
 
 # ALMOXARIFE
 
