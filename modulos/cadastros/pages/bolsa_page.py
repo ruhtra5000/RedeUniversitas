@@ -2,10 +2,9 @@ import streamlit as st
 from sqlalchemy.exc import SQLAlchemyError
 from database.entidades.Bolsa import Bolsa
 from database.entidades.enums.StatusBolsa import StatusBolsa
-from modulos.academico.academico_service import listarAlunos
+from modulos.academico.academico_service import listarAlunos, listarAlunosAtivos
 from modulos.cadastros.bolsa import criarBolsa
 from modulos.utils.cadastro_visual import (painelCadastro, renderizarAvisoCadastro, renderizarBotaoCadastro, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
-from database.entidades.enums.StatusAluno import StatusAluno
 
 # Tela de cadastro para Bolsas
 def telaCadastroBolsa():
@@ -45,11 +44,7 @@ def telaCadastroBolsa():
     if "cache_alunos" not in st.session_state:
         st.session_state.cache_alunos = listarAlunos()
 
-    lista_alunos = [
-        aluno
-        for aluno in st.session_state.cache_alunos
-        if aluno.status == StatusAluno.ATIVO
-    ]
+    lista_alunos = listarAlunosAtivos()
 
     if not lista_alunos:
         renderizarAvisoCadastro(
