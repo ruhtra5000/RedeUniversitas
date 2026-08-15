@@ -1,9 +1,10 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import CheckConstraint, Enum, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.Base import Base
+from database.entidades.enums.StatusAluno import StatusAluno
 
 if TYPE_CHECKING:
     from database.entidades.Bolsa import Bolsa
@@ -23,6 +24,7 @@ class Aluno(Base):
     coef_rend: Mapped[float] = mapped_column(Float, default=0.0)
     campus_id: Mapped[int] = mapped_column(ForeignKey("campus.id"))
     curso_id: Mapped[int] = mapped_column(ForeignKey("curso.id"))
+    status: Mapped["StatusAluno"] = mapped_column(Enum(StatusAluno), default=StatusAluno.ATIVO, nullable=False)
 
     # Ligações de ORM
     pessoa: Mapped["Pessoa"] = relationship(
