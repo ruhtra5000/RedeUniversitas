@@ -1,7 +1,7 @@
 import re
 import streamlit as st
 from modulos.academico.academico_service import listarAlunoCpf, listarAlunoId
-from modulos.utils.view_utils import formatar_cpf, limpar_consulta_aluno
+from modulos.utils.view_utils import (formatar_cpf, limpar_consulta_aluno, formatar_status_aluno)
 from modulos.utils.view_visual import (AcaoView, CampoBusca, CampoView, SecaoView, renderizarCabecalhoView, renderizarFormularioBusca, renderizarMensagemInicial, renderizarRegistroView)
 
 # Tela de visualização de aluno
@@ -152,42 +152,29 @@ def telaViewAluno():
                 [
                     CampoView(
                         rotulo="ID",
-                        valor=lambda item: (item.pessoa_id),
+                        valor=lambda item: item.pessoa_id,
                         proporcao=1,
                     ),
                     CampoView(
                         rotulo="Matrícula",
-                        valor=lambda item: (item.matricula),
-                        proporcao=2,
+                        valor=lambda item: item.matricula,
+                        proporcao=1.5,
                     ),
                     CampoView(
                         rotulo="Campus",
                         valor=lambda item: (
-                            item.campus.nome if item.campus else "Não informado"
+                            item.campus.nome
+                            if item.campus
+                            else "Não informado"
                         ),
-                        proporcao=3,
+                        proporcao=2,
                         tipo="badge",
                     ),
-                ],
-                [
                     CampoView(
-                        rotulo="Curso",
-                        valor=lambda item: (
-                            item.curso.nome if item.curso else "Não informado"
-                        ),
-                        proporcao=3,
-                    ),
-                    CampoView(
-                        rotulo="Média geral",
-                        valor=lambda item: (f"{item.media_geral or 0:.2f}"),
+                        rotulo="Status",
+                        valor=formatar_status_aluno,
                         proporcao=1.5,
-                        tipo="destaque",
-                    ),
-                    CampoView(
-                        rotulo="Coef. rendimento",
-                        valor=lambda item: (f"{item.coef_rend or 0:.2f}"),
-                        proporcao=1.5,
-                        tipo="destaque",
+                        tipo="badge",
                     ),
                 ],
             ],
@@ -199,7 +186,7 @@ def telaViewAluno():
         nome=lambda item: item.pessoa.nome,
         tipo_registro="Aluno",
         meta=lambda item: (item.curso.nome if item.curso else "Curso não informado"),
-        status="Registro localizado",
+        status=formatar_status_aluno,
         secoes=secoes,
         prefixo_chave="aluno",
         ao_limpar=limpar_consulta_aluno,

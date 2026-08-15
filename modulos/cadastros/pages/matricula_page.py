@@ -1,7 +1,7 @@
 import streamlit as st
 from sqlalchemy.exc import SQLAlchemyError
 from database.entidades.Matricula import Matricula
-from modulos.academico.academico_service import (listarAlunos, listarTurmasGeral)
+from modulos.academico.academico_service import (listarAlunos, listarTurmasGeral, listarAlunosAtivos)
 from modulos.cadastros.matricula import criarMatricula
 from modulos.utils.cadastro_visual import (painelCadastro, renderizarAvisoCadastro, renderizarBotaoCadastro, renderizarSecaoCadastro, renderizarTopoCadastro)
 
@@ -37,17 +37,17 @@ def telaCadastroMatricula():
     if "cache_turmas" not in st.session_state:
         st.session_state.cache_turmas = listarTurmasGeral()
 
-    lista_alunos = st.session_state.cache_alunos
+    lista_alunos = listarAlunosAtivos()
     lista_turmas = st.session_state.cache_turmas
 
     if not lista_alunos or not lista_turmas:
         renderizarAvisoCadastro(
-            titulo="Aluno e turma necessários",
-            descricao=(
-                "Cadastre pelo menos um aluno e uma turma antes "
-                "de realizar a matrícula."
-            ),
-        )
+        titulo="Aluno ativo e turma necessários",
+        descricao=(
+            "Cadastre pelo menos um aluno ativo e uma turma "
+            "antes de realizar a matrícula."
+        ),
+    )
 
     with painelCadastro(
         titulo="Informações da matrícula",
