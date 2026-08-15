@@ -22,9 +22,21 @@ def alunosAtivosPorCurso(idCurso: int):
 def alunosFormadosTotal():
     return dbContarAlunosFormados()
 
+def alunosFormadosPorCampus(idCampus: int):
+    return dbContarAlunosFormados(idCampus=idCampus)
+
+def alunosFormadosPorCurso(idCurso: int):
+    return dbContarAlunosFormados(idCurso=idCurso)
+
 # Retorna a quantidade de alunos evadidos
 def alunosEvadidosTotal():
     return dbContarAlunosEvadidos()
+
+def alunosEvadidosPorCampus(idCampus: int):
+    return dbContarAlunosEvadidos(idCampus=idCampus)
+
+def alunosEvadidosPorCurso(idCurso: int):
+    return dbContarAlunosEvadidos(idCurso=idCurso)
 
 # Calcula a taxa de evasão geral
 def taxaEvasaoGeral(): # Saída em porcentagem
