@@ -83,6 +83,7 @@ def limpar_consulta_aluno():
         "consulta_id",
     )
 
+# Função para formatar o status do aluno
 def formatar_status_aluno(aluno):
     if aluno.status is None:
         return "Não informado"
