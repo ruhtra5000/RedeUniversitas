@@ -400,7 +400,7 @@ def renderizarGraficoAcompanhamento(*, cr_baixo: int, muitas_reprovacoes: int, a
     dados = pd.DataFrame(
         {
             "Critério": [
-                "CRM abaixo de 5,5",
+                "CR abaixo de 5,5",
                 "3+ reprovações",
                 "Ambos os critérios",
             ],
@@ -454,7 +454,7 @@ def renderizarGraficoAcompanhamento(*, cr_baixo: int, muitas_reprovacoes: int, a
                 "Critério:N",
                 scale=alt.Scale(
                     domain=[
-                        "CRM abaixo de 5,5",
+                        "CR abaixo de 5,5",
                         "3+ reprovações",
                         "Ambos os critérios",
                     ],
@@ -634,7 +634,7 @@ def telaDashboardAcademico():
     renderizarMetricasDashboard(
         [
             MetricaDashboard(
-                "CRM médio",
+                "CR médio",
                 (
                     formatarDecimal(cr_medio, 2)
                     if cr_medio is not None
@@ -681,7 +681,7 @@ def telaDashboardAcademico():
                     if erro_baixo_desempenho is None
                     else "—"
                 ),
-                "CRM menor que 5,5 ou três ou mais reprovações.",
+                "CR menor que 5,5 ou três ou mais reprovações.",
                 "#cf6871",
                 "BD",
             ),
@@ -741,7 +741,7 @@ def telaDashboardAcademico():
             renderizarMetricasDashboard(
                 [
                     MetricaDashboard(
-                        "CRM abaixo de 5,5",
+                        "CR abaixo de 5,5",
                         formatarInteiro(alunos_cr_baixo),
                         (
                             "Alunos com coeficiente abaixo "
@@ -799,7 +799,7 @@ def telaDashboardAcademico():
     secao_tabela = criarSecaoDashboard(
         titulo="Alunos que precisam de acompanhamento",
         descricao=(
-            "Estudantes com CRM menor que 5,5 ou com três ou mais reprovações."
+            "Estudantes com CR menor que 5,5 ou com três ou mais reprovações."
         ),
         meta=(
             f"{formatarInteiro(len(baixo_desempenho))} alunos"
