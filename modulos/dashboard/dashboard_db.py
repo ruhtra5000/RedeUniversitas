@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.Conexao import SessionLocal
 from database.entidades.Aluno import Aluno
+from database.entidades.Bolsa import Bolsa
 from database.entidades.ContaReceber import ContaReceber
 from database.entidades.Curso import Curso
 from database.entidades.Matricula import Matricula
@@ -12,6 +13,7 @@ from database.entidades.Mensalidade import Mensalidade
 from database.entidades.Professor import Professor
 from database.entidades.enums.StatusAluno import StatusAluno
 import database.entidades
+from database.entidades.enums.StatusBolsa import StatusBolsa
 
 
 #  _____                     _ 
@@ -366,13 +368,75 @@ def dbCalcularDividaMedia(
 
     return (valorTotal / qtdeAlunosInad)
 
-# BOLSAS
+def dbContarBolsistas(
+        idCampus: int | None = None,
+        idCurso: int | None = None
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.count(Aluno.pessoa_id.distinct()))
+            .join(Aluno.bolsas)
+            .where(Bolsa.status == StatusBolsa.ATIVA)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Aluno.campus_id == idCampus)
+    
+        elif idCurso is not None:
+            query = query.where(Aluno.curso_id == idCurso)
+                
+        qtdeBolsistas = session.scalar(query)
+        
+        return qtdeBolsistas
 
-#  _____                                                 __ _____       _                              
-# /  __ \                                               / /|  ___|     | |                             
-# | /  \/  ___   _ __ ___   _ __   _ __   __ _  ___    / / | |__   ___ | |_   ___    __ _  _   _   ___ 
-# | |     / _ \ | '_ ` _ \ | '_ \ | '__| / _` |/ __|  / /  |  __| / __|| __| / _ \  / _` || | | | / _ \
-# | \__/\| (_) || | | | | || |_) || |   | (_| |\__ \ / /   | |___ \__ \| |_ | (_) || (_| || |_| ||  __/
-#  \____/ \___/ |_| |_| |_|| .__/ |_|    \__,_||___//_/    \____/ |___/ \__| \___/  \__, | \__,_| \___|
-#                          | |                                                         | |             
-#                          |_|                                                         |_|             
+def dbCalcularTaxaBolsistas(
+        idCampus: int | None = None,
+        idCurso: int | None = None
+    ):
+    if idCampus is not None:
+        qtdeAlunos = dbContarAlunosAtivos(idCampus=idCampus)
+        qtdeBolsistas = dbContarBolsistas(idCampus=idCampus)
+
+    elif idCurso is not None: 
+        qtdeAlunos = dbContarAlunosAtivos(idCurso=idCurso)
+        qtdeBolsistas = dbContarBolsistas(idCurso=idCurso)
+            
+    else:
+        qtdeAlunos = dbContarAlunosAtivos()
+        qtdeBolsistas = dbContarBolsistas()
+
+    return (qtdeBolsistas / qtdeAlunos)
+
+def dbCalcularValorConcedidoPorBolsas(
+        idCampus: int | None = None,
+        idCurso: int | None = None
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.sum(Curso.mensalidade_base * Bolsa.percentual_desconto))
+            .join(Bolsa.aluno)
+            .join(Aluno.curso)
+            .where(
+                Bolsa.status == StatusBolsa.ATIVA,
+                Aluno.status == StatusAluno.ATIVO
+            )
+        )
+        
+        if idCampus is not None:
+            query = query.where(Aluno.campus_id == idCampus)
+    
+        elif idCurso is not None:
+            query = query.where(Aluno.curso_id == idCurso)
+                
+        totalConcedido = session.scalar(query)
+        
+        return totalConcedido
+
+#  _____                                  _                       _ 
+# |  _  |                                (_)                     | |
+# | | | | _ __    ___  _ __   __ _   ___  _   ___   _ __    __ _ | |
+# | | | || '_ \  / _ \| '__| / _` | / __|| | / _ \ | '_ \  / _` || |
+# \ \_/ /| |_) ||  __/| |   | (_| || (__ | || (_) || | | || (_| || |
+#  \___/ | .__/  \___||_|    \__,_| \___||_| \___/ |_| |_| \__,_||_|
+#        | |                                                        
+#        |_|                                                        

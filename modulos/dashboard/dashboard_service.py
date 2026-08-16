@@ -176,3 +176,44 @@ def dividaMediaPorCampus(idCampus: int):
 
 def dividaMediaPorCurso(idCurso: int):
     return dbCalcularDividaMedia(idCurso=idCurso)
+
+# Retorna a quantidade de alunos com bolsa ativa
+def alunosBolsistasTotal():
+    return dbContarBolsistas()
+
+def alunosBolsistasPorCampus(idCampus: int):
+    return dbContarBolsistas(idCampus=idCampus)
+
+def alunosBolsistasPorCurso(idCurso: int):
+    return dbContarBolsistas(idCurso=idCurso)
+
+# Calcula o percentual de bolsistas com bolsa ativa em relação aos alunos ativos
+def taxaBolsistaGeral():
+    return dbCalcularTaxaBolsistas()
+
+def taxaBolsistaPorCampus(idCampus: int):
+    return dbCalcularTaxaBolsistas(idCampus=idCampus)
+
+def taxaBolsistaPorCurso(idCurso: int):
+    return dbCalcularTaxaBolsistas(idCurso=idCurso)
+
+# Calcula o valor monetário total "perdido" por causa de bolsas
+def valorConcedidoPorBolsaTotal():
+    return dbCalcularValorConcedidoPorBolsas()
+
+def valorConcedidoPorBolsaPorCampus(idCampus: int):
+    return dbCalcularValorConcedidoPorBolsas(idCampus=idCampus)
+
+def valorConcedidoPorBolsaPorCurso(idCurso: int):
+    return dbCalcularValorConcedidoPorBolsas(idCurso=idCurso)
+
+
+#  _____                                  _                       _ 
+# |  _  |                                (_)                     | |
+# | | | | _ __    ___  _ __   __ _   ___  _   ___   _ __    __ _ | |
+# | | | || '_ \  / _ \| '__| / _` | / __|| | / _ \ | '_ \  / _` || |
+# \ \_/ /| |_) ||  __/| |   | (_| || (__ | || (_) || | | || (_| || |
+#  \___/ | .__/  \___||_|    \__,_| \___||_| \___/ |_| |_| \__,_||_|
+#        | |                                                        
+#        |_|                                                        
+
