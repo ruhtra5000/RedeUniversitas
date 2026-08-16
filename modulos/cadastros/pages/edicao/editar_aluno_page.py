@@ -1,7 +1,8 @@
 import streamlit as st
 from sqlalchemy.exc import SQLAlchemyError
-from modulos.academico.academico_service import editarPessoa, listarAlunoId
+from modulos.academico.academico_service import editarPessoa, listarAlunoId, alterarStatusAluno
 from modulos.utils.cadastro_visual import (marcarAcoesCadastro, marcarPainelCadastro, renderizarCabecalhoFormulario, renderizarDivisorCadastro, renderizarSecaoCadastro, renderizarTopoCadastro, aplicarEstiloCamposBloqueados)
+from database.entidades.enums.StatusAluno import StatusAluno
 
 # Tela de edição para Alunos
 def telaEdicaoAluno():
@@ -113,15 +114,21 @@ def telaEdicaoAluno():
             descricao="Campus e curso atuais do estudante.",
         )
 
-        colCampus, colCurso = st.columns(2)
+        status_atual = aluno.status or StatusAluno.ATIVO
+        opcoes_status = list(StatusAluno)
+
+        colCampus, colCurso, colStatus = st.columns([2, 2, 1.5])
 
         with colCampus:
             st.text_input(
                 "Campus",
                 value=aluno.campus.nome if aluno.campus else "",
                 disabled=True,
-                help=("O campus do aluno não pode ser alterado " "diretamente."),
-                key=(f"edit_aluno_campus_" f"{st.session_state.form_key_edit_aluno}"),
+                help="O campus do aluno não pode ser alterado diretamente.",
+                key=(
+                    f"edit_aluno_campus_"
+                    f"{st.session_state.form_key_edit_aluno}"
+                ),
             )
 
         with colCurso:
@@ -129,8 +136,23 @@ def telaEdicaoAluno():
                 "Curso",
                 value=aluno.curso.nome if aluno.curso else "",
                 disabled=True,
-                help=("O curso do aluno não pode ser alterado " "diretamente."),
-                key=(f"edit_aluno_curso_" f"{st.session_state.form_key_edit_aluno}"),
+                help="O curso do aluno não pode ser alterado diretamente.",
+                key=(
+                    f"edit_aluno_curso_"
+                    f"{st.session_state.form_key_edit_aluno}"
+                ),
+            )
+
+        with colStatus:
+            novoStatus = st.selectbox(
+                "Status acadêmico *",
+                options=opcoes_status,
+                index=opcoes_status.index(status_atual),
+                format_func=lambda status: status.value.replace("_", " ").title(),
+                key=(
+                    f"edit_aluno_status_"
+                    f"{st.session_state.form_key_edit_aluno}"
+                ),
             )
 
         _, centro, _ = st.columns([2, 3, 2])
@@ -158,6 +180,9 @@ def telaEdicaoAluno():
                     email=email.strip(),
                     telefone=(telefone.strip() if telefone.strip() else None),
                 )
+
+                alterarStatusAluno(idAluno=aluno.pessoa_id, novoStatus=novoStatus)
+                st.session_state.pop("cache_alunos", None)
 
                 st.session_state.form_key_edit_aluno += 1
                 st.session_state["edicao_realizada"] = True
