@@ -1,19 +1,24 @@
-from datetime import date
+from datetime import date, datetime
 
-from sqlalchemy import case, func, or_, select
-from sqlalchemy.exc import SQLAlchemyError
+from dateutil.relativedelta import relativedelta
+from sqlalchemy import case, desc, func, or_, select
 
 from database.Conexao import SessionLocal
 from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
+from database.entidades.Compra import Compra
 from database.entidades.ContaReceber import ContaReceber
 from database.entidades.Curso import Curso
+from database.entidades.Estoque import Estoque
+from database.entidades.Fornecedor import Fornecedor
 from database.entidades.Matricula import Matricula
 from database.entidades.Mensalidade import Mensalidade
+from database.entidades.Movimentacao import Movimentacao
 from database.entidades.Professor import Professor
 from database.entidades.enums.StatusAluno import StatusAluno
-import database.entidades
 from database.entidades.enums.StatusBolsa import StatusBolsa
+from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
+import database.entidades
 
 
 #  _____                     _ 
@@ -440,3 +445,272 @@ def dbCalcularValorConcedidoPorBolsas(
 #  \___/ | .__/  \___||_|    \__,_| \___||_| \___/ |_| |_| \__,_||_|
 #        | |                                                        
 #        |_|                                                        
+
+def dbContarTipoProduto(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = select(func.count(Estoque.nome.distinct()))
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        qtdeTipos = session.scalar(query)
+        
+        return qtdeTipos
+
+def dbContarQtdeProdutos(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = select(func.sum(Estoque.qtde))
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        qtdeProdutos = session.scalar(query)
+        
+        return qtdeProdutos
+
+def dbContarProdutosComEstoqueBaixo(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.count(Estoque.id))
+            .where(Estoque.qtde < Estoque.qtde_min)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        qtdeProdutos = session.scalar(query)
+        
+        return qtdeProdutos
+
+def dbListarProdutosComEstoqueBaixo(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(Estoque)
+            .where(Estoque.qtde < Estoque.qtde_min)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        produtos = session.execute(query).scalars().all()
+        
+        return produtos
+
+def dbContarProdutosSemEstoque(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.count(Estoque.id))
+            .where(Estoque.qtde == 0)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        qtdeProdutos = session.scalar(query)
+        
+        return qtdeProdutos
+
+def dbListarProdutosSemEstoque(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(Estoque)
+            .where(Estoque.qtde == 0)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        produtos = session.execute(query).scalars().all()
+        
+        return produtos
+
+def dbCalcularProdutosMaisUsados(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        movimentacoes = func.sum(Movimentacao.qtde_mov).label("movimentacoes")
+
+        query = (
+            select(Estoque.nome, Estoque.marca, movimentacoes)
+            .join(Estoque.movimentacoes)
+            .where(Movimentacao.tipo == StatusMovimentacao.SAIDA)
+            .group_by(Estoque.nome, Estoque.marca)
+            .order_by(desc(movimentacoes))
+            .limit(5)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        produtos = session.execute(query).all()
+        
+        return produtos
+
+def dbContarQtdeEUnidadeMovimentacoes(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(
+                Movimentacao.tipo, 
+                func.count(Movimentacao.id).label("movimentacoes"),
+                func.sum(Movimentacao.qtde_mov).label("unidades")
+            )
+            .join(Movimentacao.produto)
+            .group_by(Movimentacao.tipo)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        movPorTipo = session.execute(query).all()
+        
+        return movPorTipo
+
+def dbMovimentacoesUltimosMeses(
+        idCampus: int | None = None,
+    ):
+    hoje = datetime.today()
+    dataInicio = hoje.replace(day=1) - relativedelta(months=5)
+
+    with SessionLocal() as session:
+        mes = func.date_trunc("month", Movimentacao.data).label("mes")
+
+        query = (
+            select(
+                mes,
+                Movimentacao.tipo,
+                func.sum(Movimentacao.qtde_mov).label("quantidade")
+            )
+            .join(Movimentacao.produto)
+            .where(
+                Movimentacao.data >= dataInicio
+            )
+            .group_by(
+                mes,
+                Movimentacao.tipo
+            )
+            .order_by(mes)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        movUltimosMeses = session.execute(query).all()
+        
+        return movUltimosMeses
+
+def dbContarCompras(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.count(Compra.id))
+            .join(Compra.produto)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        qtdeCompras = session.scalar(query)
+        
+        return qtdeCompras
+
+def dbCalcularValorTotalComprado(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.sum(Compra.valor_unit * Compra.qtde))
+            .join(Compra.produto)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        valorTotalComprado = session.scalar(query)
+        
+        return valorTotalComprado
+
+def dbCalcularTicketMedio(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        query = (
+            select(func.avg(Compra.valor_unit * Compra.qtde))
+            .join(Compra.produto)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        valorCompraMedio = session.scalar(query)
+        
+        return valorCompraMedio
+
+def dbListarProdutosMaisComprados(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        qtdeProdComprados = func.sum(Compra.qtde).label("qtdeComprada")
+        valorProdComprados = func.sum(Compra.qtde * Compra.valor_unit).label("valorComprado")
+
+        query = (
+            select(Estoque.nome, Estoque.marca, qtdeProdComprados, valorProdComprados)
+            .join(Estoque.compras)
+            .group_by(Estoque.nome, Estoque.marca)
+            .order_by(desc(qtdeProdComprados))
+            .limit(5)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        produtos = session.execute(query).all()
+        
+        return produtos
+
+def dbContarFornecedores():
+    with SessionLocal() as session:
+        query = (
+            select(func.count(Fornecedor.id))
+        )
+                
+        qtdeFornecedor = session.scalar(query)
+        
+        return qtdeFornecedor
+
+def dbFornecedoresMaisUsados(
+        idCampus: int | None = None,
+    ):
+    with SessionLocal() as session:
+        qtdeCompras = func.count(Compra.id).label("qtdeCompras")
+        valorProdComprados = func.sum(Compra.qtde * Compra.valor_unit).label("valorComprado")
+
+        query = (
+            select(Fornecedor, qtdeCompras, valorProdComprados)
+            .join(Fornecedor.compras)
+            .join(Compra.produto)
+            .group_by(Fornecedor)
+            .order_by(desc(qtdeCompras))
+            .limit(5)
+        )
+        
+        if idCampus is not None:
+            query = query.where(Estoque.campus_id == idCampus)
+                
+        fornecedores = session.execute(query).all()
+        
+        return fornecedores

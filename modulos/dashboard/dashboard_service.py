@@ -217,3 +217,108 @@ def valorConcedidoPorBolsaPorCurso(idCurso: int):
 #        | |                                                        
 #        |_|                                                        
 
+# Retorna a quantidade de produtos com mesmo nome (independe de marca), mais ou menos o "tipo"
+def tipoProdutosGeral():
+    return dbContarTipoProduto()
+
+def tipoProdutosPorCampus(idCampus: int):
+    return dbContarTipoProduto(idCampus=idCampus)
+
+# Retorna a quantidade de produtos em estoque
+def qtdeProdutosGeral():
+    return dbContarQtdeProdutos()
+
+def qtdeProdutosPorCampus(idCampus: int):
+    return dbContarQtdeProdutos(idCampus=idCampus)
+
+# Retorna a quantidade de produtos com estoque menor que o mínimo
+def qtdeProdutosBaixoEstoqueGeral():
+    return dbContarProdutosComEstoqueBaixo()
+
+def qtdeProdutosBaixoEstoquePorCampus(idCampus: int):
+    return dbContarProdutosComEstoqueBaixo(idCampus=idCampus)
+
+# Lista os produtos com estoque menor que o mínimo
+def listarProdutosBaixoEstoqueGeral():
+    return dbListarProdutosComEstoqueBaixo()
+
+def listarProdutosBaixoEstoquePorCampus(idCampus: int):
+    return dbListarProdutosComEstoqueBaixo(idCampus=idCampus)
+
+# Retorna a quantidade de produtos sem estoque
+def qtdeProdutosSemEstoqueGeral():
+    return dbContarProdutosSemEstoque()
+
+def qtdeProdutosSemEstoquePorCampus(idCampus: int):
+    return dbContarProdutosSemEstoque(idCampus=idCampus)
+
+# Lista os produtos sem estoque
+def listarProdutosSemEstoqueGeral():
+    return dbListarProdutosSemEstoque()
+
+def listarProdutosSemEstoquePorCampus(idCampus: int):
+    return dbListarProdutosSemEstoque(idCampus=idCampus)
+
+# Lista nome, marca e quantidade de movimentações de SAIDA dos 5 produtos mais usados
+def produtosMaisUsadosGeral():
+    return dbCalcularProdutosMaisUsados()
+
+def produtosMaisUsadosPorCampus(idCampus: int):
+    return dbCalcularProdutosMaisUsados(idCampus=idCampus)
+
+# Lista a quantidade de movimentações em si e a quantidade de unidades 
+# movimentadas por tipo de movimentação (entrada, saida, ajuste e perda)
+def movimentacoesPorTipoGeral():
+    return dbContarQtdeEUnidadeMovimentacoes()
+
+def movimentacoesPorTipoPorCampus(idCampus: int):
+    return dbContarQtdeEUnidadeMovimentacoes(idCampus=idCampus)
+
+# Retorna a quantidade de movimentações dos últimos 6 meses
+# agrupadas por tipo de movimentação e mês
+def movimentacoesRecentesGeral():
+    return dbMovimentacoesUltimosMeses()
+
+def movimentacoesRecentesPorCampus(idCampus: int):
+    return dbMovimentacoesUltimosMeses(idCampus=idCampus)
+
+# Retorna a quantidade de compras realizadas
+def qtdeComprasGeral():
+    return dbContarCompras()
+
+def qtdeComprasPorCampus(idCampus: int):
+    return dbContarCompras(idCampus=idCampus)
+
+# Retorna o valor total gasto em compras
+def valorTotalCompradoGeral():
+    return dbCalcularValorTotalComprado()
+
+def valorTotalCompradoPorCampus(idCampus: int):
+    return dbCalcularValorTotalComprado(idCampus=idCampus)
+
+# Retorna o valor médio de uma compra
+def valorMedioCompraGeral():
+    return dbCalcularTicketMedio()
+
+def valorMedioCompraPorCampus(idCampus: int):
+    return dbCalcularTicketMedio(idCampus=idCampus)
+
+# Lista nome, marca, unidades compradas, e valor gasto dos 5 produtos mais
+# vendidos por unidade, agrupados por produto
+def produtosMaisCompradosGeral():
+    return dbListarProdutosMaisComprados()
+
+def produtosMaisCompradosPorCampus(idCampus: int):
+    return dbListarProdutosMaisComprados(idCampus=idCampus)
+
+# Retorna a quantidade de fornecedores
+def qtdeFornecedores():
+    return dbContarFornecedores()
+
+# Lista os dados dos fornecedores, quantidade de vendas, valor gasto por fornecedor
+# dos 5 fornecedores mais usados por qtde de vendas, agrupados por fornecedor
+def fornecedoresMaisUsadosGeral():
+    return dbFornecedoresMaisUsados()
+
+def fornecedoresMaisUsadosPorCampus(idCampus: int):
+    return dbFornecedoresMaisUsados(idCampus=idCampus)
