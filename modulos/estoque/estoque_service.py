@@ -61,6 +61,14 @@ def listarMovimentacaoId(idMovimentacao: int):
     
     return movimentacao
 
+def criarMovimentacao(idProduto: int, idAlmoxarife: int, qtde: int, tipo: StatusMovimentacao):
+    if qtde <= 0:
+        raise Exception(
+            "A quantidade da movimentação deve ser maior que zero."
+        )
+
+    return dbCriarMovimentacao(idProduto=idProduto, idAlmoxarife=idAlmoxarife, qtde=qtde, tipo=tipo)
+
 
 #   ___   _                                       _   __       
 #  / _ \ | |                                     (_) / _|      

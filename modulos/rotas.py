@@ -59,6 +59,8 @@ from modulos.cadastros.pages.edicao.editar_fornecedor_page import telaEdicaoForn
 from modulos.dashboard.dashboard_geral_page import telaDashboardGeral
 from modulos.dashboard.dashboard_academico_page import telaDashboardAcademico
 from modulos.dashboard.dashboard_financeiro_page import telaDashboardFinanceiro
+from modulos.dashboard.dashboard_operacional_page import telaDashboardOperacional
+from modulos.estoque.movimentacao_page import telaMovimentacaoEstoque
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -127,12 +129,12 @@ editar_fornecedor_page = st.Page(telaEdicaoFornecedor, title="Fornecedor", icon=
 dashboard_geral_page = st.Page(telaDashboardGeral, title="Dashboard Geral", icon=":material/dashboard:")
 dashboard_academico_page = st.Page(telaDashboardAcademico, title="Dashboard Acadêmico", icon=":material/school:")
 dashboard_financeiro_page = st.Page(telaDashboardFinanceiro, title="Dashboard Financeiro", icon=":material/account_balance:")
+dashboard_operacional_page = st.Page(telaDashboardOperacional, title="Dashboard Operacional", icon=":material/engineering:")
 
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
 from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
 from modulos.academico.pages.renovar_matricula_page import telaRenovarMatricula
-
 from modulos.financeiro.pages.gestao_financeira_page import telaGestaoFinanceira
 
 # Operações
@@ -148,6 +150,9 @@ meu_boletim = st.Page(telaBoletim, title="Meu Boletim", icon=":material/school:"
 meu_financeiro = st.Page(telaFinanceiroAluno, title="Meu Financeiro", icon=":material/payments:", url_path="meu_financeiro")
 renovar_matricula = st.Page(telaRenovarMatricula, title="Renovar Matrícula", icon=":material/school:", url_path="renovar_matricula")
 
+# Movimentação
+movimentacao_estoque_page = st.Page(telaMovimentacaoEstoque, title="Movimentação", icon=":material/swap_vert:", url_path="movimentacao_estoque")
+
 def get_navigation():
     roles = st.session_state.get("roles", [])
 
@@ -159,7 +164,7 @@ def get_navigation():
     }
 
     if "ADMIN" in roles:
-        pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page]
+        pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page, dashboard_operacional_page]
 
     # Aluno
     if "ALUNO" in roles:
@@ -252,6 +257,12 @@ def get_navigation():
     if "ALMOXARIFE" in roles and "ADMIN" not in roles:
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
+
+        if movimentacao_estoque_page not in operacoes_list:
+            operacoes_list.append(movimentacao_estoque_page)
+
+    if operacoes_list:
+        pages["Operações"] = operacoes_list
 
     if cadastros_list:
         pages["Cadastros"] = cadastros_list
