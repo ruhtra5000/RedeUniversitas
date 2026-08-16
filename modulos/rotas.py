@@ -1,5 +1,6 @@
 import streamlit as st
 from modulos.pages.home_page import telaHome
+
 from modulos.cadastros.pages.aluno_page import telaCadastroAluno
 from modulos.cadastros.pages.professor_page import telaCadastroProfessor
 from modulos.cadastros.pages.curso_page import telaCadastroCurso
@@ -16,6 +17,7 @@ from modulos.cadastros.pages.estoque_page import telaCadastroEstoque
 from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
 from modulos.academico.pages.boletim_page import telaBoletim
 from modulos.academico.pages.financeiro_aluno_page import telaFinanceiroAluno
+
 from modulos.listagem.listagem_aluno_page import telaListagemAlunos
 from modulos.listagem.listagem_curso_page import telaListagemCursos
 from modulos.listagem.listagem_professor_page import telaListagemProfessores
@@ -29,6 +31,7 @@ from modulos.listagem.listagem_matricula_page import telaListagemMatriculas
 from modulos.listagem.listagem_compra_page import telaListagemCompras
 from modulos.listagem.listagem_fornecedor_page import telaListagemFornecedores
 from modulos.listagem.listagem_produto_page import telaListagemProdutos
+
 from modulos.view.view_aluno_page import telaViewAluno
 from modulos.view.view_curso_page import telaViewCurso
 from modulos.view.view_professor_page import telaViewProfessor
@@ -52,6 +55,10 @@ from modulos.cadastros.pages.edicao.editar_curso_page import telaEdicaoCurso
 from modulos.cadastros.pages.edicao.editar_disciplina_page import telaEdicaoDisciplina
 from modulos.cadastros.pages.edicao.editar_turma_page import telaEdicaoTurma
 from modulos.cadastros.pages.edicao.editar_fornecedor_page import telaEdicaoFornecedor
+
+from modulos.dashboard.dashboard_geral_page import telaDashboardGeral
+from modulos.dashboard.dashboard_academico_page import telaDashboardAcademico
+from modulos.dashboard.dashboard_financeiro_page import telaDashboardFinanceiro
 
 # Páginas principais
 home_page = st.Page(telaHome, title="Página Inicial", icon=":material/home:", default=True, url_path="home")
@@ -116,6 +123,11 @@ editar_disciplina_page = st.Page(telaEdicaoDisciplina, title="Disciplina", icon=
 editar_turma_page = st.Page(telaEdicaoTurma, title="Turma", icon=":material/edit:", url_path="editar_turma")
 editar_fornecedor_page = st.Page(telaEdicaoFornecedor, title="Fornecedor", icon=":material/edit:", url_path="editar_fornecedor")
 
+# Dashboards
+dashboard_geral_page = st.Page(telaDashboardGeral, title="Dashboard Geral", icon=":material/dashboard:")
+dashboard_academico_page = st.Page(telaDashboardAcademico, title="Dashboard Acadêmico", icon=":material/school:")
+dashboard_financeiro_page = st.Page(telaDashboardFinanceiro, title="Dashboard Financeiro", icon=":material/account_balance:")
+
 from modulos.academico.pages.diario_classe_page import telaDiarioClasse
 from modulos.academico.pages.designacao_cargos_page import telaDesignacaoCargos
 from modulos.academico.pages.gestao_bolsas_page import telaGestaoBolsas
@@ -146,6 +158,9 @@ def get_navigation():
         ]
     }
 
+    if "ADMIN" in roles:
+        pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page]
+
     # Aluno
     if "ALUNO" in roles:
         pages["Portal do Aluno"] = [meu_boletim, meu_financeiro, renovar_matricula]
@@ -159,6 +174,7 @@ def get_navigation():
     operacoes_list = []
 
     # Admin tem acesso a absolutamente tudo
+
     if "ADMIN" in roles:
 
         operacoes_list.append(gestao_financeira)
