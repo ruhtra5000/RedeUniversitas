@@ -1,8 +1,6 @@
 from datetime import date, datetime
-
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import case, desc, func, or_, select
-
 from database.Conexao import SessionLocal
 from database.entidades.Aluno import Aluno
 from database.entidades.Bolsa import Bolsa
@@ -19,7 +17,6 @@ from database.entidades.enums.StatusAluno import StatusAluno
 from database.entidades.enums.StatusBolsa import StatusBolsa
 from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
 import database.entidades
-
 
 #  _____                     _ 
 # |  __ \                   | |
@@ -68,6 +65,23 @@ def dbContarAlunosEvadidos(
     ):
     with SessionLocal() as session:
         query = select(func.count(Aluno.pessoa_id)).where(Aluno.status == StatusAluno.EVADIDO)
+
+        if idCampus is not None:
+            query = query.where(Aluno.campus_id == idCampus)
+
+        elif idCurso is not None: 
+            query = query.where(Aluno.curso_id == idCurso)
+
+        qtdeAlunos = session.scalar(query)
+
+        return qtdeAlunos
+    
+def dbContarAlunosTrancados(
+        idCampus: int | None = None,
+        idCurso: int | None = None
+    ):
+    with SessionLocal() as session:
+        query = select(func.count(Aluno.pessoa_id)).where(Aluno.status == StatusAluno.TRANCADO)
 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
@@ -181,7 +195,7 @@ def dbAlunosBaixoDesempenho(
     ):
     with SessionLocal() as session:
         reprovacoes = (
-            select(func.count(Matricula.id))
+            select(func.count(Matricula.turma_id))
             .where(
                 Matricula.aluno_id == Aluno.pessoa_id,
                 Matricula.aprovacao == False
@@ -229,7 +243,7 @@ def dbCalcularReceita(
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
                 
-        receita = session.scalar(query)
+        receita = select(func.coalesce(func.sum(ContaReceber.valor), 0))
         
         return receita
 
@@ -251,7 +265,7 @@ def dbCalcularTotalAReceber(
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
                     
-        receita = session.scalar(query)
+        receita = select(func.coalesce(func.sum(ContaReceber.valor), 0))
             
         return receita
 
@@ -286,7 +300,7 @@ def dbCalcularTaxaInadimplencia(
         idCurso: int | None = None
     ):
     with SessionLocal() as session:
-        query = select(func.count(Aluno))
+        query = select(func.count(Aluno.pessoa_id))
 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
@@ -299,7 +313,11 @@ def dbCalcularTaxaInadimplencia(
         else:
             qtdeInad = dbContarAlunosInadimplentes()
 
-        qtdeAlunos = session.scalar(query)
+        qtdeAlunos = session.scalar(query) or 0
+        qtdeInad = qtdeInad or 0
+
+        if not qtdeAlunos:
+            return 0
 
         return (qtdeInad / qtdeAlunos)
 
@@ -311,7 +329,7 @@ def dbCalcularValorTotalInadimplente(
 
     with SessionLocal() as session:
         query = (
-            select(func.sum(Mensalidade.valor))
+            select(func.coalesce(func.sum(Mensalidade.valor), 0))
             .join(Mensalidade.aluno)
             .where(
                 Mensalidade.data_vencimento < hoje, 
@@ -371,6 +389,12 @@ def dbCalcularDividaMedia(
         valorTotal = dbCalcularValorTotalInadimplente()
         qtdeAlunosInad = dbContarAlunosInadimplentes()
 
+    valorTotal = valorTotal or 0
+    qtdeAlunosInad = qtdeAlunosInad or 0
+
+    if not qtdeAlunosInad:
+        return 0
+
     return (valorTotal / qtdeAlunosInad)
 
 def dbContarBolsistas(
@@ -409,6 +433,12 @@ def dbCalcularTaxaBolsistas(
     else:
         qtdeAlunos = dbContarAlunosAtivos()
         qtdeBolsistas = dbContarBolsistas()
+
+    qtdeBolsistas = qtdeBolsistas or 0
+    qtdeAlunos = qtdeAlunos or 0
+
+    if not qtdeAlunos:
+        return 0
 
     return (qtdeBolsistas / qtdeAlunos)
 

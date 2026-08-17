@@ -1,12 +1,11 @@
-
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-
 from database.Conexao import SessionLocal
 from database.entidades.Almoxarife import Almoxarife
 from database.entidades.Estoque import Estoque
 from database.entidades.Movimentacao import Movimentacao
 from database.entidades.Pessoa import Pessoa 
+from database.entidades.enums.StatusMovimentacao import StatusMovimentacao
 import database.entidades
 
 
@@ -99,6 +98,96 @@ def dbListarMovimentacaoId(idMovimentacao: int):
         movimentacao = session.execute(query).scalar_one_or_none()
 
         return movimentacao
+    
+def dbCriarMovimentacao(idProduto: int, idAlmoxarife: int, qtde: int, tipo: StatusMovimentacao):
+    with SessionLocal() as session:
+        try:
+            queryProduto = (
+                select(Estoque)
+                .where(Estoque.id == idProduto)
+            )
+
+            produto = session.execute(
+                queryProduto
+            ).scalar_one_or_none()
+
+            if produto is None:
+                raise Exception(
+                    f"Produto com id {idProduto} não existente."
+                )
+
+            queryAlmoxarife = (
+                select(Almoxarife)
+                .where(
+                    Almoxarife.pessoa_id == idAlmoxarife
+                )
+            )
+
+            almoxarife = session.execute(
+                queryAlmoxarife
+            ).scalar_one_or_none()
+
+            if almoxarife is None:
+                raise Exception(
+                    f"Almoxarife com id {idAlmoxarife} não existente."
+                )
+
+            if qtde <= 0:
+                raise Exception(
+                    "A quantidade deve ser maior que zero."
+                )
+
+            if produto.campus_id != almoxarife.campus_id:
+                raise Exception(
+                    "O almoxarife não pode realizar movimentações "
+                    "em produtos de outro campus."
+                )
+
+            if tipo == StatusMovimentacao.ENTRADA:
+                produto.qtde += qtde
+
+            elif tipo == StatusMovimentacao.SAIDA:
+                if produto.qtde < qtde:
+                    raise Exception(
+                        "Quantidade insuficiente em estoque."
+                    )
+
+                produto.qtde -= qtde
+
+            elif tipo == StatusMovimentacao.PERDA:
+                if produto.qtde < qtde:
+                    raise Exception(
+                        "A quantidade da perda é maior que "
+                        "o estoque disponível."
+                    )
+
+                produto.qtde -= qtde
+
+            elif tipo == StatusMovimentacao.AJUSTE:
+                produto.qtde = qtde
+
+            movimentacao = Movimentacao(
+                produto_id=idProduto,
+                pessoa_id=idAlmoxarife,
+                qtde_mov=qtde,
+                tipo=tipo,
+            )
+
+            session.add(
+                movimentacao
+            )
+
+            session.commit()
+
+            session.refresh(
+                movimentacao
+            )
+
+            return movimentacao
+
+        except Exception:
+            session.rollback()
+            raise
 
 
 #   ___   _                                       _   __       

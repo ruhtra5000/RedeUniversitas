@@ -1,6 +1,5 @@
 from modulos.dashboard.dashboard_db import *
 
-
 #  _____                     _ 
 # |  __ \                   | |
 # | |  \/  ___  _ __   __ _ | |
@@ -37,6 +36,16 @@ def alunosEvadidosPorCampus(idCampus: int):
 
 def alunosEvadidosPorCurso(idCurso: int):
     return dbContarAlunosEvadidos(idCurso=idCurso)
+
+# Retorna a quantidade de alunos trancados
+def alunosTrancadosTotal():
+    return dbContarAlunosTrancados()
+
+def alunosTrancadosPorCampus(idCampus: int):
+    return dbContarAlunosTrancados(idCampus=idCampus)
+
+def alunosTrancadosPorCurso(idCurso: int):
+    return dbContarAlunosTrancados(idCurso=idCurso)
 
 # Calcula a taxa de evasão geral
 def taxaEvasaoGeral(): # Saída em porcentagem
