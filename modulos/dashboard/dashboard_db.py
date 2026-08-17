@@ -231,7 +231,7 @@ def dbCalcularReceita(
     ):
     with SessionLocal() as session:
         query = (
-            select(func.sum(ContaReceber.valor))
+            select(func.coalesce(func.sum(ContaReceber.valor), 0))
             .join(ContaReceber.mensalidade)
             .join(Mensalidade.aluno)
             .where(ContaReceber.data_pagamento.is_not(None))
@@ -243,7 +243,7 @@ def dbCalcularReceita(
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
                 
-        receita = select(func.coalesce(func.sum(ContaReceber.valor), 0))
+        receita = session.scalar(query)
         
         return receita
 
@@ -253,7 +253,7 @@ def dbCalcularTotalAReceber(
     ):
     with SessionLocal() as session:
         query = (
-            select(func.sum(ContaReceber.valor))
+            select(func.coalesce(func.sum(ContaReceber.valor), 0))
             .join(ContaReceber.mensalidade)
             .join(Mensalidade.aluno)
             .where(ContaReceber.data_pagamento.is_(None))
@@ -265,7 +265,7 @@ def dbCalcularTotalAReceber(
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
                     
-        receita = select(func.coalesce(func.sum(ContaReceber.valor), 0))
+        receita = session.scalar(query)
             
         return receita
 
