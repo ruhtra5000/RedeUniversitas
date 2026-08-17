@@ -93,12 +93,28 @@ def dbContarAlunosTrancados(
 
         return qtdeAlunos
 
-def dbCalcularTaxaEvasao():
+def dbCalcularTaxaEvasao(
+        idCampus: int | None = None,
+        idCurso: int | None = None
+    ):
     with SessionLocal() as session:
         query = select(func.count(Aluno.pessoa_id))
+
+        if idCampus is not None:
+            query = query.where(Aluno.campus_id == idCampus)
+            qtdeAlunosEvadidos = dbContarAlunosEvadidos(idCampus=idCampus)
+        
+        elif idCurso is not None: 
+            query = query.where(Aluno.curso_id == idCurso)
+            qtdeAlunosEvadidos = dbContarAlunosEvadidos(idCurso=idCurso)
+
+        else:
+            qtdeAlunosEvadidos = dbContarAlunosEvadidos()
+
         qtdeTotalAlunos = session.scalar(query)
 
-        qtdeAlunosEvadidos = dbContarAlunosEvadidos()
+        if not qtdeTotalAlunos:
+            return 0
     
         return (qtdeAlunosEvadidos / qtdeTotalAlunos)
 

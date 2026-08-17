@@ -51,6 +51,12 @@ def alunosTrancadosPorCurso(idCurso: int):
 def taxaEvasaoGeral(): # Saída em porcentagem
     return dbCalcularTaxaEvasao() * 100
 
+def taxaEvasaoPorCampus(idCampus: int):
+    return dbCalcularTaxaEvasao(idCampus=idCampus) * 100
+
+def taxaEvasaoPorCurso(idCurso: int):
+    return dbCalcularTaxaEvasao(idCurso=idCurso) * 100
+
 # Retorna a quantidade de professores
 def professoresTotal():
     return dbContarProfessores()
