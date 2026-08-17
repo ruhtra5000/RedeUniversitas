@@ -120,6 +120,7 @@ def rotuloGrafico(texto: str) -> None:
 
 # Função para renderizar um gráfico de valores financeiros, com barras representando receita, total a receber e valor inadimplente.
 def renderizarGraficoValoresFinanceiros(*, receita: float, a_receber: float, valor_inadimplente: float) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
 
     dados = pd.DataFrame(
         {
@@ -142,149 +143,45 @@ def renderizarGraficoValoresFinanceiros(*, receita: float, a_receber: float, val
         .apply(formatarMoeda)
     )
 
-    maior_valor = float(
-        dados["Valor"].max()
-    )
-
-    escala_maxima = (
-        maior_valor * 1.20
-        if maior_valor > 0
-        else 1
-    )
-
     ordem = [
         "Receita recebida",
         "Total a receber",
         "Valor inadimplente",
     ]
 
-    barras = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopRight=5,
-            cornerRadiusBottomRight=5,
-            size=22,
-        )
-        .encode(
-            y=alt.Y(
+    limite = (
+        None
+        if float(dados["Valor"].max()) > 0
+        else 1
+    )
+
+    renderizarGraficoBarras(
+        dados,
+        categoria="Indicador",
+        valor="Valor",
+        titulo="Comparativo de valores",
+        ordem=ordem,
+        cores={
+            "Receita recebida": COR_RECEITA,
+            "Total a receber": COR_RECEBER,
+            "Valor inadimplente": COR_INADIMPLENCIA,
+        },
+        limite=limite,
+        tooltip=[
+            alt.Tooltip(
                 "Indicador:N",
-                sort=ordem,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=11,
-                    labelPadding=10,
-                    labelLimit=180,
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Indicador",
             ),
-
-            x=alt.X(
-                "Valor:Q",
-                title=None,
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                    format="~s",
-                ),
+            alt.Tooltip(
+                "Valor formatado:N",
+                title="Valor",
             ),
-
-            color=alt.Color(
-                "Indicador:N",
-                scale=alt.Scale(
-                    domain=ordem,
-                    range=[
-                        COR_RECEITA,
-                        COR_RECEBER,
-                        COR_INADIMPLENCIA,
-                    ],
-                ),
-                legend=None,
-            ),
-
-            tooltip=[
-                alt.Tooltip(
-                    "Indicador:N",
-                    title="Indicador",
-                ),
-                alt.Tooltip(
-                    "Valor formatado:N",
-                    title="Valor",
-                ),
-            ],
-        )
-    )
-
-    valores = (
-        alt.Chart(dados)
-        .mark_text(
-            align="left",
-            baseline="middle",
-            dx=8,
-            color="#8FA0B6",
-            fontSize=11,
-        )
-        .encode(
-            y=alt.Y(
-                "Indicador:N",
-                sort=ordem,
-            ),
-
-            x=alt.X(
-                "Valor:Q",
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-            ),
-
-            text=alt.Text(
-                "Valor formatado:N"
-            ),
-        )
-    )
-
-    grafico = (
-        alt.layer(
-            barras,
-            valores,
-        )
-        .properties(
-            height=165
-        )
-        .configure_view(
-            stroke=None
-        )
-        .configure(
-            background="transparent"
-        )
-    )
-
-    rotuloGrafico(
-        "Comparativo de valores"
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+        ],
     )
 
 # Função para renderizar um gráfico de inadimplência, mostrando a distribuição entre alunos inadimplentes e sem pendência.
 def renderizarGraficoInadimplencia(*, ativos: int, inadimplentes: int) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
 
     total_base = max(
         ativos,
@@ -316,147 +213,44 @@ def renderizarGraficoInadimplencia(*, ativos: int, inadimplentes: int) -> None:
         }
     )
 
-    maior_valor = int(
-        dados["Alunos"].max()
-    )
-
-    escala_maxima = (
-        maior_valor * 1.20
-        if maior_valor > 0
-        else 1
-    )
-
     ordem = [
         "Inadimplentes",
         "Sem pendência",
     ]
 
-    barras = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopRight=5,
-            cornerRadiusBottomRight=5,
-            size=26,
-        )
-        .encode(
-            y=alt.Y(
+    limite = (
+        None
+        if int(dados["Alunos"].max()) > 0
+        else 1
+    )
+
+    renderizarGraficoBarras(
+        dados,
+        categoria="Situação",
+        valor="Alunos",
+        titulo="Distribuição da inadimplência",
+        ordem=ordem,
+        cores={
+            "Inadimplentes": COR_INADIMPLENCIA,
+            "Sem pendência": COR_RECEITA,
+        },
+        inteiro=True,
+        limite=limite,
+        tooltip=[
+            alt.Tooltip(
                 "Situação:N",
-                sort=ordem,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=11,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Situação",
             ),
-
-            x=alt.X(
+            alt.Tooltip(
                 "Alunos:Q",
-                title=None,
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    tickMinStep=1,
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Alunos",
             ),
-
-            color=alt.Color(
-                "Situação:N",
-                scale=alt.Scale(
-                    domain=ordem,
-                    range=[
-                        COR_INADIMPLENCIA,
-                        COR_RECEITA,
-                    ],
-                ),
-                legend=None,
-            ),
-
-            tooltip=[
-                alt.Tooltip(
-                    "Situação:N",
-                    title="Situação",
-                ),
-                alt.Tooltip(
-                    "Alunos:Q",
-                    title="Alunos",
-                ),
-            ],
-        )
-    )
-
-    valores = (
-        alt.Chart(dados)
-        .mark_text(
-            align="left",
-            baseline="middle",
-            dx=8,
-            color="#8FA0B6",
-            fontSize=11,
-        )
-        .encode(
-            y=alt.Y(
-                "Situação:N",
-                sort=ordem,
-            ),
-
-            x=alt.X(
-                "Alunos:Q",
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-            ),
-
-            text=alt.Text(
-                "Alunos:Q",
-                format="d",
-            ),
-        )
-    )
-
-    grafico = (
-        alt.layer(
-            barras,
-            valores,
-        )
-        .properties(
-            height=130
-        )
-        .configure_view(
-            stroke=None
-        )
-        .configure(
-            background="transparent"
-        )
-    )
-
-    rotuloGrafico(
-        "Distribuição da inadimplência"
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+        ],
     )
 
 # Função para renderizar um gráfico de bolsas, mostrando a distribuição entre alunos com bolsa ativa e sem bolsa ativa.
 def renderizarGraficoBolsas(*, ativos: int, bolsistas: int,) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
 
     total_base = max(
         ativos,
@@ -488,143 +282,39 @@ def renderizarGraficoBolsas(*, ativos: int, bolsistas: int,) -> None:
         }
     )
 
-    maior_valor = int(
-        dados["Alunos"].max()
-    )
-
-    escala_maxima = (
-        maior_valor * 1.20
-        if maior_valor > 0
-        else 1
-    )
-
     ordem = [
         "Com bolsa ativa",
         "Sem bolsa ativa",
     ]
 
-    barras = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopRight=5,
-            cornerRadiusBottomRight=5,
-            size=26,
-        )
-        .encode(
-            y=alt.Y(
+    limite = (
+        None
+        if int(dados["Alunos"].max()) > 0
+        else 1
+    )
+
+    renderizarGraficoBarras(
+        dados,
+        categoria="Situação",
+        valor="Alunos",
+        titulo="Distribuição de bolsas",
+        ordem=ordem,
+        cores={
+            "Com bolsa ativa": COR_BOLSA,
+            "Sem bolsa ativa": COR_NEUTRA,
+        },
+        inteiro=True,
+        limite=limite,
+        tooltip=[
+            alt.Tooltip(
                 "Situação:N",
-                sort=ordem,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=11,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Situação",
             ),
-
-            x=alt.X(
+            alt.Tooltip(
                 "Alunos:Q",
-                title=None,
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    tickMinStep=1,
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Alunos",
             ),
-
-            color=alt.Color(
-                "Situação:N",
-                scale=alt.Scale(
-                    domain=ordem,
-                    range=[
-                        COR_BOLSA,
-                        COR_NEUTRA,
-                    ],
-                ),
-                legend=None,
-            ),
-
-            tooltip=[
-                alt.Tooltip(
-                    "Situação:N",
-                    title="Situação",
-                ),
-                alt.Tooltip(
-                    "Alunos:Q",
-                    title="Alunos",
-                ),
-            ],
-        )
-    )
-
-    valores = (
-        alt.Chart(dados)
-        .mark_text(
-            align="left",
-            baseline="middle",
-            dx=8,
-            color="#8FA0B6",
-            fontSize=11,
-        )
-        .encode(
-            y=alt.Y(
-                "Situação:N",
-                sort=ordem,
-            ),
-
-            x=alt.X(
-                "Alunos:Q",
-                scale=alt.Scale(
-                    domain=[
-                        0,
-                        escala_maxima,
-                    ],
-                ),
-            ),
-
-            text=alt.Text(
-                "Alunos:Q",
-                format="d",
-            ),
-        )
-    )
-
-    grafico = (
-        alt.layer(
-            barras,
-            valores,
-        )
-        .properties(
-            height=130
-        )
-        .configure_view(
-            stroke=None
-        )
-        .configure(
-            background="transparent"
-        )
-    )
-
-    rotuloGrafico(
-        "Distribuição de bolsas"
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+        ],
     )
 
 # Função principal para renderizar a tela do dashboard financeiro, incluindo indicadores, gráficos e seções.

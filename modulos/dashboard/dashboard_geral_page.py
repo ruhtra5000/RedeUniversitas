@@ -97,6 +97,8 @@ def carregarIndicadoresGerais() -> dict[str, Any]:
 
 # Função para renderizar o gráfico de situação dos alunos, mostrando a distribuição percentual de alunos ativos, trancados, formados e evadidos.
 def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+
     total = sum(max(item.valor, 0) for item in status)
 
     if total <= 0:
@@ -116,97 +118,35 @@ def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
     )
 
     ordem = [item.rotulo for item in status]
+    cores = {
+        item.rotulo: item.cor
+        for item in status
+    }
 
-    grafico = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopRight=5,
-            cornerRadiusBottomRight=5,
-            size=18,
-        )
-        .encode(
-            y=alt.Y(
-                "Situação:N",
-                sort=ordem,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=11,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            x=alt.X(
+    renderizarGraficoBarras(
+        dados,
+        categoria="Situação",
+        valor="Percentual",
+        titulo="Comparativo visual",
+        ordem=ordem,
+        cores=cores,
+        limite=100,
+        percentual=True,
+        tooltip=[
+            alt.Tooltip("Situação:N", title="Situação"),
+            alt.Tooltip("Alunos:Q", title="Alunos"),
+            alt.Tooltip(
                 "Percentual:Q",
-                title=None,
-                scale=alt.Scale(domain=[0, 100]),
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    labelExpr="datum.value + '%'",
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Participação",
+                format=".1f",
             ),
-            color=alt.Color(
-                "Situação:N",
-                scale=alt.Scale(
-                    domain=[
-                        "Ativos",
-                        "Trancados",
-                        "Formados",
-                        "Evadidos",
-                    ],
-                    range=[
-                        "#54b68a",
-                        "#d4a84f",
-                        "#6f8fd3",
-                        "#cf6871",
-                    ],
-                ),
-                legend=None,
-            ),
-            tooltip=[
-                alt.Tooltip("Situação:N", title="Situação"),
-                alt.Tooltip("Alunos:Q", title="Alunos"),
-                alt.Tooltip(
-                    "Percentual:Q",
-                    title="Participação",
-                    format=".1f",
-                ),
-            ],
-        )
-        .properties(height=165)
-        .configure_view(stroke=None)
-        .configure(background="transparent")
-    )
-
-    st.html(
-        """
-        <div style="
-            color:#8190A4;
-            font-size:0.62rem;
-            font-weight:800;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            margin-bottom:-0.25rem;
-        ">
-            Comparativo visual
-        </div>
-        """
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+        ],
     )
 
 # Função para renderizar o gráfico de estrutura acadêmica, mostrando a quantidade de alunos, professores e cursos na rede.
 def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: int) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+
     dados = pd.DataFrame(
         {
             "Indicador": [
@@ -225,85 +165,28 @@ def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: i
     if int(dados["Quantidade"].sum()) <= 0:
         return
 
-    grafico = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopLeft=5,
-            cornerRadiusTopRight=5,
-            size=44,
-        )
-        .encode(
-            x=alt.X(
-                "Indicador:N",
-                sort=None,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=10,
-                    labelAngle=0,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            y=alt.Y(
-                "Quantidade:Q",
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    tickMinStep=1,
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            color=alt.Color(
-                "Indicador:N",
-                scale=alt.Scale(
-                    domain=[
-                        "Alunos",
-                        "Professores",
-                        "Cursos",
-                    ],
-                    range=[
-                        "#C49A4A",
-                        "#6f8fd3",
-                        "#8d7fd1",
-                    ],
-                ),
-                legend=None,
-            ),
-            tooltip=[
-                alt.Tooltip("Indicador:N", title="Indicador"),
-                alt.Tooltip("Quantidade:Q", title="Quantidade"),
-            ],
-        )
-        .properties(height=175)
-        .configure_view(stroke=None)
-        .configure(background="transparent")
-    )
+    ordem = [
+        "Alunos",
+        "Professores",
+        "Cursos",
+    ]
 
-    st.html(
-        """
-        <div style="
-            color:#8190A4;
-            font-size:0.62rem;
-            font-weight:800;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            margin-bottom:-0.25rem;
-        ">
-            Estrutura em números
-        </div>
-        """
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+    renderizarGraficoBarras(
+        dados,
+        categoria="Indicador",
+        valor="Quantidade",
+        titulo="Estrutura em números",
+        ordem=ordem,
+        cores={
+            "Alunos": "#C49A4A",
+            "Professores": "#6f8fd3",
+            "Cursos": "#8d7fd1",
+        },
+        inteiro=True,
+        tooltip=[
+            alt.Tooltip("Indicador:N", title="Indicador"),
+            alt.Tooltip("Quantidade:Q", title="Quantidade"),
+        ],
     )
 
 # Função principal para renderizar a tela do dashboard geral, exibindo indicadores de alunos, professores e cursos, bem como gráficos de situação e estrutura acadêmica.

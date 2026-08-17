@@ -287,6 +287,8 @@ def carregarBaixoDesempenho() -> pd.DataFrame:
 
 # Função para renderizar o gráfico de desempenho dos alunos, utilizando Altair para visualização.
 def renderizarGraficoDesempenho(faixas: list[ItemDistribuicao]) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+    
     total = sum(max(item.valor, 0) for item in faixas)
 
     if total <= 0:
@@ -306,97 +308,35 @@ def renderizarGraficoDesempenho(faixas: list[ItemDistribuicao]) -> None:
     )
 
     ordem = [item.rotulo for item in faixas]
+    cores = {
+        item.rotulo: item.cor
+        for item in faixas
+    }
 
-    grafico = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopRight=5,
-            cornerRadiusBottomRight=5,
-            size=18,
-        )
-        .encode(
-            y=alt.Y(
-                "Faixa:N",
-                sort=ordem,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=11,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            x=alt.X(
+    renderizarGraficoBarras(
+        dados,
+        categoria="Faixa",
+        valor="Percentual",
+        titulo="Comparativo visual",
+        ordem=ordem,
+        cores=cores,
+        limite=100,
+        percentual=True,
+        tooltip=[
+            alt.Tooltip("Faixa:N", title="Faixa"),
+            alt.Tooltip("Alunos:Q", title="Alunos"),
+            alt.Tooltip(
                 "Percentual:Q",
-                title=None,
-                scale=alt.Scale(domain=[0, 100]),
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    labelExpr="datum.value + '%'",
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
+                title="Participação",
+                format=".1f",
             ),
-            color=alt.Color(
-                "Faixa:N",
-                scale=alt.Scale(
-                    domain=[
-                        "Excelente",
-                        "Bom",
-                        "Regular",
-                        "Ruim",
-                    ],
-                    range=[
-                        "#6f8fd3",
-                        "#54b68a",
-                        "#d4a84f",
-                        "#cf6871",
-                    ],
-                ),
-                legend=None,
-            ),
-            tooltip=[
-                alt.Tooltip("Faixa:N", title="Faixa"),
-                alt.Tooltip("Alunos:Q", title="Alunos"),
-                alt.Tooltip(
-                    "Percentual:Q",
-                    title="Participação",
-                    format=".1f",
-                ),
-            ],
-        )
-        .properties(height=165)
-        .configure_view(stroke=None)
-        .configure(background="transparent")
-    )
-
-    st.html(
-        """
-        <div style="
-            color:#8190A4;
-            font-size:0.62rem;
-            font-weight:800;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            margin-bottom:-0.25rem;
-        ">
-            Comparativo visual
-        </div>
-        """
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+        ],
     )
 
 # Função para renderizar o gráfico de acompanhamento acadêmico, comparando os critérios de baixo desempenho dos alunos.
 def renderizarGraficoAcompanhamento(*, cr_baixo: int, muitas_reprovacoes: int, ambos_criterios: int) -> None:
+    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+
     dados = pd.DataFrame(
         {
             "Critério": [
@@ -415,86 +355,28 @@ def renderizarGraficoAcompanhamento(*, cr_baixo: int, muitas_reprovacoes: int, a
     if int(dados["Alunos"].sum()) <= 0:
         return
 
-    grafico = (
-        alt.Chart(dados)
-        .mark_bar(
-            cornerRadiusTopLeft=5,
-            cornerRadiusTopRight=5,
-            size=44,
-        )
-        .encode(
-            x=alt.X(
-                "Critério:N",
-                sort=None,
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#8FA0B6",
-                    labelFontSize=10,
-                    labelAngle=0,
-                    labelLimit=160,
-                    labelPadding=10,
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            y=alt.Y(
-                "Alunos:Q",
-                title=None,
-                axis=alt.Axis(
-                    labelColor="#66778D",
-                    labelFontSize=10,
-                    tickMinStep=1,
-                    grid=True,
-                    gridColor="rgba(148,163,184,0.08)",
-                    ticks=False,
-                    domain=False,
-                ),
-            ),
-            color=alt.Color(
-                "Critério:N",
-                scale=alt.Scale(
-                    domain=[
-                        "CR abaixo de 5,5",
-                        "3+ reprovações",
-                        "Ambos os critérios",
-                    ],
-                    range=[
-                        "#cf6871",
-                        "#d4a84f",
-                        "#8d7fd1",
-                    ],
-                ),
-                legend=None,
-            ),
-            tooltip=[
-                alt.Tooltip("Critério:N", title="Critério"),
-                alt.Tooltip("Alunos:Q", title="Alunos"),
-            ],
-        )
-        .properties(height=175)
-        .configure_view(stroke=None)
-        .configure(background="transparent")
-    )
+    ordem = [
+        "CR abaixo de 5,5",
+        "3+ reprovações",
+        "Ambos os critérios",
+    ]
 
-    st.html(
-        """
-        <div style="
-            color:#8190A4;
-            font-size:0.62rem;
-            font-weight:800;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            margin-bottom:-0.25rem;
-        ">
-            Comparativo dos critérios
-        </div>
-        """
-    )
-
-    st.altair_chart(
-        grafico,
-        use_container_width=True,
-        theme=None,
+    renderizarGraficoBarras(
+        dados,
+        categoria="Critério",
+        valor="Alunos",
+        titulo="Comparativo dos critérios",
+        ordem=ordem,
+        cores={
+            "CR abaixo de 5,5": "#cf6871",
+            "3+ reprovações": "#d4a84f",
+            "Ambos os critérios": "#8d7fd1",
+        },
+        inteiro=True,
+        tooltip=[
+            alt.Tooltip("Critério:N", title="Critério"),
+            alt.Tooltip("Alunos:Q", title="Alunos"),
+        ],
     )
 
 # Função principal para renderizar a tela do dashboard acadêmico, incluindo métricas, gráficos e tabelas de desempenho dos alunos.
