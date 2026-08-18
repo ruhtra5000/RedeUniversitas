@@ -246,6 +246,11 @@ def get_navigation():
 
     # Financeiro
     if "FINANCEIRO" in roles and "ADMIN" not in roles:
+        if "Dashboards" not in pages:
+            pages["Dashboards"] = []
+        if dashboard_financeiro_page not in pages["Dashboards"]:
+            pages["Dashboards"].append(dashboard_financeiro_page)
+            
         if cadastro_compra not in cadastros_list:
             cadastros_list.append(cadastro_compra)
         if cadastro_fornecedor not in cadastros_list:
