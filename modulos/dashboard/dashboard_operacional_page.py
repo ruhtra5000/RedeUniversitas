@@ -9,6 +9,7 @@ import streamlit as st
 from modulos.dashboard import dashboard_service
 from modulos.utils.dashboard_visual import (MetricaDashboard, criarSecaoDashboard, formatarInteiro, paraNumero, renderizarCabecalhoDashboard, renderizarEstadoVazio, renderizarMetricasDashboard)
 import modulos.utils.dashboard_graficos as dashboard_graficos
+from modulos.dashboard.dashboard_geral_page import obterCampusIdUsuario
 
 # Cores
 COR_ESTOQUE = "#54a3c7"
@@ -1216,13 +1217,14 @@ def normalizarFornecedores(dados: Any) -> pd.DataFrame:
     return df
 
 @st.cache_data(ttl=60, show_spinner=False)
-# Função para carregar indicadores operacionais do dashboard
-def carregarIndicadoresOperacionais() -> dict[str, Any]:
+# Função para carregar indicadores operacionais do dashboard, com suporte a filtro por campus.
+def carregarIndicadoresOperacionais(campus_id: int | None = None) -> dict[str, Any]:
 
-    return {
-        "tipos_produtos": paraNumero(
-            dashboard_service.tipoProdutosGeral()
-        ),
+    if campus_id is None:
+        return {
+            "tipos_produtos": paraNumero(
+                dashboard_service.tipoProdutosGeral()
+            ),
 
         "quantidade_produtos": paraNumero(
             dashboard_service.qtdeProdutosGeral()
@@ -1286,11 +1288,84 @@ def carregarIndicadoresOperacionais() -> dict[str, Any]:
             .qtdeFornecedores()
         ),
 
-        "fornecedores_usados": (
-            dashboard_service
-            .fornecedoresMaisUsadosGeral()
-        ),
-    }
+            "fornecedores_usados": (
+                dashboard_service
+                .fornecedoresMaisUsadosGeral()
+            ),
+        }
+    else:
+        return {
+            "tipos_produtos": paraNumero(
+                dashboard_service.tipoProdutosPorCampus(campus_id)
+            ),
+
+            "quantidade_produtos": paraNumero(
+                dashboard_service.qtdeProdutosPorCampus(campus_id)
+            ),
+
+            "baixo_estoque": paraNumero(
+                dashboard_service.qtdeProdutosBaixoEstoquePorCampus(campus_id)
+            ),
+
+            "sem_estoque": paraNumero(
+                dashboard_service.qtdeProdutosSemEstoquePorCampus(campus_id)
+            ),
+
+            "lista_baixo": (
+                dashboard_service
+                .listarProdutosBaixoEstoquePorCampus(campus_id)
+            ),
+
+            "lista_sem": (
+                dashboard_service
+                .listarProdutosSemEstoquePorCampus(campus_id)
+            ),
+
+            "mais_usados": (
+                dashboard_service
+                .produtosMaisUsadosPorCampus(campus_id)
+            ),
+
+            "movimentacoes_tipo": (
+                dashboard_service
+                .movimentacoesPorTipoPorCampus(campus_id)
+            ),
+
+            "movimentacoes_recentes": (
+                dashboard_service
+                .movimentacoesRecentesPorCampus(campus_id)
+            ),
+
+            "compras": paraNumero(
+                dashboard_service
+                .qtdeComprasPorCampus(campus_id)
+            ),
+
+            "valor_comprado": paraNumero(
+                dashboard_service
+                .valorTotalCompradoPorCampus(campus_id)
+            ),
+
+            "ticket_medio": paraNumero(
+                dashboard_service
+                .valorMedioCompraPorCampus(campus_id)
+            ),
+
+            "mais_comprados": (
+                dashboard_service
+                .produtosMaisCompradosPorCampus(campus_id)
+            ),
+
+            "fornecedores": paraNumero(
+                dashboard_service
+                .qtdeFornecedores()
+            ),
+
+            "fornecedores_usados": (
+                dashboard_service
+                .fornecedoresMaisUsadosPorCampus(campus_id)
+            ),
+        }
 
 # Função para renderizar o rótulo de um gráfico com título e descrição
 def rotuloGrafico(titulo: str, descricao: str | None = None) -> None:
@@ -1767,13 +1842,25 @@ def graficoFornecedores(dados: pd.DataFrame, limite_grafico: float | None = None
 
 # Função principal para renderizar a tela do dashboard operacional
 def telaDashboardOperacional():
+    campus_id = obterCampusIdUsuario()
+    campus_nome = None
+
+    if campus_id is not None:
+        from database.Conexao import SessionLocal
+        from sqlalchemy import select
+        from database.entidades.Campus import Campus
+        with SessionLocal() as session:
+            campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
+            if campus_obj:
+                campus_nome = campus_obj.nome
 
     atualizar = renderizarCabecalhoDashboard(
         titulo="Operacional",
 
         descricao=(
             "Visão do estoque, movimentações, compras "
-            "e fornecedores da Rede Universitas."
+            "e fornecedores da Rede Universitas." if campus_nome is None else
+            f"Visão do estoque, movimentações, compras e fornecedores ({campus_nome})."
         ),
 
         prefixo_chave=(
@@ -1791,7 +1878,7 @@ def telaDashboardOperacional():
         ):
 
             dados = (
-                carregarIndicadoresOperacionais()
+                carregarIndicadoresOperacionais(campus_id)
             )
 
     except Exception as erro:
