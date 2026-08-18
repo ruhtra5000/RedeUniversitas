@@ -12,7 +12,7 @@ def obterCampusIdUsuario():
     pessoa_id = st.session_state.get("pessoa_id")
     roles = st.session_state.get("roles", [])
     
-    if "ADMIN" in roles or not pessoa_id:
+    if not pessoa_id:
         return None
         
     from database.Conexao import SessionLocal
@@ -23,6 +23,9 @@ def obterCampusIdUsuario():
             from database.entidades.Campus import Campus
             campus = session.execute(select(Campus).where(Campus.reitor_id == pessoa_id)).scalar_one_or_none()
             if campus: return campus.id
+            
+        if "ADMIN" in roles:
+            return None
             
         if "ALMOXARIFE" in roles:
             from database.entidades.Almoxarife import Almoxarife

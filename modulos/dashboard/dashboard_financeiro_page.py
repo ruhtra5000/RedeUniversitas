@@ -4,6 +4,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 from modulos.dashboard import dashboard_service
+from modulos.dashboard.dashboard_geral_page import obterCampusIdUsuario
 from modulos.utils.dashboard_visual import (MetricaDashboard, criarSecaoDashboard, formatarInteiro, formatarPercentual, paraNumero, renderizarCabecalhoDashboard, renderizarMetricasDashboard)
 
 # Cores
@@ -29,19 +30,27 @@ def formatarMoeda(valor: Any) -> str:
     return f"R$ {texto}"
 
 # Função para carregar o total a receber, com suporte para diferentes nomes de função no serviço de dashboard.
-def carregarTotalAReceber() -> float:
-    funcao = getattr(
-        dashboard_service,
-        "cacularTotalAReceberGeral",
-        None,
-    )
-
-    if not callable(funcao):
-        funcao = getattr(
-            dashboard_service,
+def carregarTotalAReceber(campus_id: int | None = None) -> float:
+    if campus_id is None:
+        nomes_funcoes = (
+            "cacularTotalAReceberGeral",
             "calcularTotalAReceberGeral",
-            None,
         )
+        argumentos = ()
+    else:
+        nomes_funcoes = (
+            "cacularTotalAReceberPorCampus",
+            "calcularTotalAReceberPorCampus",
+        )
+        argumentos = (campus_id,)
+
+    funcao = None
+
+    for nome in nomes_funcoes:
+        candidata = getattr(dashboard_service, nome, None)
+        if callable(candidata):
+            funcao = candidata
+            break
 
     if not callable(funcao):
         raise AttributeError(
@@ -49,55 +58,103 @@ def carregarTotalAReceber() -> float:
             "no dashboard_service."
         )
 
-    return paraNumero(funcao())
+    return paraNumero(funcao(*argumentos))
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os indicadores financeiros, retornando um dicionário com os valores formatados.
-def carregarIndicadoresFinanceiros() -> dict[str, float]:
+def carregarIndicadoresFinanceiros(campus_id: int | None = None) -> dict[str, float]:
+    if campus_id is None:
+        return {
+            "receita": paraNumero(
+                dashboard_service.calcularReceitaTotal()
+            ),
+
+            "a_receber": carregarTotalAReceber(),
+
+            "inadimplentes": paraNumero(
+                dashboard_service.alunosInadimplentesTotal()
+            ),
+
+            "taxa_inadimplencia": paraNumero(
+                dashboard_service.taxaInadimplenciaGeral()
+            ),
+
+            "valor_inadimplente": paraNumero(
+                dashboard_service.valorTotalInadimplente()
+            ),
+
+            "mensalidades_vencidas": paraNumero(
+                dashboard_service.mensalidadesVencidasTotal()
+            ),
+
+            "divida_media": paraNumero(
+                dashboard_service.dividaMediaTotal()
+            ),
+
+            "bolsistas": paraNumero(
+                dashboard_service.alunosBolsistasTotal()
+            ),
+
+            "taxa_bolsistas": (
+                paraNumero(
+                    dashboard_service.taxaBolsistaGeral()
+                )
+                * 100
+            ),
+
+            "valor_bolsas": paraNumero(
+                dashboard_service.valorConcedidoPorBolsaTotal()
+            ),
+
+            "ativos": paraNumero(
+                dashboard_service.alunosAtivosTotal()
+            ),
+        }
+
     return {
         "receita": paraNumero(
-            dashboard_service.calcularReceitaTotal()
+            dashboard_service.calcularReceitaPorCampus(campus_id)
         ),
 
-        "a_receber": carregarTotalAReceber(),
+        "a_receber": carregarTotalAReceber(campus_id),
 
         "inadimplentes": paraNumero(
-            dashboard_service.alunosInadimplentesTotal()
+            dashboard_service.alunosInadimplentesPorCampus(campus_id)
         ),
 
         "taxa_inadimplencia": paraNumero(
-            dashboard_service.taxaInadimplenciaGeral()
+            dashboard_service.taxaInadimplenciaPorCampus(campus_id)
         ),
 
         "valor_inadimplente": paraNumero(
-            dashboard_service.valorTotalInadimplente()
+            dashboard_service.valorTotalInadimplentePorCampus(campus_id)
         ),
 
         "mensalidades_vencidas": paraNumero(
-            dashboard_service.mensalidadesVencidasTotal()
+            dashboard_service.mensalidadesVencidasPorCampus(campus_id)
         ),
 
         "divida_media": paraNumero(
-            dashboard_service.dividaMediaTotal()
+            dashboard_service.dividaMediaPorCampus(campus_id)
         ),
 
         "bolsistas": paraNumero(
-            dashboard_service.alunosBolsistasTotal()
+            dashboard_service.alunosBolsistasPorCampus(campus_id)
         ),
 
         "taxa_bolsistas": (
             paraNumero(
-                dashboard_service.taxaBolsistaGeral()
+                dashboard_service.taxaBolsistaPorCampus(campus_id)
             )
             * 100
         ),
 
         "valor_bolsas": paraNumero(
-            dashboard_service.valorConcedidoPorBolsaTotal()
+            dashboard_service.valorConcedidoPorBolsaPorCampus(campus_id)
         ),
 
         "ativos": paraNumero(
-            dashboard_service.alunosAtivosTotal()
+            dashboard_service.alunosAtivosPorCampus(campus_id)
         ),
     }
 
@@ -319,12 +376,25 @@ def renderizarGraficoBolsas(*, ativos: int, bolsistas: int,) -> None:
 
 # Função principal para renderizar a tela do dashboard financeiro, incluindo indicadores, gráficos e seções.
 def telaDashboardFinanceiro():
+    campus_id = obterCampusIdUsuario()
+    campus_nome = None
+
+    if campus_id is not None:
+        from database.Conexao import SessionLocal
+        from sqlalchemy import select
+        from database.entidades.Campus import Campus
+
+        with SessionLocal() as session:
+            campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
+            if campus_obj:
+                campus_nome = campus_obj.nome
 
     atualizar = renderizarCabecalhoDashboard(
         titulo="Financeiro",
         descricao=(
             "Visão geral das receitas, inadimplências e bolsas "
-            "da Rede Universitas."
+            "da Rede Universitas." if campus_nome is None else
+            f"Visão geral das receitas, inadimplências e bolsas ({campus_nome})."
         ),
         prefixo_chave="dashboard_financeiro",
     )
@@ -337,7 +407,7 @@ def telaDashboardFinanceiro():
             "Carregando indicadores..."
         ):
             dados = (
-                carregarIndicadoresFinanceiros()
+                carregarIndicadoresFinanceiros(campus_id)
             )
 
     except Exception as erro:
