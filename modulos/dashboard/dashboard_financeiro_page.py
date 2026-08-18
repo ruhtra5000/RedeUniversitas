@@ -177,7 +177,12 @@ def rotuloGrafico(texto: str) -> None:
 
 # Função para renderizar um gráfico de valores financeiros, com barras representando receita, total a receber e valor inadimplente.
 def renderizarGraficoValoresFinanceiros(*, receita: float, a_receber: float, valor_inadimplente: float) -> None:
-    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+    from modulos.utils.dashboard_graficos import rotuloGrafico
+
+    total = max(receita, 0) + max(a_receber, 0) + max(valor_inadimplente, 0)
+
+    if total <= 0:
+        return
 
     dados = pd.DataFrame(
         {
@@ -186,7 +191,6 @@ def renderizarGraficoValoresFinanceiros(*, receita: float, a_receber: float, val
                 "Total a receber",
                 "Valor inadimplente",
             ],
-
             "Valor": [
                 max(receita, 0),
                 max(a_receber, 0),
@@ -195,46 +199,50 @@ def renderizarGraficoValoresFinanceiros(*, receita: float, a_receber: float, val
         }
     )
 
-    dados["Valor formatado"] = (
-        dados["Valor"]
-        .apply(formatarMoeda)
-    )
+    dados["Valor formatado"] = dados["Valor"].apply(formatarMoeda)
+    dados["Percentual"] = (dados["Valor"] / total * 100).round(1)
 
-    ordem = [
-        "Receita recebida",
-        "Total a receber",
-        "Valor inadimplente",
-    ]
-
-    limite = (
-        None
-        if float(dados["Valor"].max()) > 0
-        else 1
-    )
-
-    renderizarGraficoBarras(
-        dados,
-        categoria="Indicador",
-        valor="Valor",
-        titulo="Comparativo de valores",
-        ordem=ordem,
-        cores={
-            "Receita recebida": COR_RECEITA,
-            "Total a receber": COR_RECEBER,
-            "Valor inadimplente": COR_INADIMPLENCIA,
-        },
-        limite=limite,
-        tooltip=[
-            alt.Tooltip(
+    grafico = (
+        alt.Chart(dados)
+        .mark_arc(
+            innerRadius=78,
+            outerRadius=125,
+            stroke=None,
+        )
+        .encode(
+            theta=alt.Theta(
+                "Valor:Q",
+                stack=True,
+            ),
+            color=alt.Color(
                 "Indicador:N",
-                title="Indicador",
+                scale=alt.Scale(
+                    domain=["Receita recebida", "Total a receber", "Valor inadimplente"],
+                    range=[COR_RECEITA, COR_RECEBER, COR_INADIMPLENCIA],
+                ),
+                legend=alt.Legend(
+                    orient="right",
+                    labelColor="#8FA0B6",
+                    labelFontSize=10,
+                    symbolSize=90,
+                    symbolType="circle",
+                    title=None,
+                    rowPadding=6,
+                ),
             ),
-            alt.Tooltip(
-                "Valor formatado:N",
-                title="Valor",
-            ),
-        ],
+            tooltip=[
+                alt.Tooltip("Indicador:N", title="Indicador"),
+                alt.Tooltip("Valor formatado:N", title="Valor"),
+                alt.Tooltip("Percentual:Q", title="Participação (%)", format=".1f"),
+            ],
+        )
+        .properties(height=290)
+        .configure_view(stroke=None)
+        .configure(background="transparent")
     )
+
+    rotuloGrafico("Comparativo de valores")
+    st.altair_chart(grafico, use_container_width=True, theme=None)
 
 # Função para renderizar um gráfico de inadimplência, mostrando a distribuição entre alunos inadimplentes e sem pendência.
 def renderizarGraficoInadimplencia(*, ativos: int, inadimplentes: int) -> None:
@@ -477,79 +485,82 @@ def telaDashboardFinanceiro():
         else 0
     )
 
-    renderizarMetricasDashboard(
-        [
-            MetricaDashboard(
-                "Receita recebida",
-                formatarMoeda(
-                    receita
-                ),
-                "Valor efetivamente recebido pela rede.",
-                COR_RECEITA,
-                "RR",
-            ),
-
-            MetricaDashboard(
-                "A receber",
-                formatarMoeda(
-                    a_receber
-                ),
-                "Valor que ainda deve ser recebido.",
-                COR_RECEBER,
-                "AR",
-            ),
-
-            MetricaDashboard(
-                "Valor inadimplente",
-                formatarMoeda(
-                    valor_inadimplente
-                ),
-                (
-                    "Total monetário atualmente "
-                    "em inadimplência."
-                ),
-                COR_INADIMPLENCIA,
-                "VI",
-            ),
-
-            MetricaDashboard(
-                "Receita por aluno",
-                formatarMoeda(
-                    receita_por_aluno
-                ),
-                (
-                    "Valor médio recebido "
-                    "por aluno ativo."
-                ),
-                COR_NEUTRA,
-                "RA",
-            ),
-        ],
-        colunas=4,
-    )
-
     secao_panorama = criarSecaoDashboard(
         titulo="Panorama financeiro",
-
         descricao=(
             "Comparativo dos principais valores movimentados "
             "e comprometidos pela rede."
         ),
-
         meta="Rede Universitas",
-
         contexto="RECEITAS E PENDÊNCIAS",
-
         numero=1,
     )
 
     with secao_panorama:
-
-        renderizarGraficoValoresFinanceiros(
-            receita=receita,
-            a_receber=a_receber,
-            valor_inadimplente=valor_inadimplente,
+        col_cards, col_grafico = st.columns(
+            [6, 4],
+            gap="large",
+            vertical_alignment="center",
         )
+
+        with col_cards:
+            renderizarMetricasDashboard(
+                [
+                    MetricaDashboard(
+                        "Receita recebida",
+                        formatarMoeda(
+                            receita
+                        ),
+                        "Valor efetivamente recebido pela rede.",
+                        COR_RECEITA,
+                        "RR",
+                    ),
+
+                    MetricaDashboard(
+                        "A receber",
+                        formatarMoeda(
+                            a_receber
+                        ),
+                        "Valor que ainda deve ser recebido.",
+                        COR_RECEBER,
+                        "AR",
+                    ),
+
+                    MetricaDashboard(
+                        "Valor inadimplente",
+                        formatarMoeda(
+                            valor_inadimplente
+                        ),
+                        (
+                            "Total monetário atualmente "
+                            "em inadimplência."
+                        ),
+                        COR_INADIMPLENCIA,
+                        "VI",
+                    ),
+
+                    MetricaDashboard(
+                        "Receita por aluno",
+                        formatarMoeda(
+                            receita_por_aluno
+                        ),
+                        (
+                            "Valor médio recebido "
+                            "por aluno ativo."
+                        ),
+                        COR_NEUTRA,
+                        "RA",
+                    ),
+                ],
+                colunas=2,
+            )
+
+        with col_grafico:
+            renderizarGraficoValoresFinanceiros(
+                receita=receita,
+                a_receber=a_receber,
+                valor_inadimplente=valor_inadimplente,
+            )
 
     secao_inadimplencia = criarSecaoDashboard(
         titulo="Acompanhamento de inadimplências",
