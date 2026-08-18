@@ -260,6 +260,11 @@ def get_navigation():
 
     # Almoxarife
     if "ALMOXARIFE" in roles and "ADMIN" not in roles:
+        if "Dashboards" not in pages:
+            pages["Dashboards"] = []
+        if dashboard_operacional_page not in pages["Dashboards"]:
+            pages["Dashboards"].append(dashboard_operacional_page)
+
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
 
