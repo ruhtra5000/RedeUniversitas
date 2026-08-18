@@ -8,6 +8,34 @@ import streamlit as st
 from modulos.dashboard import dashboard_service
 from modulos.utils.dashboard_visual import (ItemDistribuicao, MetricaDashboard, criarSecaoDashboard, formatarInteiro, formatarPercentual, paraNumero, renderizarCabecalhoDashboard, renderizarDistribuicaoStatus, renderizarMetricasDashboard)
 
+def obterCampusIdUsuario():
+    pessoa_id = st.session_state.get("pessoa_id")
+    roles = st.session_state.get("roles", [])
+    
+    if "ADMIN" in roles or not pessoa_id:
+        return None
+        
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    
+    with SessionLocal() as session:
+        if "REITOR" in roles:
+            from database.entidades.Campus import Campus
+            campus = session.execute(select(Campus).where(Campus.reitor_id == pessoa_id)).scalar_one_or_none()
+            if campus: return campus.id
+            
+        if "ALMOXARIFE" in roles:
+            from database.entidades.Almoxarife import Almoxarife
+            almox = session.execute(select(Almoxarife).where(Almoxarife.pessoa_id == pessoa_id)).scalar_one_or_none()
+            if almox: return almox.campus_id
+            
+        if "FINANCEIRO" in roles:
+            from database.entidades.Financeiro import Financeiro
+            fin = session.execute(select(Financeiro).where(Financeiro.pessoa_id == pessoa_id)).scalar_one_or_none()
+            if fin: return fin.campus_id
+            
+    return None
+
 # Cores
 COR_ATIVO = "#54b68a"
 COR_TRANCADO = "#d4a84f"
@@ -44,11 +72,14 @@ def obterStatusAluno(aluno: Any) -> str:
     return normalizarTexto(status)
 
 # Função para contar o número de alunos com curso trancado.
-def contarTrancados() -> tuple[float, str | None]:
-    contar = getattr(dashboard_service, "alunosTrancadosTotal", None)
+def contarTrancados(campus_id: int | None = None) -> tuple[float, str | None]:
+    if campus_id is None:
+        contar = getattr(dashboard_service, "alunosTrancadosTotal", None)
+    else:
+        contar = getattr(dashboard_service, "alunosTrancadosPorCampus", None)
 
     if callable(contar):
-        return paraNumero(contar()), None
+        return paraNumero(contar() if campus_id is None else contar(campus_id)), None
 
     try:
         academico_service = import_module(
@@ -81,19 +112,31 @@ def contarTrancados() -> tuple[float, str | None]:
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os indicadores gerais do dashboard, incluindo ativos, trancados, formados, evadidos, professores, cursos e taxa de evasão.
-def carregarIndicadoresGerais() -> dict[str, Any]:
-    trancados, aviso_trancados = contarTrancados()
+def carregarIndicadoresGerais(campus_id: int | None = None) -> dict[str, Any]:
+    trancados, aviso_trancados = contarTrancados(campus_id)
 
-    return {
-        "ativos": paraNumero(dashboard_service.alunosAtivosTotal()),
-        "trancados": trancados,
-        "formados": paraNumero(dashboard_service.alunosFormadosTotal()),
-        "evadidos": paraNumero(dashboard_service.alunosEvadidosTotal()),
-        "professores": paraNumero(dashboard_service.professoresTotal()),
-        "cursos": paraNumero(dashboard_service.cursosTotal()),
-        "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoGeral()),
-        "aviso_trancados": aviso_trancados,
-    }
+    if campus_id is None:
+        return {
+            "ativos": paraNumero(dashboard_service.alunosAtivosTotal()),
+            "trancados": trancados,
+            "formados": paraNumero(dashboard_service.alunosFormadosTotal()),
+            "evadidos": paraNumero(dashboard_service.alunosEvadidosTotal()),
+            "professores": paraNumero(dashboard_service.professoresTotal()),
+            "cursos": paraNumero(dashboard_service.cursosTotal()),
+            "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoGeral()),
+            "aviso_trancados": aviso_trancados,
+        }
+    else:
+        return {
+            "ativos": paraNumero(dashboard_service.alunosAtivosPorCampus(campus_id)),
+            "trancados": trancados,
+            "formados": paraNumero(dashboard_service.alunosFormadosPorCampus(campus_id)),
+            "evadidos": paraNumero(dashboard_service.alunosEvadidosPorCampus(campus_id)),
+            "professores": paraNumero(dashboard_service.professoresPorCampus(campus_id)),
+            "cursos": paraNumero(dashboard_service.cursosPorCampus(campus_id)),
+            "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoPorCampus(campus_id)),
+            "aviso_trancados": aviso_trancados,
+        }
 
 # Função para renderizar o gráfico de situação dos alunos, mostrando a distribuição percentual de alunos ativos, trancados, formados e evadidos.
 def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
@@ -191,10 +234,23 @@ def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: i
 
 # Função principal para renderizar a tela do dashboard geral, exibindo indicadores de alunos, professores e cursos, bem como gráficos de situação e estrutura acadêmica.
 def telaDashboardGeral():
+    campus_id = obterCampusIdUsuario()
+    campus_nome = None
+    
+    if campus_id is not None:
+        from database.Conexao import SessionLocal
+        from sqlalchemy import select
+        from database.entidades.Campus import Campus
+        with SessionLocal() as session:
+            campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
+            if campus_obj:
+                campus_nome = campus_obj.nome
+    
     atualizar = renderizarCabecalhoDashboard(
-        titulo="Geral",
+        titulo="Geral" if campus_nome is None else f"Geral",
         descricao=(
-            "Resumo dos vínculos acadêmicos e da estrutura atual da Rede Universitas."
+            "Resumo dos vínculos acadêmicos e da estrutura atual da Rede Universitas." if campus_nome is None else
+            f"Resumo dos vínculos acadêmicos e da estrutura atual ({campus_nome})."
         ),
         prefixo_chave="dashboard_geral",
     )
@@ -204,7 +260,7 @@ def telaDashboardGeral():
 
     try:
         with st.spinner("Carregando indicadores..."):
-            dados = carregarIndicadoresGerais()
+            dados = carregarIndicadoresGerais(campus_id)
     except Exception as erro:
         st.error("Não foi possível carregar os indicadores gerais.")
         st.caption(f"Detalhes técnicos: {erro}")
