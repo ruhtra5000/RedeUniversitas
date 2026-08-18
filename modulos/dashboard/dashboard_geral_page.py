@@ -186,13 +186,18 @@ def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
         ],
     )
 
-# Função para renderizar o gráfico de estrutura acadêmica, mostrando a quantidade de alunos, professores e cursos na rede.
+# Função para renderizar o gráfico de estrutura acadêmica como donut chart, mostrando a proporção entre alunos, professores e cursos.
 def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: int) -> None:
-    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+    from modulos.utils.dashboard_graficos import rotuloGrafico
+
+    total = total_alunos + professores + cursos
+
+    if total <= 0:
+        return
 
     dados = pd.DataFrame(
         {
-            "Indicador": [
+            "Categoria": [
                 "Alunos",
                 "Professores",
                 "Cursos",
@@ -205,32 +210,49 @@ def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: i
         }
     )
 
-    if int(dados["Quantidade"].sum()) <= 0:
-        return
+    dados["Percentual"] = (dados["Quantidade"] / total * 100).round(1)
 
-    ordem = [
-        "Alunos",
-        "Professores",
-        "Cursos",
-    ]
-
-    renderizarGraficoBarras(
-        dados,
-        categoria="Indicador",
-        valor="Quantidade",
-        titulo="Estrutura em números",
-        ordem=ordem,
-        cores={
-            "Alunos": "#C49A4A",
-            "Professores": "#6f8fd3",
-            "Cursos": "#8d7fd1",
-        },
-        inteiro=True,
-        tooltip=[
-            alt.Tooltip("Indicador:N", title="Indicador"),
-            alt.Tooltip("Quantidade:Q", title="Quantidade"),
-        ],
+    grafico = (
+        alt.Chart(dados)
+        .mark_arc(
+            innerRadius=78,
+            outerRadius=125,
+            stroke=None,
+        )
+        .encode(
+            theta=alt.Theta(
+                "Quantidade:Q",
+                stack=True,
+            ),
+            color=alt.Color(
+                "Categoria:N",
+                scale=alt.Scale(
+                    domain=["Alunos", "Professores", "Cursos"],
+                    range=["#C49A4A", "#6f8fd3", "#8d7fd1"],
+                ),
+                legend=alt.Legend(
+                    orient="right",
+                    labelColor="#8FA0B6",
+                    labelFontSize=10,
+                    symbolSize=90,
+                    symbolType="circle",
+                    title=None,
+                    rowPadding=6,
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("Categoria:N", title="Categoria"),
+                alt.Tooltip("Quantidade:Q", title="Quantidade", format=",d"),
+                alt.Tooltip("Percentual:Q", title="Participação (%)", format=".1f"),
+            ],
+        )
+        .properties(height=290)
+        .configure_view(stroke=None)
+        .configure(background="transparent")
     )
+
+    rotuloGrafico("Composição estrutural")
+    st.altair_chart(grafico, use_container_width=True, theme=None)
 
 # Função principal para renderizar a tela do dashboard geral, exibindo indicadores de alunos, professores e cursos, bem como gráficos de situação e estrutura acadêmica.
 def telaDashboardGeral():
@@ -362,53 +384,61 @@ def telaDashboardGeral():
     )
 
     with secao_estrutura:
-        renderizarMetricasDashboard(
-            [
-                MetricaDashboard(
-                    "Professores",
-                    formatarInteiro(professores),
-                    "Docentes atualmente vinculados à rede.",
-                    "#6f8fd3",
-                    "PR",
-                ),
-                MetricaDashboard(
-                    "Cursos",
-                    formatarInteiro(cursos),
-                    "Cursos cadastrados e disponíveis na rede.",
-                    "#8d7fd1",
-                    "CU",
-                ),
-                MetricaDashboard(
-                    "Alunos por professor",
-                    (
-                        f"{alunos_por_professor:.1f}".replace(".", ",")
-                        if alunos_por_professor is not None
-                        else "—"
-                    ),
-                    "Relação média entre vínculos envolvendo discentes e docentes.",
-                    "#54a3c7",
-                    "AP",
-                ),
-                MetricaDashboard(
-                    "Alunos por curso",
-                    (
-                        f"{alunos_por_curso:.1f}".replace(".", ",")
-                        if alunos_por_curso is not None
-                        else "—"
-                    ),
-                    "Quantidade média de alunos por curso cadastrado.",
-                    "#b383d9",
-                    "AC",
-                ),
-            ],
-            colunas=4,
+        col_cards, col_grafico = st.columns(
+            [1, 1],
+            gap="large",
+            vertical_alignment="center",
         )
 
-        renderizarGraficoEstrutura(
-            total_alunos=total_alunos,
-            professores=professores,
-            cursos=cursos,
-        )
+        with col_cards:
+            renderizarMetricasDashboard(
+                [
+                    MetricaDashboard(
+                        "Professores",
+                        formatarInteiro(professores),
+                        "Docentes atualmente vinculados à rede.",
+                        "#6f8fd3",
+                        "PR",
+                    ),
+                    MetricaDashboard(
+                        "Cursos",
+                        formatarInteiro(cursos),
+                        "Cursos cadastrados e disponíveis na rede.",
+                        "#8d7fd1",
+                        "CU",
+                    ),
+                    MetricaDashboard(
+                        "Alunos por professor",
+                        (
+                            f"{alunos_por_professor:.1f}".replace(".", ",")
+                            if alunos_por_professor is not None
+                            else "—"
+                        ),
+                        "Relação média entre vínculos envolvendo discentes e docentes.",
+                        "#54a3c7",
+                        "AP",
+                    ),
+                    MetricaDashboard(
+                        "Alunos por curso",
+                        (
+                            f"{alunos_por_curso:.1f}".replace(".", ",")
+                            if alunos_por_curso is not None
+                            else "—"
+                        ),
+                        "Quantidade média de alunos por curso cadastrado.",
+                        "#b383d9",
+                        "AC",
+                    ),
+                ],
+                colunas=2,
+            )
+
+        with col_grafico:
+            renderizarGraficoEstrutura(
+                total_alunos=total_alunos,
+                professores=professores,
+                cursos=cursos,
+            )
 
     if dados["aviso_trancados"]:
         st.caption(dados["aviso_trancados"])
