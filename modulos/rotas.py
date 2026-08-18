@@ -163,7 +163,7 @@ def get_navigation():
         ]
     }
 
-    if "ADMIN" in roles:
+    if "ADMIN" in roles or "REITOR" in roles:
         pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page, dashboard_operacional_page]
 
     # Aluno
