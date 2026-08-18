@@ -219,8 +219,11 @@ def dbAlunosBaixoDesempenho(
             .scalar_subquery()
         )
 
-        query = select(Aluno).where(
-            or_(Aluno.coef_rend < 5.5, reprovacoes >= 3)
+        query = (
+            select(Aluno, reprovacoes.label("reprovacoes"))
+            .where(
+                or_(Aluno.coef_rend < 5.5, reprovacoes >= 3)
+            )
         )
     
         if idCampus is not None:
@@ -229,9 +232,9 @@ def dbAlunosBaixoDesempenho(
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
     
-        alunos = session.execute(query).scalars().all()
+        resultado = session.execute(query).all()
     
-        return alunos
+        return resultado
 
 
 # ______  _                                   _              
