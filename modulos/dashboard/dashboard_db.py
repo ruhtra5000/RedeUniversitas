@@ -123,13 +123,13 @@ def dbContarProfessores(
         idCurso: int | None = None
     ):
     with SessionLocal() as session:
-        query = select(func.count(Professor.pessoa_id))
-
-        if idCampus is not None:
-            query = query.where(Professor.campus_id == idCampus)
-
-        elif idCurso is not None: 
-            query = query.where(Professor.curso_id == idCurso)
+        if idCurso is not None:
+            from database.entidades.Turma import Turma
+            query = select(func.count(func.distinct(Turma.professor_id))).where(Turma.curso_id == idCurso)
+        else:
+            query = select(func.count(Professor.pessoa_id))
+            if idCampus is not None:
+                query = query.where(Professor.campus_id == idCampus)
 
         qtdeProfessores = session.scalar(query)
 

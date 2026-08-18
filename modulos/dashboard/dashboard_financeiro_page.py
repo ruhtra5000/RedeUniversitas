@@ -30,19 +30,25 @@ def formatarMoeda(valor: Any) -> str:
     return f"R$ {texto}"
 
 # Função para carregar o total a receber, com suporte para diferentes nomes de função no serviço de dashboard.
-def carregarTotalAReceber(campus_id: int | None = None) -> float:
-    if campus_id is None:
+def carregarTotalAReceber(campus_id: int | None = None, curso_id: int | None = None) -> float:
+    if curso_id is not None:
         nomes_funcoes = (
-            "cacularTotalAReceberGeral",
-            "calcularTotalAReceberGeral",
+            "cacularTotalAReceberPorCurso",
+            "calcularTotalAReceberPorCurso",
         )
-        argumentos = ()
-    else:
+        argumentos = (curso_id,)
+    elif campus_id is not None:
         nomes_funcoes = (
             "cacularTotalAReceberPorCampus",
             "calcularTotalAReceberPorCampus",
         )
         argumentos = (campus_id,)
+    else:
+        nomes_funcoes = (
+            "cacularTotalAReceberGeral",
+            "calcularTotalAReceberGeral",
+        )
+        argumentos = ()
 
     funcao = None
 
@@ -62,101 +68,49 @@ def carregarTotalAReceber(campus_id: int | None = None) -> float:
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os indicadores financeiros, retornando um dicionário com os valores formatados.
-def carregarIndicadoresFinanceiros(campus_id: int | None = None) -> dict[str, float]:
-    if campus_id is None:
+def carregarIndicadoresFinanceiros(campus_id: int | None = None, curso_id: int | None = None) -> dict[str, float]:
+    if curso_id is not None:
         return {
-            "receita": paraNumero(
-                dashboard_service.calcularReceitaTotal()
-            ),
-
-            "a_receber": carregarTotalAReceber(),
-
-            "inadimplentes": paraNumero(
-                dashboard_service.alunosInadimplentesTotal()
-            ),
-
-            "taxa_inadimplencia": paraNumero(
-                dashboard_service.taxaInadimplenciaGeral()
-            ),
-
-            "valor_inadimplente": paraNumero(
-                dashboard_service.valorTotalInadimplente()
-            ),
-
-            "mensalidades_vencidas": paraNumero(
-                dashboard_service.mensalidadesVencidasTotal()
-            ),
-
-            "divida_media": paraNumero(
-                dashboard_service.dividaMediaTotal()
-            ),
-
-            "bolsistas": paraNumero(
-                dashboard_service.alunosBolsistasTotal()
-            ),
-
-            "taxa_bolsistas": (
-                paraNumero(
-                    dashboard_service.taxaBolsistaGeral()
-                )
-                * 100
-            ),
-
-            "valor_bolsas": paraNumero(
-                dashboard_service.valorConcedidoPorBolsaTotal()
-            ),
-
-            "ativos": paraNumero(
-                dashboard_service.alunosAtivosTotal()
-            ),
+            "receita": paraNumero(dashboard_service.calcularReceitaPorCurso(curso_id)),
+            "a_receber": carregarTotalAReceber(curso_id=curso_id),
+            "inadimplentes": paraNumero(dashboard_service.alunosInadimplentesPorCurso(curso_id)),
+            "taxa_inadimplencia": paraNumero(dashboard_service.taxaInadimplenciaPorCurso(curso_id)),
+            "valor_inadimplente": paraNumero(dashboard_service.valorTotalInadimplentePorCurso(curso_id)),
+            "mensalidades_vencidas": paraNumero(dashboard_service.mensalidadesVencidasPorCurso(curso_id)),
+            "divida_media": paraNumero(dashboard_service.dividaMediaPorCurso(curso_id)),
+            "bolsistas": paraNumero(dashboard_service.alunosBolsistasPorCurso(curso_id)),
+            "taxa_bolsistas": (paraNumero(dashboard_service.taxaBolsistaPorCurso(curso_id)) * 100),
+            "valor_bolsas": paraNumero(dashboard_service.valorConcedidoPorBolsaPorCurso(curso_id)),
+            "ativos": paraNumero(dashboard_service.alunosAtivosPorCurso(curso_id)),
         }
-
-    return {
-        "receita": paraNumero(
-            dashboard_service.calcularReceitaPorCampus(campus_id)
-        ),
-
-        "a_receber": carregarTotalAReceber(campus_id),
-
-        "inadimplentes": paraNumero(
-            dashboard_service.alunosInadimplentesPorCampus(campus_id)
-        ),
-
-        "taxa_inadimplencia": paraNumero(
-            dashboard_service.taxaInadimplenciaPorCampus(campus_id)
-        ),
-
-        "valor_inadimplente": paraNumero(
-            dashboard_service.valorTotalInadimplentePorCampus(campus_id)
-        ),
-
-        "mensalidades_vencidas": paraNumero(
-            dashboard_service.mensalidadesVencidasPorCampus(campus_id)
-        ),
-
-        "divida_media": paraNumero(
-            dashboard_service.dividaMediaPorCampus(campus_id)
-        ),
-
-        "bolsistas": paraNumero(
-            dashboard_service.alunosBolsistasPorCampus(campus_id)
-        ),
-
-        "taxa_bolsistas": (
-            paraNumero(
-                dashboard_service.taxaBolsistaPorCampus(campus_id)
-            )
-            * 100
-        ),
-
-        "valor_bolsas": paraNumero(
-            dashboard_service.valorConcedidoPorBolsaPorCampus(campus_id)
-        ),
-
-        "ativos": paraNumero(
-            dashboard_service.alunosAtivosPorCampus(campus_id)
-        ),
-    }
+    elif campus_id is not None:
+        return {
+            "receita": paraNumero(dashboard_service.calcularReceitaPorCampus(campus_id)),
+            "a_receber": carregarTotalAReceber(campus_id=campus_id),
+            "inadimplentes": paraNumero(dashboard_service.alunosInadimplentesPorCampus(campus_id)),
+            "taxa_inadimplencia": paraNumero(dashboard_service.taxaInadimplenciaPorCampus(campus_id)),
+            "valor_inadimplente": paraNumero(dashboard_service.valorTotalInadimplentePorCampus(campus_id)),
+            "mensalidades_vencidas": paraNumero(dashboard_service.mensalidadesVencidasPorCampus(campus_id)),
+            "divida_media": paraNumero(dashboard_service.dividaMediaPorCampus(campus_id)),
+            "bolsistas": paraNumero(dashboard_service.alunosBolsistasPorCampus(campus_id)),
+            "taxa_bolsistas": (paraNumero(dashboard_service.taxaBolsistaPorCampus(campus_id)) * 100),
+            "valor_bolsas": paraNumero(dashboard_service.valorConcedidoPorBolsaPorCampus(campus_id)),
+            "ativos": paraNumero(dashboard_service.alunosAtivosPorCampus(campus_id)),
+        }
+    else:
+        return {
+            "receita": paraNumero(dashboard_service.calcularReceitaTotal()),
+            "a_receber": carregarTotalAReceber(),
+            "inadimplentes": paraNumero(dashboard_service.alunosInadimplentesTotal()),
+            "taxa_inadimplencia": paraNumero(dashboard_service.taxaInadimplenciaGeral()),
+            "valor_inadimplente": paraNumero(dashboard_service.valorTotalInadimplente()),
+            "mensalidades_vencidas": paraNumero(dashboard_service.mensalidadesVencidasTotal()),
+            "divida_media": paraNumero(dashboard_service.dividaMediaTotal()),
+            "bolsistas": paraNumero(dashboard_service.alunosBolsistasTotal()),
+            "taxa_bolsistas": (paraNumero(dashboard_service.taxaBolsistaGeral()) * 100),
+            "valor_bolsas": paraNumero(dashboard_service.valorConcedidoPorBolsaTotal()),
+            "ativos": paraNumero(dashboard_service.alunosAtivosTotal()),
+        }
 
 # Função para renderizar um rótulo de gráfico com estilo personalizado.
 def rotuloGrafico(texto: str) -> None:
@@ -385,25 +339,37 @@ def renderizarGraficoBolsas(*, ativos: int, bolsistas: int,) -> None:
 # Função principal para renderizar a tela do dashboard financeiro, incluindo indicadores, gráficos e seções.
 def telaDashboardFinanceiro():
     campus_id = obterCampusIdUsuario()
+    from modulos.dashboard.dashboard_geral_page import obterCursoIdUsuario
+    curso_id = obterCursoIdUsuario()
+    
     campus_nome = None
+    curso_nome = None
 
-    if campus_id is not None:
-        from database.Conexao import SessionLocal
-        from sqlalchemy import select
-        from database.entidades.Campus import Campus
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    from database.entidades.Campus import Campus
+    from database.entidades.Curso import Curso
 
-        with SessionLocal() as session:
+    with SessionLocal() as session:
+        if curso_id is not None:
+            curso_obj = session.execute(select(Curso).where(Curso.id == curso_id)).scalar_one_or_none()
+            if curso_obj:
+                curso_nome = curso_obj.nome
+        elif campus_id is not None:
             campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
             if campus_obj:
                 campus_nome = campus_obj.nome
 
+    if curso_nome:
+        desc = f"Visão geral das receitas, inadimplências e bolsas (Curso: {curso_nome})."
+    elif campus_nome:
+        desc = f"Visão geral das receitas, inadimplências e bolsas ({campus_nome})."
+    else:
+        desc = "Visão geral das receitas, inadimplências e bolsas da Rede Universitas."
+
     atualizar = renderizarCabecalhoDashboard(
         titulo="Financeiro",
-        descricao=(
-            "Visão geral das receitas, inadimplências e bolsas "
-            "da Rede Universitas." if campus_nome is None else
-            f"Visão geral das receitas, inadimplências e bolsas ({campus_nome})."
-        ),
+        descricao=desc,
         prefixo_chave="dashboard_financeiro",
     )
 
@@ -415,7 +381,7 @@ def telaDashboardFinanceiro():
             "Carregando indicadores..."
         ):
             dados = (
-                carregarIndicadoresFinanceiros(campus_id)
+                carregarIndicadoresFinanceiros(campus_id=campus_id, curso_id=curso_id)
             )
 
     except Exception as erro:
