@@ -123,104 +123,214 @@ def listarAlunosBaixoDesempenhoPorCurso(idCurso: int):
 # \_|    |_||_| |_| \__,_||_| |_| \___| \___||_||_|    \___/ 
 
 # Calcula o valor recebido total
-def calcularReceitaTotal():
-    return dbCalcularReceita()
+def calcularReceitaTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularReceita(dataIni=dataIni, dataFim=dataFim)
 
-def calcularReceitaPorCampus(idCampus: int):
-    return dbCalcularReceita(idCampus=idCampus)
+def calcularReceitaPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularReceita(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def calcularReceitaPorCurso(idCurso: int):
-    return dbCalcularReceita(idCurso=idCurso)
+def calcularReceitaPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularReceita(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Calcula o valor a receber total
-def cacularTotalAReceberGeral():
-    return dbCalcularTotalAReceber()
+def cacularTotalAReceberGeral(
+        dataIni: date | None = None,
+        dataFim: date | None = None    
+    ):
+    return dbCalcularTotalAReceber(dataIni=dataIni, dataFim=dataFim)
 
-def cacularTotalAReceberPorCampus(idCampus: int):
-    return dbCalcularTotalAReceber(idCampus=idCampus)
+def cacularTotalAReceberPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTotalAReceber(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def cacularTotalAReceberPorCurso(idCurso: int):
-    return dbCalcularTotalAReceber(idCurso=idCurso)
+def cacularTotalAReceberPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTotalAReceber(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Retorna a quantidade de alunos inadimplentes
-def alunosInadimplentesTotal():
-    return dbContarAlunosInadimplentes()
+def alunosInadimplentesTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarAlunosInadimplentes(dataIni=dataIni, dataFim=dataFim)
 
-def alunosInadimplentesPorCampus(idCampus: int):
-    return dbContarAlunosInadimplentes(idCampus=idCampus)
+def alunosInadimplentesPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarAlunosInadimplentes(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def alunosInadimplentesPorCurso(idCurso: int):
-    return dbContarAlunosInadimplentes(idCurso=idCurso)
+def alunosInadimplentesPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarAlunosInadimplentes(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Calcula a taxa de inadimplencia (saída em porcentagem)
-def taxaInadimplenciaGeral():
-    return dbCalcularTaxaInadimplencia() * 100
+def taxaInadimplenciaGeral(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaInadimplencia(dataIni=dataIni, dataFim=dataFim) * 100
 
-def taxaInadimplenciaPorCampus(idCampus: int):
-    return dbCalcularTaxaInadimplencia(idCampus=idCampus) * 100
+def taxaInadimplenciaPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaInadimplencia(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim) * 100
 
-def taxaInadimplenciaPorCurso(idCurso: int):
-    return dbCalcularTaxaInadimplencia(idCurso=idCurso) * 100
+def taxaInadimplenciaPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaInadimplencia(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim) * 100
 
 # Calcula o valor monetário não pago por inadimplencia
-def valorTotalInadimplente():
-    return dbCalcularValorTotalInadimplente()
+def valorTotalInadimplente(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorTotalInadimplente(dataIni=dataIni, dataFim=dataFim)
 
-def valorTotalInadimplentePorCampus(idCampus: int):
-    return dbCalcularValorTotalInadimplente(idCampus=idCampus)
+def valorTotalInadimplentePorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorTotalInadimplente(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def valorTotalInadimplentePorCurso(idCurso: int):
-    return dbCalcularValorTotalInadimplente(idCurso=idCurso)
+def valorTotalInadimplentePorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorTotalInadimplente(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Retorna a quantidade de mensalidades vencidas
-def mensalidadesVencidasTotal():
-    return dbContarMensalidadesVencidas()
+def mensalidadesVencidasTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarMensalidadesVencidas(dataIni=dataIni, dataFim=dataFim)
 
-def mensalidadesVencidasPorCampus(idCampus: int):
-    return dbContarMensalidadesVencidas(idCampus=idCampus)
+def mensalidadesVencidasPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarMensalidadesVencidas(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def mensalidadesVencidasPorCurso(idCurso: int):
-    return dbContarMensalidadesVencidas(idCurso=idCurso)
+def mensalidadesVencidasPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarMensalidadesVencidas(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Calcula a divida média (inadimplente) por aluno
-def dividaMediaTotal():
-    return dbCalcularDividaMedia()
+def dividaMediaTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularDividaMedia(dataIni=dataIni, dataFim=dataFim)
 
-def dividaMediaPorCampus(idCampus: int):
-    return dbCalcularDividaMedia(idCampus=idCampus)
+def dividaMediaPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularDividaMedia(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def dividaMediaPorCurso(idCurso: int):
-    return dbCalcularDividaMedia(idCurso=idCurso)
+def dividaMediaPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularDividaMedia(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Retorna a quantidade de alunos com bolsa ativa
-def alunosBolsistasTotal():
-    return dbContarBolsistas()
+def alunosBolsistasTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarBolsistas(dataIni=dataIni, dataFim=dataFim)
 
-def alunosBolsistasPorCampus(idCampus: int):
-    return dbContarBolsistas(idCampus=idCampus)
+def alunosBolsistasPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarBolsistas(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def alunosBolsistasPorCurso(idCurso: int):
-    return dbContarBolsistas(idCurso=idCurso)
+def alunosBolsistasPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbContarBolsistas(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Calcula o percentual de bolsistas com bolsa ativa em relação aos alunos ativos
-def taxaBolsistaGeral():
-    return dbCalcularTaxaBolsistas()
+def taxaBolsistaGeral(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaBolsistas(dataIni=dataIni, dataFim=dataFim)
 
-def taxaBolsistaPorCampus(idCampus: int):
-    return dbCalcularTaxaBolsistas(idCampus=idCampus)
+def taxaBolsistaPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaBolsistas(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def taxaBolsistaPorCurso(idCurso: int):
-    return dbCalcularTaxaBolsistas(idCurso=idCurso)
+def taxaBolsistaPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularTaxaBolsistas(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 # Calcula o valor monetário total "perdido" por causa de bolsas
-def valorConcedidoPorBolsaTotal():
-    return dbCalcularValorConcedidoPorBolsas()
+def valorConcedidoPorBolsaTotal(
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorConcedidoPorBolsas(dataIni=dataIni, dataFim=dataFim)
 
-def valorConcedidoPorBolsaPorCampus(idCampus: int):
-    return dbCalcularValorConcedidoPorBolsas(idCampus=idCampus)
+def valorConcedidoPorBolsaPorCampus(
+        idCampus: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorConcedidoPorBolsas(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
-def valorConcedidoPorBolsaPorCurso(idCurso: int):
-    return dbCalcularValorConcedidoPorBolsas(idCurso=idCurso)
+def valorConcedidoPorBolsaPorCurso(
+        idCurso: int,
+        dataIni: date | None = None,
+        dataFim: date | None = None
+    ):
+    return dbCalcularValorConcedidoPorBolsas(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
 
 #  _____                                  _                       _ 

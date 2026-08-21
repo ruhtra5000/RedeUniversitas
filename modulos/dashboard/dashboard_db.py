@@ -243,7 +243,9 @@ def dbAlunosBaixoDesempenho(
 
 def dbCalcularReceita(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
     with SessionLocal() as session:
         query = (
@@ -252,20 +254,27 @@ def dbCalcularReceita(
             .join(Mensalidade.aluno)
             .where(ContaReceber.data_pagamento.is_not(None))
         )
-        
+
+        # Filtro de campus e curso
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
     
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
-                
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(ContaReceber.data_pagamento.between(dataIni, dataFim))
+           
         receita = session.scalar(query)
         
         return receita
 
 def dbCalcularTotalAReceber(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
     with SessionLocal() as session:
         query = (
@@ -274,12 +283,17 @@ def dbCalcularTotalAReceber(
             .join(Mensalidade.aluno)
             .where(ContaReceber.data_pagamento.is_(None))
         )
-            
+
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
         
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(ContaReceber.data_vencimento.between(dataIni, dataFim))
                     
         receita = session.scalar(query)
             
@@ -287,25 +301,41 @@ def dbCalcularTotalAReceber(
 
 def dbContarAlunosInadimplentes(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
-    hoje = date.today()
-
     with SessionLocal() as session:
         query = (
             select(func.count(Aluno.pessoa_id.distinct()))
             .join(Aluno.mensalidades)
-            .where(
-                Mensalidade.data_vencimento < hoje, 
-                Mensalidade.foi_paga == False
-            )
+            .join(Mensalidade.contareceber)
         )
 
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
         
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(
+                Mensalidade.data_vencimento.between(dataIni, dataFim),
+                or_(
+                    ContaReceber.data_pagamento.is_(None),
+                    ContaReceber.data_pagamento > ContaReceber.data_vencimento
+                )
+            )
+        # Sem filtro de data
+        else:
+            hoje = date.today()
+            query = query.where(
+                Mensalidade.data_vencimento < hoje,
+                Mensalidade.foi_paga == False
+            )
+
 
         qtdeAlunos = session.scalar(query)
 
@@ -313,21 +343,24 @@ def dbContarAlunosInadimplentes(
 
 def dbCalcularTaxaInadimplencia(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
     with SessionLocal() as session:
         query = select(func.count(Aluno.pessoa_id))
 
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
-            qtdeInad = dbContarAlunosInadimplentes(idCampus=idCampus)
+            qtdeInad = dbContarAlunosInadimplentes(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
-            qtdeInad = dbContarAlunosInadimplentes(idCurso=idCurso)
+            qtdeInad = dbContarAlunosInadimplentes(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
             
         else:
-            qtdeInad = dbContarAlunosInadimplentes()
+            qtdeInad = dbContarAlunosInadimplentes(dataIni=dataIni, dataFim=dataFim)
 
         qtdeAlunos = session.scalar(query) or 0
         qtdeInad = qtdeInad or 0
@@ -339,25 +372,40 @@ def dbCalcularTaxaInadimplencia(
 
 def dbCalcularValorTotalInadimplente(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
-    hoje = date.today()
-
     with SessionLocal() as session:
         query = (
             select(func.coalesce(func.sum(Mensalidade.valor), 0))
             .join(Mensalidade.aluno)
-            .where(
-                Mensalidade.data_vencimento < hoje, 
-                Mensalidade.foi_paga == False
-            )
+            .join(Mensalidade.contareceber)
         )
 
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
         
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(
+                Mensalidade.data_vencimento.between(dataIni, dataFim),
+                or_(
+                    ContaReceber.data_pagamento.is_(None),
+                    ContaReceber.data_pagamento > ContaReceber.data_vencimento
+                )
+            )
+        # Sem filtro de data
+        else:
+            hoje = date.today()
+            query = query.where(
+                Mensalidade.data_vencimento < hoje,
+                Mensalidade.foi_paga == False
+            )
 
         valorTotal = session.scalar(query)
 
@@ -365,25 +413,40 @@ def dbCalcularValorTotalInadimplente(
 
 def dbContarMensalidadesVencidas(
         idCampus: int | None = None,
-        idCurso: int | None = None 
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):  
-    hoje = date.today()
-
     with SessionLocal() as session:
         query = (
             select(func.count(Mensalidade.id))
             .join(Mensalidade.aluno)
-            .where(
-                Mensalidade.data_vencimento < hoje, 
-                Mensalidade.foi_paga == False
-            )
+            .join(Mensalidade.contareceber)
         )
 
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
         
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(
+                Mensalidade.data_vencimento.between(dataIni, dataFim),
+                or_(
+                    ContaReceber.data_pagamento.is_(None),
+                    ContaReceber.data_pagamento > ContaReceber.data_vencimento
+                )
+            )
+        # Sem filtro de data
+        else:
+            hoje = date.today()
+            query = query.where(
+                Mensalidade.data_vencimento < hoje,
+                Mensalidade.foi_paga == False
+            )
 
         qtdeTotal = session.scalar(query)
 
@@ -391,19 +454,23 @@ def dbContarMensalidadesVencidas(
 
 def dbCalcularDividaMedia(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
+
+    # Filtro de campus e curso 
     if idCampus is not None:
-        valorTotal = dbCalcularValorTotalInadimplente(idCampus=idCampus)
-        qtdeAlunosInad = dbContarAlunosInadimplentes(idCampus=idCampus)
+        valorTotal = dbCalcularValorTotalInadimplente(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
+        qtdeAlunosInad = dbContarAlunosInadimplentes(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
         
     elif idCurso is not None: 
-        valorTotal = dbCalcularValorTotalInadimplente(idCurso=idCurso)
-        qtdeAlunosInad = dbContarAlunosInadimplentes(idCurso=idCurso)
+        valorTotal = dbCalcularValorTotalInadimplente(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
+        qtdeAlunosInad = dbContarAlunosInadimplentes(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
 
     else:
-        valorTotal = dbCalcularValorTotalInadimplente()
-        qtdeAlunosInad = dbContarAlunosInadimplentes()
+        valorTotal = dbCalcularValorTotalInadimplente(dataIni=dataIni, dataFim=dataFim)
+        qtdeAlunosInad = dbContarAlunosInadimplentes(dataIni=dataIni, dataFim=dataFim)
 
     valorTotal = valorTotal or 0
     qtdeAlunosInad = qtdeAlunosInad or 0
@@ -415,7 +482,9 @@ def dbCalcularDividaMedia(
 
 def dbContarBolsistas(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
     with SessionLocal() as session:
         query = (
@@ -423,12 +492,20 @@ def dbContarBolsistas(
             .join(Aluno.bolsas)
             .where(Bolsa.status == StatusBolsa.ATIVA)
         )
-        
+
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
     
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(
+                Bolsa.data_inicio <= dataFim,
+                Bolsa.data_fim >= dataIni
+            )
                 
         qtdeBolsistas = session.scalar(query)
         
@@ -436,19 +513,22 @@ def dbContarBolsistas(
 
 def dbCalcularTaxaBolsistas(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
+    # Filtro de campus e curso 
     if idCampus is not None:
         qtdeAlunos = dbContarAlunosAtivos(idCampus=idCampus)
-        qtdeBolsistas = dbContarBolsistas(idCampus=idCampus)
+        qtdeBolsistas = dbContarBolsistas(idCampus=idCampus, dataIni=dataIni, dataFim=dataFim)
 
     elif idCurso is not None: 
         qtdeAlunos = dbContarAlunosAtivos(idCurso=idCurso)
-        qtdeBolsistas = dbContarBolsistas(idCurso=idCurso)
+        qtdeBolsistas = dbContarBolsistas(idCurso=idCurso, dataIni=dataIni, dataFim=dataFim)
             
     else:
         qtdeAlunos = dbContarAlunosAtivos()
-        qtdeBolsistas = dbContarBolsistas()
+        qtdeBolsistas = dbContarBolsistas(dataIni=dataIni, dataFim=dataFim)
 
     qtdeBolsistas = qtdeBolsistas or 0
     qtdeAlunos = qtdeAlunos or 0
@@ -460,7 +540,9 @@ def dbCalcularTaxaBolsistas(
 
 def dbCalcularValorConcedidoPorBolsas(
         idCampus: int | None = None,
-        idCurso: int | None = None
+        idCurso: int | None = None,
+        dataIni: date | None = None,
+        dataFim: date | None = None,
     ):
     with SessionLocal() as session:
         query = (
@@ -472,12 +554,20 @@ def dbCalcularValorConcedidoPorBolsas(
                 Aluno.status == StatusAluno.ATIVO
             )
         )
-        
+
+        # Filtro de campus e curso 
         if idCampus is not None:
             query = query.where(Aluno.campus_id == idCampus)
     
         elif idCurso is not None:
             query = query.where(Aluno.curso_id == idCurso)
+
+        # Filtro de data
+        if dataIni is not None and dataFim is not None:
+            query = query.where(
+                Bolsa.data_inicio <= dataFim,
+                Bolsa.data_fim >= dataIni
+            )
                 
         totalConcedido = session.scalar(query)
         
