@@ -8,6 +8,58 @@ import streamlit as st
 from modulos.dashboard import dashboard_service
 from modulos.utils.dashboard_visual import (ItemDistribuicao, MetricaDashboard, criarSecaoDashboard, formatarInteiro, formatarPercentual, paraNumero, renderizarCabecalhoDashboard, renderizarDistribuicaoStatus, renderizarMetricasDashboard)
 
+def obterCampusIdUsuario():
+    pessoa_id = st.session_state.get("pessoa_id")
+    roles = st.session_state.get("roles", [])
+    
+    if not pessoa_id:
+        return None
+        
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    
+    with SessionLocal() as session:
+        if "REITOR" in roles:
+            from database.entidades.Campus import Campus
+            campus = session.execute(select(Campus).where(Campus.reitor_id == pessoa_id)).scalar_one_or_none()
+            if campus: return campus.id
+            
+        if "ADMIN" in roles:
+            return None
+            
+        if "ALMOXARIFE" in roles:
+            from database.entidades.Almoxarife import Almoxarife
+            almox = session.execute(select(Almoxarife).where(Almoxarife.pessoa_id == pessoa_id)).scalar_one_or_none()
+            if almox: return almox.campus_id
+            
+        if "FINANCEIRO" in roles:
+            from database.entidades.Financeiro import Financeiro
+            fin = session.execute(select(Financeiro).where(Financeiro.pessoa_id == pessoa_id)).scalar_one_or_none()
+            if fin: return fin.campus_id
+            
+    return None
+
+def obterCursoIdUsuario():
+    pessoa_id = st.session_state.get("pessoa_id")
+    roles = st.session_state.get("roles", [])
+    
+    if not pessoa_id:
+        return None
+        
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    
+    with SessionLocal() as session:
+        if "COORDENADOR" in roles:
+            from database.entidades.Curso import Curso
+            curso = session.execute(select(Curso).where(Curso.coordenador_id == pessoa_id)).scalar_one_or_none()
+            if curso: return curso.id
+            
+        if "ADMIN" in roles:
+            return None
+            
+    return None
+
 # Cores
 COR_ATIVO = "#54b68a"
 COR_TRANCADO = "#d4a84f"
@@ -44,11 +96,19 @@ def obterStatusAluno(aluno: Any) -> str:
     return normalizarTexto(status)
 
 # Função para contar o número de alunos com curso trancado.
-def contarTrancados() -> tuple[float, str | None]:
-    contar = getattr(dashboard_service, "alunosTrancadosTotal", None)
+def contarTrancados(campus_id: int | None = None, curso_id: int | None = None) -> tuple[float, str | None]:
+    if curso_id is not None:
+        contar = getattr(dashboard_service, "alunosTrancadosPorCurso", None)
+        args = (curso_id,)
+    elif campus_id is not None:
+        contar = getattr(dashboard_service, "alunosTrancadosPorCampus", None)
+        args = (campus_id,)
+    else:
+        contar = getattr(dashboard_service, "alunosTrancadosTotal", None)
+        args = ()
 
     if callable(contar):
-        return paraNumero(contar()), None
+        return paraNumero(contar(*args)), None
 
     try:
         academico_service = import_module(
@@ -81,19 +141,42 @@ def contarTrancados() -> tuple[float, str | None]:
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os indicadores gerais do dashboard, incluindo ativos, trancados, formados, evadidos, professores, cursos e taxa de evasão.
-def carregarIndicadoresGerais() -> dict[str, Any]:
-    trancados, aviso_trancados = contarTrancados()
+def carregarIndicadoresGerais(campus_id: int | None = None, curso_id: int | None = None) -> dict[str, Any]:
+    trancados, aviso_trancados = contarTrancados(campus_id=campus_id, curso_id=curso_id)
 
-    return {
-        "ativos": paraNumero(dashboard_service.alunosAtivosTotal()),
-        "trancados": trancados,
-        "formados": paraNumero(dashboard_service.alunosFormadosTotal()),
-        "evadidos": paraNumero(dashboard_service.alunosEvadidosTotal()),
-        "professores": paraNumero(dashboard_service.professoresTotal()),
-        "cursos": paraNumero(dashboard_service.cursosTotal()),
-        "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoGeral()),
-        "aviso_trancados": aviso_trancados,
-    }
+    if curso_id is not None:
+        return {
+            "ativos": paraNumero(dashboard_service.alunosAtivosPorCurso(curso_id)),
+            "trancados": trancados, # You can modify contarTrancados for course later, keeping it general/campus for now or fixing if needed.
+            "formados": paraNumero(dashboard_service.alunosFormadosPorCurso(curso_id)),
+            "evadidos": paraNumero(dashboard_service.alunosEvadidosPorCurso(curso_id)),
+            "professores": paraNumero(dashboard_service.professoresPorCurso(curso_id)),
+            "cursos": 1,
+            "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoPorCurso(curso_id)),
+            "aviso_trancados": aviso_trancados,
+        }
+    elif campus_id is not None:
+        return {
+            "ativos": paraNumero(dashboard_service.alunosAtivosPorCampus(campus_id)),
+            "trancados": trancados,
+            "formados": paraNumero(dashboard_service.alunosFormadosPorCampus(campus_id)),
+            "evadidos": paraNumero(dashboard_service.alunosEvadidosPorCampus(campus_id)),
+            "professores": paraNumero(dashboard_service.professoresPorCampus(campus_id)),
+            "cursos": paraNumero(dashboard_service.cursosPorCampus(campus_id)),
+            "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoPorCampus(campus_id)),
+            "aviso_trancados": aviso_trancados,
+        }
+    else:
+        return {
+            "ativos": paraNumero(dashboard_service.alunosAtivosTotal()),
+            "trancados": trancados,
+            "formados": paraNumero(dashboard_service.alunosFormadosTotal()),
+            "evadidos": paraNumero(dashboard_service.alunosEvadidosTotal()),
+            "professores": paraNumero(dashboard_service.professoresTotal()),
+            "cursos": paraNumero(dashboard_service.cursosTotal()),
+            "taxa_evasao": paraNumero(dashboard_service.taxaEvasaoGeral()),
+            "aviso_trancados": aviso_trancados,
+        }
 
 # Função para renderizar o gráfico de situação dos alunos, mostrando a distribuição percentual de alunos ativos, trancados, formados e evadidos.
 def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
@@ -143,13 +226,18 @@ def renderizarGraficoSituacaoAluno(status: list[ItemDistribuicao]) -> None:
         ],
     )
 
-# Função para renderizar o gráfico de estrutura acadêmica, mostrando a quantidade de alunos, professores e cursos na rede.
+# Função para renderizar o gráfico de estrutura acadêmica como donut chart, mostrando a proporção entre alunos, professores e cursos.
 def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: int) -> None:
-    from modulos.utils.dashboard_graficos import renderizarGraficoBarras
+    from modulos.utils.dashboard_graficos import rotuloGrafico
+
+    total = total_alunos + professores + cursos
+
+    if total <= 0:
+        return
 
     dados = pd.DataFrame(
         {
-            "Indicador": [
+            "Categoria": [
                 "Alunos",
                 "Professores",
                 "Cursos",
@@ -162,40 +250,83 @@ def renderizarGraficoEstrutura(*, total_alunos: int, professores: int, cursos: i
         }
     )
 
-    if int(dados["Quantidade"].sum()) <= 0:
-        return
+    dados["Percentual"] = (dados["Quantidade"] / total * 100).round(1)
 
-    ordem = [
-        "Alunos",
-        "Professores",
-        "Cursos",
-    ]
-
-    renderizarGraficoBarras(
-        dados,
-        categoria="Indicador",
-        valor="Quantidade",
-        titulo="Estrutura em números",
-        ordem=ordem,
-        cores={
-            "Alunos": "#C49A4A",
-            "Professores": "#6f8fd3",
-            "Cursos": "#8d7fd1",
-        },
-        inteiro=True,
-        tooltip=[
-            alt.Tooltip("Indicador:N", title="Indicador"),
-            alt.Tooltip("Quantidade:Q", title="Quantidade"),
-        ],
+    grafico = (
+        alt.Chart(dados)
+        .mark_arc(
+            innerRadius=78,
+            outerRadius=125,
+            stroke=None,
+        )
+        .encode(
+            theta=alt.Theta(
+                "Quantidade:Q",
+                stack=True,
+            ),
+            color=alt.Color(
+                "Categoria:N",
+                scale=alt.Scale(
+                    domain=["Alunos", "Professores", "Cursos"],
+                    range=["#C49A4A", "#6f8fd3", "#8d7fd1"],
+                ),
+                legend=alt.Legend(
+                    orient="right",
+                    labelColor="#8FA0B6",
+                    labelFontSize=10,
+                    symbolSize=90,
+                    symbolType="circle",
+                    title=None,
+                    rowPadding=6,
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("Categoria:N", title="Categoria"),
+                alt.Tooltip("Quantidade:Q", title="Quantidade", format=",d"),
+                alt.Tooltip("Percentual:Q", title="Participação (%)", format=".1f"),
+            ],
+        )
+        .properties(height=290)
+        .configure_view(stroke=None)
+        .configure(background="transparent")
     )
+
+    rotuloGrafico("Composição estrutural")
+    st.altair_chart(grafico, use_container_width=True, theme=None)
 
 # Função principal para renderizar a tela do dashboard geral, exibindo indicadores de alunos, professores e cursos, bem como gráficos de situação e estrutura acadêmica.
 def telaDashboardGeral():
+    campus_id = obterCampusIdUsuario()
+    curso_id = obterCursoIdUsuario()
+    
+    campus_nome = None
+    curso_nome = None
+    
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    from database.entidades.Campus import Campus
+    from database.entidades.Curso import Curso
+
+    with SessionLocal() as session:
+        if curso_id is not None:
+            curso_obj = session.execute(select(Curso).where(Curso.id == curso_id)).scalar_one_or_none()
+            if curso_obj:
+                curso_nome = curso_obj.nome
+        elif campus_id is not None:
+            campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
+            if campus_obj:
+                campus_nome = campus_obj.nome
+
+    if curso_nome:
+        desc = f"Resumo dos vínculos acadêmicos e da estrutura atual (Curso: {curso_nome})."
+    elif campus_nome:
+        desc = f"Resumo dos vínculos acadêmicos e da estrutura atual ({campus_nome})."
+    else:
+        desc = "Resumo dos vínculos acadêmicos e da estrutura atual da Rede Universitas."
+
     atualizar = renderizarCabecalhoDashboard(
         titulo="Geral",
-        descricao=(
-            "Resumo dos vínculos acadêmicos e da estrutura atual da Rede Universitas."
-        ),
+        descricao=desc,
         prefixo_chave="dashboard_geral",
     )
 
@@ -204,7 +335,7 @@ def telaDashboardGeral():
 
     try:
         with st.spinner("Carregando indicadores..."):
-            dados = carregarIndicadoresGerais()
+            dados = carregarIndicadoresGerais(campus_id=campus_id, curso_id=curso_id)
     except Exception as erro:
         st.error("Não foi possível carregar os indicadores gerais.")
         st.caption(f"Detalhes técnicos: {erro}")
@@ -306,53 +437,61 @@ def telaDashboardGeral():
     )
 
     with secao_estrutura:
-        renderizarMetricasDashboard(
-            [
-                MetricaDashboard(
-                    "Professores",
-                    formatarInteiro(professores),
-                    "Docentes atualmente vinculados à rede.",
-                    "#6f8fd3",
-                    "PR",
-                ),
-                MetricaDashboard(
-                    "Cursos",
-                    formatarInteiro(cursos),
-                    "Cursos cadastrados e disponíveis na rede.",
-                    "#8d7fd1",
-                    "CU",
-                ),
-                MetricaDashboard(
-                    "Alunos por professor",
-                    (
-                        f"{alunos_por_professor:.1f}".replace(".", ",")
-                        if alunos_por_professor is not None
-                        else "—"
-                    ),
-                    "Relação média entre vínculos envolvendo discentes e docentes.",
-                    "#54a3c7",
-                    "AP",
-                ),
-                MetricaDashboard(
-                    "Alunos por curso",
-                    (
-                        f"{alunos_por_curso:.1f}".replace(".", ",")
-                        if alunos_por_curso is not None
-                        else "—"
-                    ),
-                    "Quantidade média de alunos por curso cadastrado.",
-                    "#b383d9",
-                    "AC",
-                ),
-            ],
-            colunas=4,
+        col_cards, col_grafico = st.columns(
+            [1, 1],
+            gap="large",
+            vertical_alignment="center",
         )
 
-        renderizarGraficoEstrutura(
-            total_alunos=total_alunos,
-            professores=professores,
-            cursos=cursos,
-        )
+        with col_cards:
+            renderizarMetricasDashboard(
+                [
+                    MetricaDashboard(
+                        "Professores",
+                        formatarInteiro(professores),
+                        "Docentes atualmente vinculados à rede.",
+                        "#6f8fd3",
+                        "PR",
+                    ),
+                    MetricaDashboard(
+                        "Cursos",
+                        formatarInteiro(cursos),
+                        "Cursos cadastrados e disponíveis na rede.",
+                        "#8d7fd1",
+                        "CU",
+                    ),
+                    MetricaDashboard(
+                        "Alunos por professor",
+                        (
+                            f"{alunos_por_professor:.1f}".replace(".", ",")
+                            if alunos_por_professor is not None
+                            else "—"
+                        ),
+                        "Relação média entre vínculos envolvendo discentes e docentes.",
+                        "#54a3c7",
+                        "AP",
+                    ),
+                    MetricaDashboard(
+                        "Alunos por curso",
+                        (
+                            f"{alunos_por_curso:.1f}".replace(".", ",")
+                            if alunos_por_curso is not None
+                            else "—"
+                        ),
+                        "Quantidade média de alunos por curso cadastrado.",
+                        "#b383d9",
+                        "AC",
+                    ),
+                ],
+                colunas=2,
+            )
+
+        with col_grafico:
+            renderizarGraficoEstrutura(
+                total_alunos=total_alunos,
+                professores=professores,
+                cursos=cursos,
+            )
 
     if dados["aviso_trancados"]:
         st.caption(dados["aviso_trancados"])

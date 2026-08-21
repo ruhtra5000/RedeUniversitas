@@ -163,8 +163,10 @@ def get_navigation():
         ]
     }
 
-    if "ADMIN" in roles:
+    if "ADMIN" in roles or "REITOR" in roles:
         pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page, dashboard_operacional_page]
+    elif "COORDENADOR" in roles:
+        pages["Dashboards"] = [dashboard_geral_page, dashboard_academico_page, dashboard_financeiro_page]
 
     # Aluno
     if "ALUNO" in roles:
@@ -246,6 +248,11 @@ def get_navigation():
 
     # Financeiro
     if "FINANCEIRO" in roles and "ADMIN" not in roles:
+        if "Dashboards" not in pages:
+            pages["Dashboards"] = []
+        if dashboard_financeiro_page not in pages["Dashboards"]:
+            pages["Dashboards"].append(dashboard_financeiro_page)
+            
         if cadastro_compra not in cadastros_list:
             cadastros_list.append(cadastro_compra)
         if cadastro_fornecedor not in cadastros_list:
@@ -255,6 +262,11 @@ def get_navigation():
 
     # Almoxarife
     if "ALMOXARIFE" in roles and "ADMIN" not in roles:
+        if "Dashboards" not in pages:
+            pages["Dashboards"] = []
+        if dashboard_operacional_page not in pages["Dashboards"]:
+            pages["Dashboards"].append(dashboard_operacional_page)
+
         if cadastro_estoque not in cadastros_list:
             cadastros_list.append(cadastro_estoque)
 

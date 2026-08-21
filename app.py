@@ -77,6 +77,12 @@ def verificarLogin():
                 reitor_campus = session.execute(select(Campus).where(Campus.reitor_id == pessoa.id)).scalar_one_or_none()
                 if reitor_campus:
                     roles.append("REITOR")
+                
+                # Verifica se é coordenador de algum curso
+                from database.entidades.Curso import Curso
+                coordenador_curso = session.execute(select(Curso).where(Curso.coordenador_id == pessoa.id)).scalar_one_or_none()
+                if coordenador_curso:
+                    roles.append("COORDENADOR")
 
             if pessoa.almoxarife: roles.append("ALMOXARIFE")
             if pessoa.aluno: roles.append("ALUNO")

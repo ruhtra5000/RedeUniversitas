@@ -123,13 +123,13 @@ def dbContarProfessores(
         idCurso: int | None = None
     ):
     with SessionLocal() as session:
-        query = select(func.count(Professor.pessoa_id))
-
-        if idCampus is not None:
-            query = query.where(Professor.campus_id == idCampus)
-
-        elif idCurso is not None: 
-            query = query.where(Professor.curso_id == idCurso)
+        if idCurso is not None:
+            from database.entidades.Turma import Turma
+            query = select(func.count(func.distinct(Turma.professor_id))).where(Turma.curso_id == idCurso)
+        else:
+            query = select(func.count(Professor.pessoa_id))
+            if idCampus is not None:
+                query = query.where(Professor.campus_id == idCampus)
 
         qtdeProfessores = session.scalar(query)
 
@@ -219,8 +219,11 @@ def dbAlunosBaixoDesempenho(
             .scalar_subquery()
         )
 
-        query = select(Aluno).where(
-            or_(Aluno.coef_rend < 5.5, reprovacoes >= 3)
+        query = (
+            select(Aluno, reprovacoes.label("reprovacoes"))
+            .where(
+                or_(Aluno.coef_rend < 5.5, reprovacoes >= 3)
+            )
         )
     
         if idCampus is not None:
@@ -229,9 +232,9 @@ def dbAlunosBaixoDesempenho(
         elif idCurso is not None: 
             query = query.where(Aluno.curso_id == idCurso)
     
-        alunos = session.execute(query).scalars().all()
+        resultado = session.execute(query).all()
     
-        return alunos
+        return resultado
 
 
 # ______  _                                   _              

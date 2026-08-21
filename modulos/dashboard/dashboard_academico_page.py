@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 from modulos.dashboard import dashboard_service
 from modulos.utils.dashboard_visual import (ItemDistribuicao, MetricaDashboard, criarSecaoDashboard, formatarDecimal, formatarInteiro, formatarPercentual, paraNumero, renderizarCabecalhoDashboard, renderizarEstadoVazio, renderizarDistribuicaoStatus, renderizarMetricasDashboard)
+from modulos.dashboard.dashboard_geral_page import obterCampusIdUsuario
 
 # CORES E ORDEM
 ORDEM_DESEMPENHO = ["Excelente", "Bom", "Regular", "Ruim"]
@@ -268,22 +269,30 @@ def normalizarAlunosBaixoDesempenho(dados: Any) -> pd.DataFrame:
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar o coeficiente de rendimento médio (CR) total, utilizando cache para otimização.
-def carregarCrMedio() -> float:
-    return paraNumero(dashboard_service.crMedioTotal())
+def carregarCrMedio(campus_id: int | None = None, curso_id: int | None = None) -> float:
+    if curso_id is not None:
+        return paraNumero(dashboard_service.crMedioCurso(curso_id))
+    if campus_id is None:
+        return paraNumero(dashboard_service.crMedioTotal())
+    return paraNumero(dashboard_service.crMedioPorCampus(campus_id))
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os dados de desempenho dos alunos, utilizando cache para otimização.
-def carregarDesempenho() -> pd.DataFrame:
-    return normalizarDesempenho(
-        dashboard_service.agruparAlunosDesempenhoGeral()
-    )
+def carregarDesempenho(campus_id: int | None = None, curso_id: int | None = None) -> pd.DataFrame:
+    if curso_id is not None:
+        return normalizarDesempenho(dashboard_service.agruparAlunosDesempenhoPorCurso(curso_id))
+    if campus_id is None:
+        return normalizarDesempenho(dashboard_service.agruparAlunosDesempenhoGeral())
+    return normalizarDesempenho(dashboard_service.agruparAlunosDesempenhoPorCampus(campus_id))
 
 @st.cache_data(ttl=60, show_spinner=False)
 # Função para carregar os dados de alunos com baixo desempenho, utilizando cache para otimização.
-def carregarBaixoDesempenho() -> pd.DataFrame:
-    return normalizarAlunosBaixoDesempenho(
-        dashboard_service.listarAlunosBaixoDesempenhoGeral()
-    )
+def carregarBaixoDesempenho(campus_id: int | None = None, curso_id: int | None = None) -> pd.DataFrame:
+    if curso_id is not None:
+        return normalizarAlunosBaixoDesempenho(dashboard_service.listarAlunosBaixoDesempenhoPorCurso(curso_id))
+    if campus_id is None:
+        return normalizarAlunosBaixoDesempenho(dashboard_service.listarAlunosBaixoDesempenhoGeral())
+    return normalizarAlunosBaixoDesempenho(dashboard_service.listarAlunosBaixoDesempenhoPorCampus(campus_id))
 
 # Função para renderizar o gráfico de desempenho dos alunos, utilizando Altair para visualização.
 def renderizarGraficoDesempenho(faixas: list[ItemDistribuicao]) -> None:
@@ -381,13 +390,38 @@ def renderizarGraficoAcompanhamento(*, cr_baixo: int, muitas_reprovacoes: int, a
 
 # Função principal para renderizar a tela do dashboard acadêmico, incluindo métricas, gráficos e tabelas de desempenho dos alunos.
 def telaDashboardAcademico():
+    campus_id = obterCampusIdUsuario()
+    from modulos.dashboard.dashboard_geral_page import obterCursoIdUsuario
+    curso_id = obterCursoIdUsuario()
+    
+    campus_nome = None
+    curso_nome = None
+    
+    from database.Conexao import SessionLocal
+    from sqlalchemy import select
+    from database.entidades.Campus import Campus
+    from database.entidades.Curso import Curso
+
+    with SessionLocal() as session:
+        if curso_id is not None:
+            curso_obj = session.execute(select(Curso).where(Curso.id == curso_id)).scalar_one_or_none()
+            if curso_obj:
+                curso_nome = curso_obj.nome
+        elif campus_id is not None:
+            campus_obj = session.execute(select(Campus).where(Campus.id == campus_id)).scalar_one_or_none()
+            if campus_obj:
+                campus_nome = campus_obj.nome
+
+    if curso_nome:
+        desc = f"Rendimento dos alunos e situações que exigem acompanhamento da equipe acadêmica (Curso: {curso_nome})."
+    elif campus_nome:
+        desc = f"Rendimento dos alunos e situações que exigem acompanhamento da equipe acadêmica ({campus_nome})."
+    else:
+        desc = "Rendimento dos alunos e situações que exigem acompanhamento da equipe acadêmica da rede."
 
     atualizar = renderizarCabecalhoDashboard(
         titulo="Acadêmico",
-        descricao=(
-            "Rendimento dos alunos e situações que exigem acompanhamento da "
-            "equipe acadêmica."
-        ),
+        descricao=desc,
         prefixo_chave="dashboard_academico",
     )
 
@@ -420,17 +454,17 @@ def telaDashboardAcademico():
 
     with st.spinner("Carregando indicadores..."):
         try:
-            cr_medio = carregarCrMedio()
+            cr_medio = carregarCrMedio(campus_id=campus_id, curso_id=curso_id)
         except Exception as erro:
             erro_cr = erro
 
         try:
-            desempenho = carregarDesempenho()
+            desempenho = carregarDesempenho(campus_id=campus_id, curso_id=curso_id)
         except Exception as erro:
             erro_desempenho = erro
 
         try:
-            baixo_desempenho = carregarBaixoDesempenho()
+            baixo_desempenho = carregarBaixoDesempenho(campus_id=campus_id, curso_id=curso_id)
         except Exception as erro:
             erro_baixo_desempenho = erro
 

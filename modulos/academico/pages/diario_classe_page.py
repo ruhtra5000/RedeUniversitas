@@ -132,7 +132,7 @@ def telaDiarioClasse():
                     ),
                     "Total Aulas": totalAulas,
                     "Frequência %": (
-                        f"{matricula.frequencia_rel * 100:.1f}%"
+                        f"{matricula.frequencia_rel}%"
                         if matricula.frequencia_rel is not None
                         else "0.0%"
                     ),
